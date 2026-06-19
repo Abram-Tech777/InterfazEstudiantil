@@ -1,77 +1,76 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/fragments/head :: head('Gestión de Usuarios')"></head>
-<body class="bg-light">
+<head th:replace="~{/fragments/head :: head('Formulario de Usuario')}"></head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
 
-    <div th:replace="/fragments/menu :: menu"></div>
+    <div th:replace="~{/fragments/menu :: menu}"></div>
 
-    <div class="container mt-5">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h3 class="mb-0">Control de Usuarios y Accesos</h3>
-                <a th:href="@{/gestionusuarios/nuevo}" class="btn btn-light btn-sm fw-bold">+ Registrar Nuevo Usuario</a>
+    <main class="flex-grow flex items-center justify-center p-6">
+        <div class="w-full max-w-2xl bg-white rounded-xl shadow-lg overflow-hidden">
+            
+            <div class="bg-gray-800 text-white p-6">
+                <h4 class="text-xl font-bold" th:text="${usuario.idUsuario == 0} ? 'Registrar Nuevo Usuario' : 'Modificar Usuario'">Formulario</h4>
+                <p class="text-sm text-gray-300 mt-1">Completa los campos a continuación.</p>
             </div>
-            <div class="card-body">
 
-                <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show" role="alert">
-                    <span th:text="${mensajeExito}"></span>
-                    <button type="button" class="btn-close" onclick="this.parentElement.style.display='none';"></button>
-                </div>
+            <div class="p-8">
+                <form th:action="@{/gestionusuarios/guardar}" th:object="${usuario}" method="post" class="space-y-6">
+                    
+                    <input type="hidden" th:field="*{idUsuario}" />
+                    <input type="hidden" th:field="*{codUsuario}" />
 
-                <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <span th:text="${mensajeError}"></span>
-                    <button type="button" class="btn-close" onclick="this.parentElement.style.display='none';"></button>
-                </div>
+                    <div th:if="${usuario.idUsuario != 0}" class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-center mb-6">
+                        <label class="block text-sm font-bold text-gray-500 mb-1">Código de Acceso del Sistema</label>
+                        <span class="text-2xl font-black text-gray-800 tracking-wider" th:text="${usuario.codUsuario}"></span>
+                    </div>
 
-                <div class="table-responsive mt-3">
-                    <table class="table table-hover table-bordered align-middle">
-                        <thead class="table-dark text-center">
-                            <tr>
-                                <th style="width: 15%;">Código</th>
-                                <th>Nombre Completo</th>
-                                <th style="width: 15%;">Rol / Perfil</th>
-                                <th style="width: 15%;">Estado</th>
-                                <th style="width: 20%;">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:if="${#lists.isEmpty(usuarios)}">
-                                <td colspan="5" class="text-center text-muted py-4">No hay usuarios registrados en el sistema.</td>
-                            </tr>
-                            
-                            <tr th:each="u : ${usuarios}" class="text-center">
-                                <td th:text="${u.codUsuario}" class="fw-bold text-primary"></td>
-                                <td th:text="${u.nombreCompleto}" class="text-start ps-3"></td>
-                                <td>
-									<span th:text="${u.rol}"
-									      th:class="${#strings.equalsIgnoreCase(u.rol,'ADMINISTRADOR') ? 'badge bg-danger' : (#strings.equalsIgnoreCase(u.rol,'DOCENTE') ? 'badge bg-warning text-dark' : 'badge bg-info text-dark')}">
-									</span>
-                                </td>
-                                <td>
-                                    <span th:text="${u.estado}" 
-                                          th:class="${u.estado == 'ACTIVO'} ? 'badge bg-success' : 'badge bg-secondary'">
-                                    </span>
-                                </td>
-                                <td>
-                                    <a th:href="@{/gestionusuarios/editar/{id}(id=${u.idUsuario})}" class="btn btn-warning btn-sm me-1">Editar</a>
-                                    <a th:if="${u.estado == 'ACTIVO'}" 
-                                       th:href="@{/gestionusuarios/eliminar/{id}(id=${u.idUsuario})}" 
-                                       class="btn btn-danger btn-sm" 
-                                       onclick="return confirm('¿Estás seguro de que deseas inhabilitar este usuario?');">
-                                        Desactivar
-                                    </a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                    <div class="grid grid-cols-1 gap-6">
+                        <div>
+                            <label for="nombreCompleto" class="block text-sm font-bold text-gray-700 mb-2">Nombre Completo</label>
+                            <input type="text" id="nombreCompleto" th:field="*{nombreCompleto}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition" placeholder="Ej: Paco Pérez" required />
+                        </div>
 
+                        <div>
+                            <label for="password" class="block text-sm font-bold text-gray-700 mb-2">Contraseña</label>
+                            <input type="password" id="password" th:field="*{password}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition" placeholder="Asigna una contraseña" required />
+                        </div>
+
+                        <div>
+                            <label for="correo" class="block text-sm font-bold text-gray-700 mb-2">Correo Electrónico (Opcional)</label>
+                            <input type="email" id="correo" th:field="*{correo}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition" placeholder="Ej: usuario@colegio.edu.pe" />
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="rol" class="block text-sm font-bold text-gray-700 mb-2">Rol del Sistema</label>
+                                <select id="rol" th:field="*{rol}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition bg-white" required>
+                                    <option value="">-- Seleccione un Rol --</option>
+                                    <option value="ADMINISTRADOR">Administrador</option>
+                                    <option value="DOCENTE">Docente</option>
+                                    <option value="ESTUDIANTE">Estudiante</option>
+                                </select>
+                            </div>
+
+                            <div th:if="${usuario.idUsuario != 0}">
+                                <label for="estado" class="block text-sm font-bold text-gray-700 mb-2">Estado de la Cuenta</label>
+                                <select id="estado" th:field="*{estado}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition bg-white" required>
+                                    <option value="ACTIVO">ACTIVO</option>
+                                    <option value="INACTIVO">INACTIVO</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end space-x-4 pt-6 mt-6 border-t border-gray-200">
+                        <a th:href="@{/gestionusuarios}" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-bold transition">Cancelar</a>
+                        <button type="submit" class="px-6 py-3 bg-[#e60000] hover:bg-red-700 text-white rounded-lg font-bold shadow-md transition" th:text="${usuario.idUsuario == 0} ? 'Registrar Cuenta' : 'Guardar Cambios'"></button>
+                    </div>
+
+                </form>
             </div>
         </div>
-    </div>
+    </main>
 
-    <div th:replace="/fragments/scripts :: scripts"></div>
-
+    <div th:replace="~{/fragments/scripts :: scripts}"></div>
 </body>
 </html>
-

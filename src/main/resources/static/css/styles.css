@@ -1,0 +1,39 @@
+/* VARIABLES GLOBALES */
+:root {
+    --borde-color: #000000;
+    --azul-acento: #0d6efd;
+    --rojo-britanico: #e60000;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 1. Componentes con lógica de estado */
+.nav-btn {
+    transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+    transform: translateX(4px);
+}
+
+/* 2. Estilos específicos de tablas */
+.tabla-horario {
+    border-collapse: collapse;
+}
+
+.tabla-horario th, .tabla-horario td {
+    border: 2px solid var(--borde-color);
+}
+
+/* 3. Estilos de componentes reutilizables */
+.recreo {
+    background-color: #f1f2f6;
+    font-weight: bold;
+    letter-spacing: 3px;
+}
+
+.star-fav {
+    transition: color 0.2s ease;
+}

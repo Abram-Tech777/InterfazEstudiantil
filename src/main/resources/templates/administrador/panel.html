@@ -1,20 +1,59 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/fragments/head :: head('Panel Administrador')"></head>
-<body>
-  <div th:replace="/fragments/menu :: menu"></div>
+<head th:replace="~{/fragments/head :: head('Panel Administrador')}"></head>
+<body class="bg-gray-50 m-0 p-0 h-screen flex flex-col">
 
-  <div class="container mt-4">
-    <h1>Panel Administrador</h1>
-	<div class="list-group mt-3">
-	  <a th:href="@{/gestionusuarios}" class="list-group-item list-group-item-action">Gestión de Usuarios</a>
-	  <a th:href="@{/gestionaulas}" class="list-group-item list-group-item-action">Gestión de Aulas</a>
-	  <a th:href="@{/gestioncomunicados/lista}" class="list-group-item list-group-item-action">Comunicados</a>
-	  <a th:href="@{/gestionarhorarios}" class="list-group-item list-group-item-action">Horarios</a>
-	</div>
-  </div>
+    <div th:replace="~{/fragments/menu :: menu}"></div>
 
-  <div th:replace="/fragments/scripts :: scripts"></div>
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Panel de Control Principal</h1>
+            <p class="text-gray-500 mt-2">Bienvenido, selecciona un módulo para gestionar el colegio.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <a th:href="@{/gestionusuarios}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 p-6 border border-gray-100 flex items-center space-x-4 group">
+                <div class="bg-blue-50 p-4 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <i class="fas fa-users text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">Usuarios</h3>
+                    <p class="text-sm text-gray-500">Cuentas y roles</p>
+                </div>
+            </a>
+
+            <a th:href="@{/gestionaulas}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 p-6 border border-gray-100 flex items-center space-x-4 group">
+                <div class="bg-green-50 p-4 rounded-lg text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
+                    <i class="fas fa-chalkboard text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">Aulas</h3>
+                    <p class="text-sm text-gray-500">Grados y secciones</p>
+                </div>
+            </a>
+
+            <a th:href="@{/gestioncomunicados/lista}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 p-6 border border-gray-100 flex items-center space-x-4 group">
+                <div class="bg-yellow-50 p-4 rounded-lg text-yellow-600 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
+                    <i class="fas fa-bullhorn text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">Comunicados</h3>
+                    <p class="text-sm text-gray-500">Anuncios oficiales</p>
+                </div>
+            </a>
+
+            <a th:href="@{/gestionarhorarios}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 p-6 border border-gray-100 flex items-center space-x-4 group">
+                <div class="bg-purple-50 p-4 rounded-lg text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                    <i class="fas fa-calendar-alt text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">Horarios</h3>
+                    <p class="text-sm text-gray-500">Gestión de tiempos</p>
+                </div>
+            </a>
+        </div>
+    </main>
+
+    <div th:replace="~{/fragments/scripts :: scripts}"></div>
 </body>
 </html>
-
