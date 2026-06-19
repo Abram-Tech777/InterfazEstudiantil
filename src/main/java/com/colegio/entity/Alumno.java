@@ -11,11 +11,11 @@ public class Alumno {
     @Column(name = "id_alumno")
     private int idAlumno;
 
-    @Column(name = "nombre", nullable = false, length = 50)
-    private String nombre;
+    @Column(name = "nombre_completo", length = 100, nullable = true)
+    private String nombreCompleto;
 
-	@Column(name = "apellido", nullable = false, length = 50)
-	private String apellido;
+    @Column(name = "estado", length = 15, nullable = false)
+    private String estado = "ACTIVO";
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_aula", nullable = true)
@@ -27,15 +27,46 @@ public class Alumno {
 
     public Alumno() {}
 
+	public int getIdAlumno() {
+		return idAlumno;
+	}
 
-    public int getIdAlumno() { return idAlumno; }
-    public void setIdAlumno(int idAlumno) { this.idAlumno = idAlumno; }
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-    public String getApellido() { return apellido; }
-    public void setApellido(String apellido) { this.apellido = apellido; }
-    public Aula getAula() { return aula; }
-    public void setAula(Aula aula) { this.aula = aula; }
-    public Usuario getUsuario() { return usuario; }
-    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+	public void setIdAlumno(int idAlumno) {
+		this.idAlumno = idAlumno;
+	}
+
+	public String getNombreCompleto() {
+		return nombreCompleto;
+	}
+
+	public void setNombreCompleto(String nombreCompleto) {
+		this.nombreCompleto = nombreCompleto;
+	}
+
+	public Aula getAula() {
+		return aula;
+	}
+
+	public void setAula(Aula aula) {
+		this.aula = aula;
+	}
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+
+   
 }

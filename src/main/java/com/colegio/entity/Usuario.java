@@ -31,8 +31,6 @@ public class Usuario {
 	@Column(nullable = false, length = 15)
 	private String estado = "ACTIVO";
 
-	@Column(name = "correo", length = 100)
-	private String correo;
 
 
 	public Usuario() {
@@ -110,16 +108,6 @@ public class Usuario {
 		this.estado = estado;
 	}
 
-	public String getCorreo() {
-		return correo;
-	}
-
-	public void setCorreo(String correo) {
-		if (correo == null) {
-			this.correo = null;
-		} else {
-			this.correo = correo.trim().toLowerCase();
-		}
-	}
+    // correo eliminado: getters/setters removidos
 
 }

@@ -32,15 +32,13 @@
 
                             <div class="mb-3">
                                 <label for="password" class="form-label fw-bold">Contraseña:</label>
-                                <input type="password" id="password" th:field="*{password}" class="form-control" 
-                                       placeholder="Asigna una contraseña para el ingreso" required />
+                                <input type="password" id="password" th:field="*{password}" class="form-control"
+                                       placeholder="Asigna una contraseña para el ingreso"
+                                       th:attr="data-masked=${usuario.idUsuario != 0 ? 'true' : null}" />
+                                <div class="form-text" th:if="${usuario.idUsuario != 0}">Dejar vacío para mantener la contraseña actual. Haga clic en el campo para editarla.</div>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="correo" class="form-label fw-bold">Correo Electrónico (opcional):</label>
-                                <input type="email" id="correo" th:field="*{correo}" class="form-control" 
-                                       placeholder="Ej: usuario@colegio.edu.ec" />
-                            </div>
+                            <!-- Campo correo eliminado del formulario -->
 
                             <div class="mb-3">
                                 <label for="rol" class="form-label fw-bold">Rol del Sistema:</label>
@@ -75,7 +73,29 @@
     </div>
 
     <div th:replace="/fragments/scripts :: scripts"></div>
+    <script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function(){
+        var pwd = document.getElementById('password');
+        if(!pwd) return;
+        var MASK = '********';
+        // If editing existing user, show masked placeholder
+        var isEdit = /*[[${usuario.idUsuario != 0}]]*/ false;
+        if(isEdit && (pwd.value == null || pwd.value === '')){
+            pwd.value = MASK;
+        }
+        pwd.addEventListener('focus', function(){
+            if(this.value === MASK) this.value = '';
+        });
+        var form = pwd.closest('form');
+        if(form){
+            form.addEventListener('submit', function(){
+                if(pwd.value === MASK) pwd.value = '';
+            });
+        }
+    });
+    /*]]>*/
+    </script>
 
 </body>
 </html>
-

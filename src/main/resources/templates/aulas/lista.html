@@ -47,6 +47,7 @@
                                 <td>
                                     <a th:href="@{/gestionaulas/detalle/{id}(id=${a.idAula})}" class="btn btn-info btn-sm me-2">Ver Detalle</a>
                                     <a th:href="@{/gestionaulas/asignar/{id}(id=${a.idAula})}" class="btn btn-success btn-sm me-2">Asignar Docentes</a>
+                                    <a th:href="@{/gestionaulas/asignarAlumnos/{id}(id=${a.idAula})}" class="btn btn-info btn-sm me-2">Asignar Alumnos</a>
                                     <a th:href="@{/gestionaulas/editar/{id}(id=${a.idAula})}" class="btn btn-warning btn-sm me-2">Editar</a>
                                     <a th:href="@{/gestionaulas/eliminar/{id}(id=${a.idAula})}" 
                                        class="btn btn-danger btn-sm" 
@@ -67,4 +68,3 @@
 
 </body>
 </html>
-

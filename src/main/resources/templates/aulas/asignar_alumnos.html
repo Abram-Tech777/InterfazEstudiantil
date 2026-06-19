@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Asignar Alumnos - Aula')"></head>
+<body>
+    <div class="container mt-4">
+        <th:block th:replace="fragments/menu :: menu"/>
+
+        <div class="row mt-4">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Asignar Alumnos a Aula</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="mb-3">
+                            <strong>Aula:</strong>
+                            <span th:text="${aula.nombre}"></span>
+                            (Capacidad: <span th:text="${aula.capacidad}"></span>)
+                        </h6>
+
+                        <form method="POST" th:action="@{/gestionaulas/asignarAlumnos/{id}(id=${aula.idAula})}">
+                            <table class="table table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Seleccionar</th>
+                                        <th>Alumno</th>
+                                        <th>Usuario</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="alumno : ${todosAlumnos}">
+                                        <td>
+                                            <input type="checkbox" name="alumnos" th:value="${alumno.idAlumno}"
+                                                   th:checked="${idsAsignados.contains(alumno.idAlumno)}"
+                                                   th:disabled="${alumno.estado != 'ACTIVO'}"/>
+                                        </td>
+                                        <td th:text="${(alumno.nombreCompleto != null and !#strings.isEmpty(alumno.nombreCompleto)) ? alumno.nombreCompleto : (alumno.nombre + ' ' + alumno.apellido)}"></td>
+                                        <td th:text="${alumno.usuario.codUsuario}"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-check-circle"></i> Guardar Asignaciones
+                                </button>
+                                <a href="/gestionaulas" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Cancelar
+                                </a>
+                            </div>
+                        </form>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </div>
+
+     <th:block th:replace="fragments/scripts :: scripts"/>
+ </body>
+ </html>

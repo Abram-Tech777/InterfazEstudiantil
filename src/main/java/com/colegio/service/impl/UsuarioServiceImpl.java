@@ -129,27 +129,19 @@ public class UsuarioServiceImpl implements UsuarioService {
 			if (alumnoRepository.findByUsuario_IdUsuario(usuario.getIdUsuario()).isPresent()) {
 				return; 
 			}
-			
 			Alumno alumno = new Alumno();
-			alumno.setUsuario(usuario);
-			
-			if (usuario.getNombreCompleto() != null && !usuario.getNombreCompleto().isEmpty()) {
-				String[] partes = usuario.getNombreCompleto().split(" ", 2);
-				alumno.setNombre(partes[0]);
-				if (partes.length > 1) {
-					alumno.setApellido(partes[1]);
-				} else {
-					alumno.setApellido(partes[0]);
-				}
-			} else {
-				alumno.setNombre("Estudiante");
-				alumno.setApellido("Sin Asignar");
-			}
-			
-			alumnoRepository.save(alumno);
-		} catch (Exception e) {
-			System.err.println("Error al crear Alumno para usuario " + usuario.getIdUsuario() + ": " + e.getMessage());
-		}
+	        alumno.setUsuario(usuario);
+
+	        if (usuario.getNombreCompleto() != null && !usuario.getNombreCompleto().isBlank()) {
+	            alumno.setNombreCompleto(usuario.getNombreCompleto().trim());
+	        } else {
+	            alumno.setNombreCompleto("Estudiante Sin Asignar");
+	        }
+
+	        alumnoRepository.save(alumno);
+	    } catch (Exception e) {
+	        System.err.println("Error al crear Alumno para usuario " + usuario.getIdUsuario() + ": " + e.getMessage());
+	    }
 	}
 
 	@Override
@@ -180,9 +172,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 			existente.setNombreCompleto(usuario.getNombreCompleto());
 		}
 
-		if (usuario.getPassword() != null) {
-			existente.setPassword(usuario.getPassword());
-		}
+        if (usuario.getPassword() != null && !usuario.getPassword().isBlank()) {
+            existente.setPassword(usuario.getPassword());
+        }
 
 		if (usuario.getRol() != null) {
 			existente.setRol(usuario.getRol());

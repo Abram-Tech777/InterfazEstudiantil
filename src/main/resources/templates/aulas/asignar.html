@@ -39,10 +39,10 @@
                                         </td>
                                         <td th:text="${docente.nombreCompleto}"></td>
                                         <td>
-                                            <select th:name="'rolAsignado_' + ${docente.idDocente}" class="form-control form-control-sm">
-                                                <option value="DOCENTE" selected>DOCENTE</option>
-                                                <option value="TUTOR">TUTOR</option>
-                                                <option value="AUXILIAR">AUXILIAR</option>
+                                            <select th:name="${'rolAsignado_' + docente.idDocente}" class="form-control form-control-sm">
+                                                <option value="DOCENTE" th:selected="${rolesPorDocente[docente.idDocente] == null ? true : rolesPorDocente[docente.idDocente] == 'DOCENTE'}">DOCENTE</option>
+                                                <option value="TUTOR" th:selected="${rolesPorDocente[docente.idDocente] == 'TUTOR'}">TUTOR</option>
+                                                <option value="AUXILIAR" th:selected="${rolesPorDocente[docente.idDocente] == 'AUXILIAR'}">AUXILIAR</option>
                                             </select>
                                         </td>
                                     </tr>

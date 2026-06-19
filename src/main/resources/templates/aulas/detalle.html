@@ -70,19 +70,26 @@
                         </div>
                         <table th:if="${!alumnos.isEmpty()}" class="table table-striped">
                             <thead class="table-light">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Nombre</th>
-                                    <th>Apellido</th>
-                                    <th>Usuario</th>
-                                </tr>
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre</th>
+                                <th>Estado</th>
+                                <th>Usuario</th>
+                                <th>Acciones</th>
+                            </tr>
                             </thead>
                             <tbody>
                                 <tr th:each="alumno, iterStat : ${alumnos}">
                                     <td th:text="${iterStat.count}"></td>
-                                    <td th:text="${alumno.nombre}"></td>
-                                    <td th:text="${alumno.apellido}"></td>
-                                    <td th:text="${alumno.usuario.usuario}"></td>
+                                    <td th:text="${alumno.nombreCompleto != null && !#strings.isEmpty(alumno.nombreCompleto) ? alumno.nombreCompleto : alumno.nombre}"></td>
+                                    <td>
+                                        <span th:class="${alumno.estado == 'ACTIVO' ? 'badge bg-success' : 'badge bg-secondary'}" th:text="${alumno.estado == 'ACTIVO' ? 'Activado' : 'Desactivado'}"></span>
+                                    </td>
+                                    <td th:text="${alumno.usuario != null ? alumno.usuario.codUsuario : ''}"></td>
+                                    <td>
+                                        <a th:if="${alumno.estado == 'ACTIVO'}" th:href="@{/gestionaulas/quitarAlumno/{id}(id=${alumno.idAlumno})}" class="btn btn-sm btn-warning">Quitar</a>
+                                        <a th:if="${alumno.estado != 'ACTIVO'}" th:href="@{/gestionaulas/activarAlumno/{id}(id=${alumno.idAlumno})}" class="btn btn-sm btn-success">Activar</a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -95,6 +102,9 @@
                     </a>
                     <a th:href="@{/gestionaulas/asignar/{id}(id=${aula.idAula})}" class="btn btn-warning">
                         <i class="bi bi-pencil"></i> Editar Asignaciones
+                    </a>
+                    <a th:href="@{/gestionaulas/asignarAlumnos/{id}(id=${aula.idAula})}" class="btn btn-info">
+                        <i class="bi bi-people"></i> Asignar Alumnos
                     </a>
                 </div>
             </div>
