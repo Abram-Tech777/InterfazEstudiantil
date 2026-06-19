@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Mi Asistencia')"></head>
+<body>
+  <div th:replace="/fragments/menu :: menu"></div>
+
+  <div class="container mt-4">
+    <h1>Mi Asistencia</h1>
+    
+    <div th:if="${asistencias == null or asistencias.isEmpty()}" class="alert alert-info mt-3">
+      No hay registro de asistencias aún. El docente registrará tu asistencia en clase.
+    </div>
+    
+    <div th:if="${asistencias != null and !asistencias.isEmpty()}" class="table-responsive mt-3">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>Curso</th>
+            <th>Docente</th>
+            <th>Fecha</th>
+            <th>Día</th>
+            <th>Estado</th>
+            <th>Observaciones</th>
+          </tr>
+        </thead>
+         <tbody>
+           <tr th:each="asistencia : ${asistencias}" th:class="${asistencia.estado == 'ASISTIO' ? 'table-success' : (asistencia.estado == 'TARDE' ? 'table-warning' : 'table-danger')}">
+             <td th:text="${asistencia.curso != null ? asistencia.curso.nombreCurso : 'N/A'}"></td>
+             <td th:text="${asistencia.horario != null && asistencia.horario.docente != null ? asistencia.horario.docente.getNombre() + ' ' + asistencia.horario.docente.getApellido() : 'N/A'}"></td>
+             <td th:text="${#temporals.format(asistencia.fecha, 'dd/MM/yyyy')}"></td>
+             <td th:text="${asistencia.horario != null ? asistencia.horario.diaSemana : 'N/A'}"></td>
+             <td>
+               <span th:if="${asistencia.estado == 'ASISTIO'}" class="badge bg-success">Presente</span>
+               <span th:if="${asistencia.estado == 'TARDE'}" class="badge bg-warning">Tarde</span>
+               <span th:if="${asistencia.estado == 'FALTA'}" class="badge bg-danger">Ausente</span>
+             </td>
+             <td th:text="${asistencia.observaciones != null ? asistencia.observaciones : '-'}"></td>
+           </tr>
+         </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div th:replace="/fragments/scripts :: scripts"></div>
+</body>
+</html>

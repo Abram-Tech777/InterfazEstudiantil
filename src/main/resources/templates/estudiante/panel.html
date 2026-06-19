@@ -8,12 +8,12 @@
     <h1>Panel Estudiante</h1>
     <div class="list-group mt-3">
       <a th:href="@{/gestioncomunicados/bandeja}" class="list-group-item list-group-item-action">Bandeja</a>
-      <a href="#" onclick="return false;" class="list-group-item list-group-item-action">Mis Notas (Próx.)</a>
-      <a href="#" onclick="return false;" class="list-group-item list-group-item-action">Mi Asistencia (Próx.)</a>
+      <a th:href="@{/estudiante/horario}" class="list-group-item list-group-item-action">Mi Horario</a>
+      <a th:href="@{/estudiante/notas}" class="list-group-item list-group-item-action">Mis Notas</a>
+      <a th:href="@{/estudiante/asistencia}" class="list-group-item list-group-item-action">Mi Asistencia</a>
     </div>
   </div>
 
   <div th:replace="/fragments/scripts :: scripts"></div>
 </body>
 </html>
-

@@ -26,11 +26,13 @@ public class Horario {
     @JoinColumn(name = "id_aula", nullable = false)
     private Aula aula;
 
-    @Column(name = "id_docente", nullable = false)
-    private int idDocente;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_docente", nullable = false)
+    private Docente docente;
 
-    @Column(name = "id_curso", nullable = false)
-    private int idCurso;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_curso", nullable = false)
+    private Curso curso;
 
     @Column(name = "dia_semana", nullable = false, length = 15)
     private String diaSemana;
@@ -52,11 +54,27 @@ public class Horario {
     public Aula getAula() { return aula; }
     public void setAula(Aula aula) { this.aula = aula; }
 
-    public int getIdDocente() { return idDocente; }
-    public void setIdDocente(int idDocente) { this.idDocente = idDocente; }
+    public Docente getDocente() { return docente; }
+    public void setDocente(Docente docente) { this.docente = docente; }
 
-    public int getIdCurso() { return idCurso; }
-    public void setIdCurso(int idCurso) { this.idCurso = idCurso; }
+    public int getIdDocente() { return docente != null ? docente.getIdDocente() : 0; }
+    public void setIdDocente(int idDocente) { 
+        if (this.docente == null) {
+            this.docente = new Docente();
+        }
+        this.docente.setIdDocente(idDocente);
+    }
+
+    public Curso getCurso() { return curso; }
+    public void setCurso(Curso curso) { this.curso = curso; }
+
+    public int getIdCurso() { return curso != null ? curso.getIdCurso() : 0; }
+    public void setIdCurso(int idCurso) {
+        if (this.curso == null) {
+            this.curso = new Curso();
+        }
+        this.curso.setIdCurso(idCurso);
+    }
 
     public String getDiaSemana() { return diaSemana; }
     public void setDiaSemana(String diaSemana) { this.diaSemana = diaSemana; }

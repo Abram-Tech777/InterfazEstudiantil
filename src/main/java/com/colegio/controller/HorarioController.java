@@ -57,10 +57,12 @@ public class HorarioController {
 	@GetMapping
 	public String listarHorarios(Model model, HttpSession session) {
 	    List<Horario> horarios;
+	    boolean esDocente = false;
 	    
 	    Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
 	    
 	    if (usuarioLogueado != null && "DOCENTE".equals(usuarioLogueado.getRol())) {
+	        esDocente = true;
 	        var docenteOpt = docenteRepository.findByUsuario_IdUsuario(usuarioLogueado.getIdUsuario());
 	        if (docenteOpt.isPresent()) {
 	            Docente docente = docenteOpt.get();
@@ -78,6 +80,7 @@ public class HorarioController {
 	    }
 	    
 	    model.addAttribute("horarios", horarios);
+	    model.addAttribute("esDocente", esDocente);
 	    
 	    Map<Integer, String> docentesMap = docenteRepository.findAll()
 	            .stream()
@@ -94,7 +97,12 @@ public class HorarioController {
 	
 	
 	@GetMapping("/nuevo")
-	public String mostrarFormularioNuevo(@ModelAttribute("horario") Horario horario, Model model) {
+	public String mostrarFormularioNuevo(@ModelAttribute("horario") Horario horario, Model model, HttpSession session) {
+	    Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
+	    if (usuarioLogueado != null && "DOCENTE".equals(usuarioLogueado.getRol())) {
+	        return "redirect:/gestionarhorarios";
+	    }
+	    
 	    if (horario.getAula() == null) {
 	        horario.setAula(new Aula());
 	    }
@@ -110,7 +118,12 @@ public class HorarioController {
 	@PostMapping("/guardar")
 	public String guardarHorario(@ModelAttribute("horario") Horario h, @RequestParam(value = "horaInicio", required = false) String horaInicioStr,
 	       @RequestParam(value = "horaFin", required = false) String horaFinStr,
-	       Model model, RedirectAttributes redirectAttrs) {
+	       Model model, RedirectAttributes redirectAttrs, HttpSession session) {
+	    Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
+	    if (usuarioLogueado != null && "DOCENTE".equals(usuarioLogueado.getRol())) {
+	        return "redirect:/gestionarhorarios";
+	    }
+	    
 	    try {
 	        if (h.getAula() == null || h.getAula().getIdAula() == 0) {
 	            throw new IllegalArgumentException("Debe seleccionar un aula válida.");
@@ -149,7 +162,12 @@ public class HorarioController {
     }
 	
 	@GetMapping("/editar/{id}")
-    public String mostrarFormularioEditar(@PathVariable("id") int id, Model model) {
+    public String mostrarFormularioEditar(@PathVariable("id") int id, Model model, HttpSession session) {
+        Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuarioLogueado != null && "DOCENTE".equals(usuarioLogueado.getRol())) {
+            return "redirect:/gestionarhorarios";
+        }
+        
         Horario h = horarioService.getHorarioById(id);
         if (h.getAula() == null) {
             h.setAula(new Aula());
@@ -163,7 +181,12 @@ public class HorarioController {
     }
 	
 	@GetMapping("/eliminar/{id}")
-    public String eliminarHorario(@PathVariable("id") int id, RedirectAttributes redirectAttrs) {
+    public String eliminarHorario(@PathVariable("id") int id, RedirectAttributes redirectAttrs, HttpSession session) {
+        Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuarioLogueado != null && "DOCENTE".equals(usuarioLogueado.getRol())) {
+            return "redirect:/gestionarhorarios";
+        }
+        
         try {
             horarioService.deleteHorario(id);
             redirectAttrs.addFlashAttribute("mensajeExito", "Horario eliminado correctamente.");
@@ -174,7 +197,7 @@ public class HorarioController {
     }
 	
 	private List<String> diasSemana() {
-        return Arrays.asList("LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO");
+        return Arrays.asList("LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES");
     }
 	
 }

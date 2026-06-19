@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Control de Asistencia')"></head>
+<body>
+  <div th:replace="fragments/menu :: menu"></div>
+  <div class="container mt-4">
+    <h3>Control de Asistencia</h3>
+    <div th:if="${#lists.isEmpty(horarios)}" class="alert alert-info">No tienes horarios asignados.</div>
+    <div th:if="${!#lists.isEmpty(horarios)}" class="table-responsive">
+       <table class="table table-striped">
+         <thead>
+           <tr>
+             <th>#</th>
+             <th>Día</th>
+             <th>Hora Inicio</th>
+             <th>Hora Fin</th>
+             <th>Aula</th>
+             <th>Curso</th>
+             <th>Acción</th>
+           </tr>
+         </thead>
+         <tbody>
+           <tr th:each="h, iter : ${horarios}">
+             <td th:text="${iter.count}"></td>
+             <td th:text="${h.diaSemana}"></td>
+             <td th:text="${h.horaInicio != null ? h.horaInicio.format(T(java.time.format.DateTimeFormatter).ofPattern('hh:mm a')) : ''}"></td>
+             <td th:text="${h.horaFin != null ? h.horaFin.format(T(java.time.format.DateTimeFormatter).ofPattern('hh:mm a')) : ''}"></td>
+             <td th:text="${h.aula != null ? (h.aula.grado + ' - ' + h.aula.seccion) : ''}"></td>
+             <td th:text="${h.curso != null ? h.curso.nombreCurso : h.idCurso}"></td>
+             <td>
+               <a th:href="@{/docente/asistencia/abrir/{id}(id=${h.idHorario})}" class="btn btn-sm btn-primary">Abrir</a>
+             </td>
+           </tr>
+         </tbody>
+       </table>
+    </div>
+    <a href="/docente/panel" class="btn btn-secondary">Volver</a>
+  </div>
+  <div th:replace="fragments/scripts :: scripts"></div>
+</body>
+</html>

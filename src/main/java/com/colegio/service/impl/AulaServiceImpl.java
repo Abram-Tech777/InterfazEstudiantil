@@ -58,7 +58,6 @@ public class AulaServiceImpl implements AulaService {
         String nuevoGrado = aula.getGrado();
         String nuevaSeccion = aula.getSeccion();
 
-        // Validar unicidad de grado y sección si están cambiando
         if (nuevoGrado != null && nuevaSeccion != null) {
             Optional<Aula> encontrada = aulaRepository.buscarPorGradoYSeccion(nuevoGrado, nuevaSeccion);
             if (encontrada.isPresent() && encontrada.get().getIdAula() != id) {

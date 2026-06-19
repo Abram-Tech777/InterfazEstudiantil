@@ -9,12 +9,11 @@
     <div class="list-group mt-3">
       <a th:href="@{/gestioncomunicados/nuevo}" class="list-group-item list-group-item-action">Crear Comunicado</a>
       <a th:href="@{/gestioncomunicados/lista}" class="list-group-item list-group-item-action">Mis Comunicados</a>
-      <a href="#" onclick="return false;" class="list-group-item list-group-item-action">Mi Horario (Próx.)</a>
-      <a href="#" onclick="return false;" class="list-group-item list-group-item-action">Control de Asistencia (Próx.)</a>
+      <a th:href="@{/gestionarhorarios}" class="list-group-item list-group-item-action">Mi Horario</a>
+      <a th:href="@{/docente/asistencia}" class="list-group-item list-group-item-action">Control de Asistencia</a>
     </div>
   </div>
 
   <div th:replace="/fragments/scripts :: scripts"></div>
 </body>
 </html>
-

@@ -14,9 +14,6 @@ public class Alumno {
     @Column(name = "nombre_completo", length = 100, nullable = true)
     private String nombreCompleto;
 
-    @Column(name = "estado", length = 15, nullable = false)
-    private String estado = "ACTIVO";
-
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_aula", nullable = true)
 	private Aula aula;
@@ -59,12 +56,37 @@ public class Alumno {
         this.usuario = usuario;
     }
 
-    public String getEstado() {
-        return estado;
+    // Note: Alumno.estado removed — database column must be dropped separately after deploy
+
+    // Helpers for templates that may use nombre / apellido
+    public String getNombre() {
+        if (nombreCompleto == null || nombreCompleto.isBlank()) return "";
+        String[] parts = nombreCompleto.trim().split("\\s+", 2);
+        return parts[0];
     }
 
-    public void setEstado(String estado) {
-        this.estado = estado;
+    public void setNombre(String nombre) {
+        String apellido = getApellido();
+        if (apellido == null || apellido.isEmpty()) {
+            this.nombreCompleto = nombre;
+        } else {
+            this.nombreCompleto = nombre + " " + apellido;
+        }
+    }
+
+    public String getApellido() {
+        if (nombreCompleto == null || nombreCompleto.isBlank()) return "";
+        String[] parts = nombreCompleto.trim().split("\\s+", 2);
+        return parts.length > 1 ? parts[1] : "";
+    }
+
+    public void setApellido(String apellido) {
+        String nombre = getNombre();
+        if (nombre == null || nombre.isEmpty()) {
+            this.nombreCompleto = apellido;
+        } else {
+            this.nombreCompleto = nombre + " " + apellido;
+        }
     }
 
 

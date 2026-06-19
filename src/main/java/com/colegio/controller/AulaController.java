@@ -199,13 +199,6 @@ public class AulaController {
         try {
             Alumno alumno = alumnoRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Alumno no encontrado"));
-
-            if (alumno.getEstado() != null && !"ACTIVO".equalsIgnoreCase(alumno.getEstado())) {
-                redirectAttrs.addFlashAttribute("mensajeError", "No se puede quitar un alumno desactivado.");
-                Integer aulaId = alumno.getAula() != null ? alumno.getAula().getIdAula() : null;
-                return aulaId != null ? "redirect:/gestionaulas/detalle/" + aulaId : "redirect:/gestionaulas";
-            }
-
             Integer aulaId = alumno.getAula() != null ? alumno.getAula().getIdAula() : null;
             alumno.setAula(null);
             alumnoRepository.save(alumno);
@@ -217,39 +210,5 @@ public class AulaController {
         }
     }
 
-    @GetMapping("/activarAlumno/{id}")
-    public String activarAlumno(@PathVariable("id") int id, RedirectAttributes redirectAttrs) {
-        try {
-            Alumno alumno = alumnoRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Alumno no encontrado"));
-            alumno.setEstado("ACTIVO");
-            alumnoRepository.save(alumno);
-            redirectAttrs.addFlashAttribute("mensajeExito", "Alumno activado correctamente.");
-            if (alumno.getAula() != null) {
-                return "redirect:/gestionaulas/detalle/" + alumno.getAula().getIdAula();
-            }
-            return "redirect:/gestionaulas";
-        } catch (Exception e) {
-            redirectAttrs.addFlashAttribute("mensajeError", "No se pudo activar el alumno: " + e.getMessage());
-            return "redirect:/gestionaulas";
-        }
-    }
 
-    @GetMapping("/desactivarAlumno/{id}")
-    public String desactivarAlumno(@PathVariable("id") int id, RedirectAttributes redirectAttrs) {
-        try {
-            Alumno alumno = alumnoRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Alumno no encontrado"));
-            alumno.setEstado("INACTIVO");
-            alumnoRepository.save(alumno);
-            redirectAttrs.addFlashAttribute("mensajeExito", "Alumno desactivado correctamente.");
-            if (alumno.getAula() != null) {
-                return "redirect:/gestionaulas/detalle/" + alumno.getAula().getIdAula();
-            }
-            return "redirect:/gestionaulas";
-        } catch (Exception e) {
-            redirectAttrs.addFlashAttribute("mensajeError", "No se pudo desactivar el alumno: " + e.getMessage());
-            return "redirect:/gestionaulas";
-        }
-    }
 }

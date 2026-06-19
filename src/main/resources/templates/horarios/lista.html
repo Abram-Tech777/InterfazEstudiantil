@@ -9,7 +9,7 @@
     <div class="card shadow">
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
             <h4 class="mb-0">Gestión de Programación Académica</h4>
-            <a th:href="@{/gestionarhorarios/nuevo}" class="btn btn-success btn-sm">Añadir Nuevo Horario</a>
+            <a th:if="${!esDocente}" th:href="@{/gestionarhorarios/nuevo}" class="btn btn-success btn-sm">Añadir Nuevo Horario</a>
         </div>
         <div class="card-body">
 
@@ -41,15 +41,15 @@
                             <td th:text="${h.idHorario}" class="fw-bold"></td>
                             <td th:text="${h.aula.grado + ' - ' + h.aula.seccion}"></td>
                             <td th:text="${docentesMap[h.idDocente] != null ? docentesMap[h.idDocente] : h.idDocente}"></td>
-                            <td th:text="${cursosMap[h.idCurso] != null ? cursosMap[h.idCurso] : h.idCurso}"></td>
+                            <td th:text="${h.curso != null ? h.curso.nombreCurso : (cursosMap[h.idCurso] != null ? cursosMap[h.idCurso] : h.idCurso)}"></td>
                             <td>
                                 <span class="badge bg-primary" th:text="${h.diaSemana}"></span>
                             </td>
                             <td th:text="${h.horaInicio != null ? h.horaInicio.format(T(java.time.format.DateTimeFormatter).ofPattern('hh:mm a')) : ''}"></td>
                             <td th:text="${h.horaFin != null ? h.horaFin.format(T(java.time.format.DateTimeFormatter).ofPattern('hh:mm a')) : ''}"></td>
                             <td class="text-center">
-                                <a th:href="@{/gestionarhorarios/editar/{id}(id=${h.idHorario})}" class="btn btn-warning btn-sm me-2">Editar</a>
-                                <a th:href="@{/gestionarhorarios/eliminar/{id}(id=${h.idHorario})}" 
+                                <a th:if="${!esDocente}" th:href="@{/gestionarhorarios/editar/{id}(id=${h.idHorario})}" class="btn btn-warning btn-sm me-2">Editar</a>
+                                <a th:if="${!esDocente}" th:href="@{/gestionarhorarios/eliminar/{id}(id=${h.idHorario})}" 
                                    class="btn btn-danger btn-sm" 
                                    onclick="return confirm('¿Estás seguro de que deseas eliminar este horario?');">
                                    Eliminar

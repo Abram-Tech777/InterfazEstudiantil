@@ -23,11 +23,11 @@ public class HorarioServiceImpl implements HorarioService {
         if (horario.getHoraInicio() == null || horario.getHoraFin() == null || !horario.getHoraInicio().isBefore(horario.getHoraFin())) {
             throw new IllegalArgumentException("La hora de inicio debe ser anterior a la hora de fin.");
         }
-        var choqueAula = horarioRepository.buscarChoqueAula(horario.getAula().getIdAula(), horario.getDiaSemana(), horario.getHoraInicio());
+        var choqueAula = horarioRepository.buscarChoqueAula(horario.getAula().getIdAula(), horario.getDiaSemana(), horario.getHoraInicio(), horario.getHoraFin());
         if (!choqueAula.isEmpty()) {
             throw new IllegalArgumentException("Ya existe un horario para esa aula en ese día y hora.");
         }
-        var choqueDocente = horarioRepository.buscarChoqueDocente(horario.getIdDocente(), horario.getDiaSemana(), horario.getHoraInicio());
+        var choqueDocente = horarioRepository.buscarChoqueDocente(horario.getIdDocente(), horario.getDiaSemana(), horario.getHoraInicio(), horario.getHoraFin());
         if (!choqueDocente.isEmpty()) {
             throw new IllegalArgumentException("El docente ya tiene un horario asignado en ese día y hora.");
         }
@@ -58,12 +58,12 @@ public class HorarioServiceImpl implements HorarioService {
         }
 
 
-        var choqueAula = horarioRepository.buscarChoqueAula(horario.getAula().getIdAula(), horario.getDiaSemana(), horario.getHoraInicio());
+        var choqueAula = horarioRepository.buscarChoqueAula(horario.getAula().getIdAula(), horario.getDiaSemana(), horario.getHoraInicio(), horario.getHoraFin());
         if (!choqueAula.isEmpty() && choqueAula.get(0).getIdHorario() != id) {
             throw new IllegalArgumentException("Otra entrada de horario ya usa esa aula en ese momento.");
         }
 
-        var choqueDocente = horarioRepository.buscarChoqueDocente(horario.getIdDocente(), horario.getDiaSemana(), horario.getHoraInicio());
+        var choqueDocente = horarioRepository.buscarChoqueDocente(horario.getIdDocente(), horario.getDiaSemana(), horario.getHoraInicio(), horario.getHoraFin());
         if (!choqueDocente.isEmpty() && choqueDocente.get(0).getIdHorario() != id) {
             throw new IllegalArgumentException("El docente ya tiene otro horario en ese día y hora.");
         }

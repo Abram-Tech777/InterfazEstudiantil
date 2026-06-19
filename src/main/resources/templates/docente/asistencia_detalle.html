@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Registro de Asistencia')"></head>
+<body>
+  <div th:replace="fragments/menu :: menu"></div>
+  <div class="container mt-4">
+    <h3>Asistencia - <span th:text="${horario.diaSemana}"></span> <small th:text="${horario.horaInicio}"></small></h3>
+    <form th:action="@{/docente/asistencia/guardar}" method="post">
+      <input type="hidden" name="idHorario" th:value="${horario.idHorario}" />
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Alumno</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="a, iter : ${alumnos}">
+            <td th:text="${iter.count}"></td>
+            <td th:text="${a.nombreCompleto}"></td>
+            <td>
+              <select th:name="${'estado_' + a.idAlumno}" class="form-select">
+                <option value="">-- Seleccionar --</option>
+                <option value="ASISTIO">Asistió</option>
+                <option value="TARDE">Tarde</option>
+                <option value="FALTA">Falta</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button type="submit" class="btn btn-success">Guardar Asistencia</button>
+      <a th:href="@{/docente/asistencia}" class="btn btn-secondary">Volver</a>
+    </form>
+  </div>
+  <div th:replace="fragments/scripts :: scripts"></div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Mis Notas')"></head>
+<body>
+  <div th:replace="/fragments/menu :: menu"></div>
+
+  <div class="container mt-4">
+    <h1>Mis Notas</h1>
+    
+    <div th:if="${notas == null or notas.isEmpty()}" class="alert alert-info mt-3">
+      No hay notas registradas aún. El docente las subirá próximamente.
+    </div>
+    
+    <div th:if="${notas != null and !notas.isEmpty()}" class="table-responsive mt-3">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>Curso</th>
+            <th>Bimestre</th>
+            <th>Nota</th>
+            <th>Docente</th>
+            <th>Fecha Registro</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="nota : ${notas}">
+            <td th:text="${nota.curso != null ? nota.curso.nombreCurso : 'N/A'}"></td>
+            <td th:text="${nota.bimestre}"></td>
+            <td>
+              <span th:if="${nota.nota != null}" class="badge" th:classappend="${nota.nota.doubleValue() >= 13 ? 'bg-success' : nota.nota.doubleValue() >= 11 ? 'bg-info' : 'bg-warning'}" th:text="${nota.nota}"></span>
+              <span th:unless="${nota.nota != null}" class="badge bg-secondary">N/A</span>
+            </td>
+            <td th:text="${nota.docente != null ? nota.docente.getNombre() + ' ' + nota.docente.getApellido() : 'N/A'}"></td>
+            <td th:text="${#temporals.format(nota.fechaRegistro, 'dd/MM/yyyy')}"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div th:replace="/fragments/scripts :: scripts"></div>
+</body>
+</html>

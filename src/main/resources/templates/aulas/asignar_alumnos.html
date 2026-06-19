@@ -31,8 +31,7 @@
                                     <tr th:each="alumno : ${todosAlumnos}">
                                         <td>
                                             <input type="checkbox" name="alumnos" th:value="${alumno.idAlumno}"
-                                                   th:checked="${idsAsignados.contains(alumno.idAlumno)}"
-                                                   th:disabled="${alumno.estado != 'ACTIVO'}"/>
+                                                   th:checked="${idsAsignados.contains(alumno.idAlumno)}" />
                                         </td>
                                         <td th:text="${(alumno.nombreCompleto != null and !#strings.isEmpty(alumno.nombreCompleto)) ? alumno.nombreCompleto : (alumno.nombre + ' ' + alumno.apellido)}"></td>
                                         <td th:text="${alumno.usuario.codUsuario}"></td>

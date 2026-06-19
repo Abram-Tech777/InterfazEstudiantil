@@ -31,8 +31,8 @@
             <ul class="dropdown-menu" aria-labelledby="docenteMenu">
               <li><a class="dropdown-item" th:href="@{/gestioncomunicados/nuevo}">Crear Comunicado</a></li>
               <li><a class="dropdown-item" th:href="@{/gestioncomunicados/lista}">Mis Comunicados</a></li>
-              <li><a class="dropdown-item" href="#" onclick="return false;">Mi Horario (Próx.)</a></li>
-              <li><a class="dropdown-item" href="#" onclick="return false;">Control de Asistencia (Próx.)</a></li>
+              <li><a class="dropdown-item" th:href="@{/gestionarhorarios}">Mi Horario</a></li>
+              <li><a class="dropdown-item" th:href="@{/docente/asistencia}">Control de Asistencia</a></li>
             </ul>
           </li>
 
@@ -43,8 +43,8 @@
                aria-expanded="false">Estudiante</a>
             <ul class="dropdown-menu" aria-labelledby="estudianteMenu">
               <li><a class="dropdown-item" th:href="@{/gestioncomunicados/bandeja}">Bandeja</a></li>
-              <li><a class="dropdown-item" href="#" onclick="return false;">Mis Notas (Próx.)</a></li>
-              <li><a class="dropdown-item" href="#" onclick="return false;">Mi Asistencia (Próx.)</a></li>
+              <li><a class="dropdown-item" th:href="@{/estudiante/notas}">Mis Notas</a></li>
+              <li><a class="dropdown-item" th:href="@{/estudiante/asistencia}">Mi Asistencia</a></li>
             </ul>
           </li>
 
