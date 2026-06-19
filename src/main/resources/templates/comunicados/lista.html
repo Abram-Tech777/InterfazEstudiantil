@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Gestión de Comunicados')"></head>
+<body class="bg-light">
+
+<div th:replace="/fragments/menu :: menu"></div>
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Comunicados</h4>
+            <a th:href="@{/gestioncomunicados/nuevo}" class="btn btn-success btn-sm">Nuevo Comunicado</a>
+        </div>
+        <div class="card-body">
+
+            <div th:if="${mensajeExito}" class="alert alert-success" th:text="${mensajeExito}"></div>
+            <div th:if="${mensajeError}" class="alert alert-danger" th:text="${mensajeError}"></div>
+
+            <div class="list-group">
+                <div th:each="c : ${comunicados}" class="list-group-item list-group-item-action mb-2">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1" th:text="${c.titulo}"></h5>
+                        <small class="text-muted" th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm').format(c.fechaEmision)}"></small>
+                    </div>
+                    <p class="mb-1" th:text="${c.contenido}"></p>
+                    <small class="text-muted">
+                      Autor: 
+                      <span th:text="${autorMap[c.autor.idUsuario] != null ? autorMap[c.autor.idUsuario] : (c.autor != null ? c.autor.nombreCompleto : 'Desconocido')}"></span>
+                    </small>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div th:replace="/fragments/scripts :: scripts"></div>
+</body>
+</html>
+

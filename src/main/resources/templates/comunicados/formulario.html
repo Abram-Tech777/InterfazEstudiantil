@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Registrar Comunicado')"></head>
+<body class="bg-light">
+
+<div th:replace="/fragments/menu :: menu"></div>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0" th:text="${comunicado.idComunicado == 0 ? 'Registrar Comunicado' : 'Editar Comunicado'}"></h5>
+                </div>
+                <div class="card-body">
+
+                    <div th:if="${mensajeError}" class="alert alert-danger" th:text="${mensajeError}"></div>
+
+                    <form id="formComunicado" th:action="@{/gestioncomunicados/guardar}" th:object="${comunicado}" method="post">
+                        <input type="hidden" th:field="*{idComunicado}" />
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Enviar a</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="destinoTipo" id="destAula" value="AULA" checked>
+                                    <label class="form-check-label" for="destAula">Aula</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="destinoTipo" id="destGrado" value="GRADO">
+                                    <label class="form-check-label" for="destGrado">Grado completo</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="destinoTipo" id="destGlobal" value="GLOBAL">
+                                    <label class="form-check-label" for="destGlobal">Todos</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="selectAulaBlock" class="mb-3">
+                            <label class="form-label fw-bold">Aula</label>
+                            <select th:field="*{aula.idAula}" class="form-select">
+                                <option value="0">-- Seleccione Aula --</option>
+                                <option th:each="a : ${aulas}" th:value="${a.idAula}" th:text="${a.grado + ' - ' + a.seccion}"></option>
+                            </select>
+                        </div>
+
+                        <div id="selectGradoBlock" class="mb-3" style="display:none;">
+                            <label class="form-label fw-bold">Grado</label>
+                            <select th:field="*{grado}" id="gradoSeleccionado" class="form-select">
+                                <option value="">-- Seleccione Grado --</option>
+                                <option th:each="g : ${grados}" th:value="${g}" th:text="${g}"></option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Título</label>
+                            <input type="text" th:field="*{titulo}" class="form-control" placeholder="Título del comunicado" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Contenido</label>
+                            <textarea th:field="*{contenido}" class="form-control" rows="6" placeholder="Escribe aquí el anuncio o comunicado" required></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a th:href="@{/gestioncomunicados/lista}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-success">Publicar Comunicado</button>
+                        </div>
+                    </form>
+
+                    <script>
+                      document.addEventListener('DOMContentLoaded', function () {
+                        const radios = document.querySelectorAll('input[name="destinoTipo"]');
+                        const aulaBlock = document.getElementById('selectAulaBlock');
+                        const gradoBlock = document.getElementById('selectGradoBlock');
+                        function update() {
+                          const v = document.querySelector('input[name="destinoTipo"]:checked').value;
+                          aulaBlock.style.display = (v === 'AULA') ? '' : 'none';
+                          gradoBlock.style.display = (v === 'GRADO') ? '' : 'none';
+                        }
+                        radios.forEach(r => r.addEventListener('change', update));
+                        update();
+                      });
+                    </script>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="/fragments/scripts :: scripts"></div>
+</body>
+</html>
+

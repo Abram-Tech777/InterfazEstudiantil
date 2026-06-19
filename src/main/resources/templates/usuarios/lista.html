@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Gestión de Usuarios')"></head>
+<body class="bg-light">
+
+    <div th:replace="/fragments/menu :: menu"></div>
+
+    <div class="container mt-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Control de Usuarios y Accesos</h3>
+                <a th:href="@{/gestionusuarios/nuevo}" class="btn btn-light btn-sm fw-bold">+ Registrar Nuevo Usuario</a>
+            </div>
+            <div class="card-body">
+
+                <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${mensajeExito}"></span>
+                    <button type="button" class="btn-close" onclick="this.parentElement.style.display='none';"></button>
+                </div>
+
+                <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${mensajeError}"></span>
+                    <button type="button" class="btn-close" onclick="this.parentElement.style.display='none';"></button>
+                </div>
+
+                <div class="table-responsive mt-3">
+                    <table class="table table-hover table-bordered align-middle">
+                        <thead class="table-dark text-center">
+                            <tr>
+                                <th style="width: 15%;">Código</th>
+                                <th>Nombre Completo</th>
+                                <th style="width: 15%;">Rol / Perfil</th>
+                                <th style="width: 15%;">Estado</th>
+                                <th style="width: 20%;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(usuarios)}">
+                                <td colspan="5" class="text-center text-muted py-4">No hay usuarios registrados en el sistema.</td>
+                            </tr>
+                            
+                            <tr th:each="u : ${usuarios}" class="text-center">
+                                <td th:text="${u.codUsuario}" class="fw-bold text-primary"></td>
+                                <td th:text="${u.nombreCompleto}" class="text-start ps-3"></td>
+                                <td>
+									<span th:text="${u.rol}"
+									      th:class="${#strings.equalsIgnoreCase(u.rol,'ADMINISTRADOR') ? 'badge bg-danger' : (#strings.equalsIgnoreCase(u.rol,'DOCENTE') ? 'badge bg-warning text-dark' : 'badge bg-info text-dark')}">
+									</span>
+                                </td>
+                                <td>
+                                    <span th:text="${u.estado}" 
+                                          th:class="${u.estado == 'ACTIVO'} ? 'badge bg-success' : 'badge bg-secondary'">
+                                    </span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/gestionusuarios/editar/{id}(id=${u.idUsuario})}" class="btn btn-warning btn-sm me-1">Editar</a>
+                                    <a th:if="${u.estado == 'ACTIVO'}" 
+                                       th:href="@{/gestionusuarios/eliminar/{id}(id=${u.idUsuario})}" 
+                                       class="btn btn-danger btn-sm" 
+                                       onclick="return confirm('¿Estás seguro de que deseas inhabilitar este usuario?');">
+                                        Desactivar
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="/fragments/scripts :: scripts"></div>
+
+</body>
+</html>
+

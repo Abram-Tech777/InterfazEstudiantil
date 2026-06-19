@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Detalle del Aula')"></head>
+<body>
+    <div class="container mt-4">
+        <!-- Menú -->
+        <th:block th:replace="fragments/menu :: menu"/>
+
+        <div class="row mt-4">
+            <div class="col-md-10 offset-md-1">
+                <!-- Información del Aula -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Información del Aula</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Capacidad:</strong> <span th:text="${aula.capacidad}"></span> estudiantes</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Grado:</strong> <span th:text="${aula.grado}"></span></p>
+                                <p><strong>Sección:</strong> <span th:text="${aula.seccion}"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--Docentes Asignados -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Docentes Asignados</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${docentesAsignados.isEmpty()}" class="alert alert-warning">
+                            No hay docentes asignados a esta aula.
+                        </div>
+                        <table th:if="${!docentesAsignados.isEmpty()}" class="table table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Docente</th>
+                                    <th>Rol</th>
+                                    <th>Activo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="ad : ${docentesAsignados}">
+                                    <td th:text="${ad.docente.nombreCompleto}"></td>
+                                    <td>
+                                        <span class="badge bg-info" th:text="${ad.rol}"></span>
+                                    </td>
+                                    <td>
+                                        <span th:if="${ad.activo}" class="badge bg-success">Sí</span>
+                                        <span th:unless="${ad.activo}" class="badge bg-danger">No</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Alumnos del Aula -->
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Alumnos del Aula</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${alumnos.isEmpty()}" class="alert alert-warning">
+                            No hay alumnos registrados en esta aula.
+                        </div>
+                        <table th:if="${!alumnos.isEmpty()}" class="table table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nombre</th>
+                                    <th>Apellido</th>
+                                    <th>Usuario</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="alumno, iterStat : ${alumnos}">
+                                    <td th:text="${iterStat.count}"></td>
+                                    <td th:text="${alumno.nombre}"></td>
+                                    <td th:text="${alumno.apellido}"></td>
+                                    <td th:text="${alumno.usuario.usuario}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <a href="/gestionaulas" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver a Aulas
+                    </a>
+                    <a th:href="@{/gestionaulas/asignar/{id}(id=${aula.idAula})}" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Editar Asignaciones
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block th:replace="fragments/scripts :: scripts"/>
+</body>
+</html>

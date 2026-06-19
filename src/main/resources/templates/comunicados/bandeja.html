@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Bandeja de Comunicados')"></head>
+<body class="bg-light">
+<div th:replace="/fragments/menu :: menu"></div>
+<div class="container mt-4">
+    <h3>Bandeja de Comunicados</h3>
+    <div th:if="${#lists.isEmpty(comunicados)}" class="alert alert-info">No tienes comunicados.</div>
+
+    <div th:each="c : ${comunicados}" class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <strong th:text="${c.titulo}"></strong>
+                <div class="text-muted small" th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm').format(c.fechaEmision)}"></div>
+            </div>
+            <div class="text-end small text-muted" th:text="${autorMap[c.autor.idUsuario]}"></div>
+        </div>
+        <div class="card-body">
+            <p th:text="${c.contenido}"></p>
+        </div>
+    </div>
+</div>
+
+<div th:replace="/fragments/scripts :: scripts"></div>
+</body>
+</html>
+

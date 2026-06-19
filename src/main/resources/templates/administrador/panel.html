@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Panel Administrador')"></head>
+<body>
+  <div th:replace="/fragments/menu :: menu"></div>
+
+  <div class="container mt-4">
+    <h1>Panel Administrador</h1>
+	<div class="list-group mt-3">
+	  <a th:href="@{/gestionusuarios}" class="list-group-item list-group-item-action">Gestión de Usuarios</a>
+	  <a th:href="@{/gestionaulas}" class="list-group-item list-group-item-action">Gestión de Aulas</a>
+	  <a th:href="@{/gestioncomunicados/lista}" class="list-group-item list-group-item-action">Comunicados</a>
+	  <a th:href="@{/gestionarhorarios}" class="list-group-item list-group-item-action">Horarios</a>
+	</div>
+  </div>
+
+  <div th:replace="/fragments/scripts :: scripts"></div>
+</body>
+</html>
+

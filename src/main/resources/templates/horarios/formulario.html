@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Formulario Horario')"></head>
+<body class="bg-light">
+
+<div th:replace="/fragments/menu :: menu"></div>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0" th:text="${horario.idHorario == 0 ? 'Registrar Horario' : 'Editar Horario'}"></h5>
+                </div>
+                <div class="card-body">
+
+                    <div th:if="${mensajeError}" class="alert alert-danger" th:text="${mensajeError}"></div>
+
+                    <form id="formHorario" th:action="@{/gestionarhorarios/guardar}" th:object="${horario}" method="post">
+                        <input type="hidden" th:field="*{idHorario}" />
+
+						<div class="mb-3">
+						    <label class="form-label fw-bold">Aula</label>
+						    <select th:field="*{aula.idAula}" class="form-select" required>
+						        <option value="0">-- Seleccione Aula --</option>
+						        <option th:each="a : ${aulas}" th:value="${a.idAula}" th:text="${a.grado + ' - ' + a.seccion}"></option>
+						    </select>
+						</div>
+						
+						
+						<div class="mb-3">
+						  <label class="form-label fw-bold">Docente</label>
+						  <select th:field="*{idDocente}" class="form-select" required>
+						      <option value="0">-- Seleccione Docente --</option>
+						      <option th:each="d : ${docentes}"
+						              th:value="${d.idDocente}"
+						              th:text="${d.nombre + ' ' + d.apellido}"></option>
+						  </select>
+						</div>
+
+                        
+						<div class="mb-3">
+						    <label class="form-label fw-bold">Curso</label>
+						    <select th:field="*{idCurso}" class="form-select" required>
+						        <option value="0">-- Seleccione Curso --</option>
+						        <option th:each="c : ${cursos}" th:value="${c.idCurso}" th:text="${c.nombreCurso}"></option>
+						    </select>
+						</div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Día de la semana</label>
+                            <select th:field="*{diaSemana}" class="form-select" required>
+                                <option value="">-- Seleccione Día --</option>
+                                <option th:each="d : ${dias}" th:value="${d}" th:text="${d}"></option>
+                            </select>
+                        </div>
+
+                        <div class="row">
+							<div class="col-md-6 mb-3">
+							    <label class="form-label fw-bold">Hora inicio</label>
+							    <input id="horaInicioVisible" class="form-control" placeholder="Ej: 04:30 PM" />
+							    <input type="hidden" th:field="*{horaInicio}" id="horaInicioHidden" />
+							</div>
+							
+							<div class="col-md-6 mb-3">
+							    <label class="form-label fw-bold">Hora fin</label>
+							    <input id="horaFinVisible" class="form-control" placeholder="Ej: 05:30 PM" />
+							    <input type="hidden" th:field="*{horaFin}" id="horaFinHidden" />
+							</div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a th:href="@{/gestionarhorarios}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-success">Guardar Horario</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+
+  function to24(time12) {
+    if (!time12) return '';
+    time12 = time12.trim().toUpperCase();
+    var m24 = time12.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+    if (m24) {
+      var hh = String(parseInt(m24[1],10)).padStart(2,'0');
+      return hh + ':' + m24[2];
+    }
+
+    var m = time12.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i);
+    if (!m) return '';
+    var h = parseInt(m[1],10);
+    var mm = m[2] ? m[2] : '00';
+    var ampm = m[3].toUpperCase();
+    if (ampm === 'PM' && h !== 12) h += 12;
+    if (ampm === 'AM' && h === 12) h = 0;
+    return String(h).padStart(2,'0') + ':' + mm;
+  }
+
+  function to12(time24) {
+    if (!time24) return '';
+    var parts = time24.split(':');
+    if (parts.length < 2) return '';
+    var h = parseInt(parts[0],10);
+    var m = parts[1];
+    var ampm = (h >= 12) ? 'PM' : 'AM';
+    if (h === 0) h = 12;
+    else if (h > 12) h = h - 12;
+    return h + ':' + String(m).padStart(2,'0') + ' ' + ampm;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    try {
+      if (typeof flatpickr !== 'undefined') {
+        flatpickr("#horaInicioVisible", { enableTime:true, noCalendar:true, time_24hr:false, dateFormat:"h:i K" });
+        flatpickr("#horaFinVisible",   { enableTime:true, noCalendar:true, time_24hr:false, dateFormat:"h:i K" });
+      }
+    } catch(e) {
+      console.warn('flatpickr init failed', e);
+    }
+
+    const startHidden = document.getElementById('horaInicioHidden');
+    const endHidden   = document.getElementById('horaFinHidden');
+    const startVisible = document.getElementById('horaInicioVisible');
+    const endVisible   = document.getElementById('horaFinVisible');
+
+
+    if (startHidden && startHidden.value) startVisible.value = to12(startHidden.value);
+    if (endHidden   && endHidden.value)   endVisible.value   = to12(endHidden.value);
+
+    const form = document.getElementById('formHorario') || document.querySelector('form[action="/gestionarhorarios/guardar"]');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        var v1 = startVisible ? startVisible.value : '';
+        var v2 = endVisible ? endVisible.value : '';
+        var s24 = to24(v1);
+        var e24 = to24(v2);
+
+        if (!s24 || !e24) {
+          e.preventDefault();
+          alert('Formato de hora inválido. Use el selector o escriba por ejemplo "04:30 PM".');
+          return;
+        }
+
+
+        var sParts = s24.split(':').map(Number);
+        var eParts = e24.split(':').map(Number);
+        var sMinutes = sParts[0]*60 + sParts[1];
+        var eMinutes = eParts[0]*60 + eParts[1];
+        if (sMinutes >= eMinutes) {
+          e.preventDefault();
+          alert('La hora de inicio debe ser anterior a la hora de fin.');
+          return;
+        }
+
+
+        startHidden.value = s24;
+        endHidden.value   = e24;
+      });
+    }
+  });
+</script>
+
+<div th:replace="/fragments/scripts :: scripts"></div>
+</body>
+</html>

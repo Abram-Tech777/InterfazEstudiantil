@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Asignar Docentes - Aula')"></head>
+<body>
+    <div class="container mt-4">
+        <!-- Menú -->
+        <th:block th:replace="fragments/menu :: menu"/>
+
+        <div class="row mt-4">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Asignar Docentes a Aula</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="mb-3">
+                            <strong>Aula:</strong>
+                            <span th:text="${aula.nombre}"></span>
+                            (Capacidad: <span th:text="${aula.capacidad}"></span>)
+                        </h6>
+
+                        <form method="POST" th:action="@{/gestionaulas/asignar/{id}(id=${aula.idAula})}">
+                            <!-- Tabla de docentes -->
+                            <table class="table table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Seleccionar</th>
+                                        <th>Docente</th>
+                                        <th>Rol</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="docente : ${todosDocentes}">
+                                        <td>
+                                            <input type="checkbox" 
+                                                   name="docentes" 
+                                                   th:value="${docente.idDocente}"
+                                                   th:checked="${idsAsignados.contains(docente.idDocente)}"/>
+                                        </td>
+                                        <td th:text="${docente.nombreCompleto}"></td>
+                                        <td>
+                                            <select th:name="'rolAsignado_' + ${docente.idDocente}" class="form-control form-control-sm">
+                                                <option value="DOCENTE" selected>DOCENTE</option>
+                                                <option value="TUTOR">TUTOR</option>
+                                                <option value="AUXILIAR">AUXILIAR</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="form-group mb-3">
+                                <label for="rol">Rol por defecto:</label>
+                                <select id="rol" name="rol" class="form-control">
+                                    <option value="DOCENTE" selected>DOCENTE</option>
+                                    <option value="TUTOR">TUTOR</option>
+                                    <option value="AUXILIAR">AUXILIAR</option>
+                                </select>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-check-circle"></i> Guardar Asignaciones
+                                </button>
+                                <a href="/gestionaulas" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-left"></i> Cancelar
+                                </a>
+                            </div>
+                        </form>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </div>
+
+     <th:block th:replace="fragments/scripts :: scripts"/>
+     
+     <script>
+         document.addEventListener('DOMContentLoaded', function(){
+             var defaultRolSelect = document.getElementById('rol');
+             if(defaultRolSelect){
+                 defaultRolSelect.addEventListener('change', function(){
+                     var selectedRole = this.value;
+                     document.querySelectorAll('input[name="docentes"]:checked').forEach(function(checkbox){
+                         var selectPerDocente = document.querySelector('select[name="rolAsignado_' + checkbox.value + '"]');
+                         if(selectPerDocente) selectPerDocente.value = selectedRole;
+                     });
+                 });
+             }
+         });
+     </script>
+ </body>
+ </html>

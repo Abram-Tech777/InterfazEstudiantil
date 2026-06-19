@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Acceso al Sistema - Colegio')"></head>
+<body class="bg-dark d-flex align-items-center justify-content-center" style="height: 100vh;">
+
+    <div class="card shadow-lg p-4" style="width: 380px; border-radius: 12px;">
+        <div class="text-center mb-4">
+            <h3 class="fw-bold text-primary">Intranet Escolar</h3>
+            <p class="text-muted small">Ingresa tus credenciales de acceso</p>
+        </div>
+        
+        <form th:action="@{/login}" method="post">
+            
+            <div th:if="${error}" class="alert alert-danger py-2 text-center small" th:text="${error}"></div>
+            
+            <div class="mb-3">
+                <label class="form-label fw-bold small">Código de Usuario:</label>
+                <input type="text" name="codUsuario" class="form-control" placeholder="Ej: C2026001" required>
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label fw-bold small">Contraseña:</label>
+                <input type="password" name="password" class="form-control" placeholder="********" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100 fw-bold py-2">Iniciar Sesión</button>
+        </form>
+    </div>
+
+<div th:replace="/fragments/scripts :: scripts"></div>
+</body>
+</html>
+

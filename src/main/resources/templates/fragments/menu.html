@@ -1,0 +1,71 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="menu">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" th:href="@{/}">Colegio</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+              aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+          <!-- Menú Administrador -->
+          <li class="nav-item dropdown"
+              th:if="${session.usuarioLogueado != null and #strings.equalsIgnoreCase(session.usuarioLogueado.rol,'ADMINISTRADOR')}">
+            <a class="nav-link dropdown-toggle" href="#" id="adminMenu" role="button" data-bs-toggle="dropdown"
+               aria-expanded="false">Administrador</a>
+            <ul class="dropdown-menu" aria-labelledby="adminMenu">
+              <li><a class="dropdown-item" th:href="@{/gestionusuarios}" th:classappend="${currentUri != null and currentUri.startsWith('/gestionusuarios') ? ' active' : ''}">Gestión de Usuarios</a></li>
+              <li><a class="dropdown-item" th:href="@{/gestionaulas}" th:classappend="${currentUri != null and currentUri.startsWith('/gestionaulas') ? ' active' : ''}">Gestión de Aulas</a></li>
+              <li><a class="dropdown-item" th:href="@{/gestioncomunicados/lista}" th:classappend="${currentUri != null and currentUri.startsWith('/gestioncomunicados') ? ' active' : ''}">Comunicados</a></li>
+              <li><a class="dropdown-item" th:href="@{/gestionarhorarios}" th:classappend="${currentUri != null and currentUri.startsWith('/gestionarhorarios') ? ' active' : ''}">Horarios</a></li>
+            </ul>
+          </li>
+
+          <!-- Menú Docente -->
+          <li class="nav-item dropdown"
+              th:if="${session.usuarioLogueado != null and #strings.equalsIgnoreCase(session.usuarioLogueado.rol,'DOCENTE')}">
+            <a class="nav-link dropdown-toggle" href="#" id="docenteMenu" role="button" data-bs-toggle="dropdown"
+               aria-expanded="false">Docente</a>
+            <ul class="dropdown-menu" aria-labelledby="docenteMenu">
+              <li><a class="dropdown-item" th:href="@{/gestioncomunicados/nuevo}">Crear Comunicado</a></li>
+              <li><a class="dropdown-item" th:href="@{/gestioncomunicados/lista}">Mis Comunicados</a></li>
+              <li><a class="dropdown-item" href="#" onclick="return false;">Mi Horario (Próx.)</a></li>
+              <li><a class="dropdown-item" href="#" onclick="return false;">Control de Asistencia (Próx.)</a></li>
+            </ul>
+          </li>
+
+          <!-- Menú Estudiante -->
+          <li class="nav-item dropdown"
+              th:if="${session.usuarioLogueado != null and #strings.equalsIgnoreCase(session.usuarioLogueado.rol,'ESTUDIANTE')}">
+            <a class="nav-link dropdown-toggle" href="#" id="estudianteMenu" role="button" data-bs-toggle="dropdown"
+               aria-expanded="false">Estudiante</a>
+            <ul class="dropdown-menu" aria-labelledby="estudianteMenu">
+              <li><a class="dropdown-item" th:href="@{/gestioncomunicados/bandeja}">Bandeja</a></li>
+              <li><a class="dropdown-item" href="#" onclick="return false;">Mis Notas (Próx.)</a></li>
+              <li><a class="dropdown-item" href="#" onclick="return false;">Mi Asistencia (Próx.)</a></li>
+            </ul>
+          </li>
+
+        </ul>
+
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item me-2" th:if="${session.usuarioLogueado != null}">
+            <span class="nav-link"><strong th:text="${session.usuarioLogueado.nombreCompleto}">Usuario</strong></span>
+          </li>
+
+          <li class="nav-item" th:if="${session.usuarioLogueado != null}">
+            <form th:action="@{/logout}" method="post" class="d-inline">
+              <button type="submit" class="btn btn-outline-danger btn-sm">Cerrar sesión</button>
+            </form>
+          </li>
+
+          <li class="nav-item" th:if="${session.usuarioLogueado == null}">
+            <a class="nav-link" th:href="@{/login}">Iniciar sesión</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</div>

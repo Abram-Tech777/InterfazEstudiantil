@@ -1,0 +1,29 @@
+package com.colegio.repository;
+
+import java.time.LocalTime;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.colegio.entity.Horario;
+
+public interface HorarioRepository extends JpaRepository<Horario, Integer>{
+
+	
+	@Query("SELECT h FROM Horario h WHERE h.aula.idAula = :idAula AND h.diaSemana = :dia AND h.horaInicio = :inicio")
+    List<Horario> buscarChoqueAula(@Param("idAula") int idAula, @Param("dia") String dia, @Param("inicio") LocalTime inicio);
+
+    @Query("SELECT h FROM Horario h WHERE h.idDocente = :idDocente AND h.diaSemana = :dia AND h.horaInicio = :inicio")
+    List<Horario> buscarChoqueDocente(@Param("idDocente") int idDocente, @Param("dia") String dia, @Param("inicio") LocalTime inicio);
+
+    @Query("SELECT h FROM Horario h ORDER BY h.diaSemana ASC, h.horaInicio ASC")
+    List<Horario> listarTodosOrdenados();
+
+    @Query("SELECT h FROM Horario h WHERE h.idDocente = :idDocente AND h.aula.idAula IN :aulasIds ORDER BY h.diaSemana ASC, h.horaInicio ASC")
+    List<Horario> findByDocenteAndAulasAsignadas(@Param("idDocente") int idDocente, @Param("aulasIds") List<Integer> aulasIds);
+
+    @Query("SELECT h FROM Horario h WHERE h.idDocente = :idDocente ORDER BY h.diaSemana ASC, h.horaInicio ASC")
+    List<Horario> findByIdDocente(@Param("idDocente") int idDocente);
+}

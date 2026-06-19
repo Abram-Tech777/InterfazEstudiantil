@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Gestión de Aulas')"></head>
+<body class="bg-light">
+
+    <div th:replace="/fragments/menu :: menu"></div>
+
+    <div class="container mt-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Mantenimiento de Aulas</h3>
+                <a th:href="@{/gestionaulas/nuevo}" class="btn btn-light btn-sm fw-bold">+ Registrar Nueva Aula</a>
+            </div>
+            <div class="card-body">
+
+                <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${mensajeExito}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="none" onclick="this.parentElement.style.display='none';"></button>
+                </div>
+
+                <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${mensajeError}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="none" onclick="this.parentElement.style.display='none';"></button>
+                </div>
+
+                <div class="table-responsive mt-3">
+                    <table class="table table-hover table-bordered align-middle">
+                        <thead class="table-dark text-center">
+                            <tr>
+                                <th style="width: 10%;">ID Aula</th>
+                                <th>Grado / Nivel</th>
+                                <th style="width: 15%;">Sección</th>
+                                <th style="width: 15%;">Capacidad (Alumnos)</th>
+                                <th style="width: 30%;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(aulas)}">
+                                <td colspan="5" class="text-center text-muted py-4">No hay aulas registradas en el sistema.</td>
+                            </tr>
+                            
+                            <tr th:each="a : ${aulas}" class="text-center">
+                                <td th:text="${a.idAula}" class="fw-bold"></td>
+                                <td th:text="${a.grado}" class="text-start ps-4"></td>
+                                <td th:text="${a.seccion}"></td>
+                                <td th:text="${a.capacidad}"></td>
+                                <td>
+                                    <a th:href="@{/gestionaulas/detalle/{id}(id=${a.idAula})}" class="btn btn-info btn-sm me-2">Ver Detalle</a>
+                                    <a th:href="@{/gestionaulas/asignar/{id}(id=${a.idAula})}" class="btn btn-success btn-sm me-2">Asignar Docentes</a>
+                                    <a th:href="@{/gestionaulas/editar/{id}(id=${a.idAula})}" class="btn btn-warning btn-sm me-2">Editar</a>
+                                    <a th:href="@{/gestionaulas/eliminar/{id}(id=${a.idAula})}" 
+                                       class="btn btn-danger btn-sm" 
+                                       onclick="return confirm('¿Estás seguro de que deseas eliminar esta aula?');">
+                                        Eliminar
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="/fragments/scripts :: scripts"></div>
+
+</body>
+</html>
+

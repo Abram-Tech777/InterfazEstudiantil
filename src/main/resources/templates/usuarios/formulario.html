@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Formulario de Usuario')"></head>
+<body class="bg-light">
+
+    <div th:replace="/fragments/menu :: menu"></div>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-header bg-dark text-white">
+                        <h4 class="mb-0" th:text="${usuario.idUsuario == 0} ? 'Registrar Usuario' : 'Modificar Usuario'">Formulario Usuario</h4>
+                    </div>
+                    <div class="card-body p-4">
+
+                        <form th:action="@{/gestionusuarios/guardar}" th:object="${usuario}" method="post">
+                            
+                            <input type="hidden" th:field="*{idUsuario}" />
+                            <input type="hidden" th:field="*{codUsuario}" />
+
+                            <div class="mb-3 text-center bg-light p-2 rounded border" th:if="${usuario.idUsuario != 0}">
+                                <label class="form-label d-block fw-bold text-secondary mb-1">Código de Acceso:</label>
+                                <span class="fs-4 fw-bold text-dark" th:text="${usuario.codUsuario}"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="nombreCompleto" class="form-label fw-bold">Nombre Completo:</label>
+                                <input type="text" id="nombreCompleto" th:field="*{nombreCompleto}" class="form-control" 
+                                       placeholder="Ej: Paco Pérez" required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label fw-bold">Contraseña:</label>
+                                <input type="password" id="password" th:field="*{password}" class="form-control" 
+                                       placeholder="Asigna una contraseña para el ingreso" required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="correo" class="form-label fw-bold">Correo Electrónico (opcional):</label>
+                                <input type="email" id="correo" th:field="*{correo}" class="form-control" 
+                                       placeholder="Ej: usuario@colegio.edu.ec" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="rol" class="form-label fw-bold">Rol del Sistema:</label>
+                                <select id="rol" th:field="*{rol}" class="form-select" required>
+                                    <option value="">-- Seleccione un Rol --</option>
+                                    <option value="ADMINISTRADOR">Administrador</option>
+                                    <option value="DOCENTE">Docente</option>
+                                    <option value="ESTUDIANTE">Estudiante</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4" th:if="${usuario.idUsuario != 0}">
+                                <label for="estado" class="form-label fw-bold">Estado de la Cuenta:</label>
+                                <select id="estado" th:field="*{estado}" class="form-select" required>
+                                    <option value="ACTIVO">ACTIVO</option>
+                                    <option value="INACTIVO">INACTIVO</option>
+                                </select>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/gestionusuarios}" class="btn btn-secondary">Cancelar</a>
+                                <button type="submit" class="btn btn-success" 
+                                        th:text="${usuario.idUsuario == 0} ? 'Registrar Cuenta' : 'Guardar Cambios'"></button>
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="/fragments/scripts :: scripts"></div>
+
+</body>
+</html>
+
