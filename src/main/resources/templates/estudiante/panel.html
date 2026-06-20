@@ -1,19 +1,51 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/fragments/head :: head('Panel Estudiante')"></head>
-<body>
-  <div th:replace="/fragments/menu :: menu"></div>
+<body class="bg-gray-50 m-0 p-0 min-h-screen flex flex-col">
 
-  <div class="container mt-4">
-    <h1>Panel Estudiante</h1>
-    <div class="list-group mt-3">
-      <a th:href="@{/gestioncomunicados/bandeja}" class="list-group-item list-group-item-action">Bandeja</a>
-      <a th:href="@{/estudiante/horario}" class="list-group-item list-group-item-action">Mi Horario</a>
-      <a th:href="@{/estudiante/notas}" class="list-group-item list-group-item-action">Mis Notas</a>
-      <a th:href="@{/estudiante/asistencia}" class="list-group-item list-group-item-action">Mi Asistencia</a>
-    </div>
-  </div>
+    <div th:replace="/fragments/menu :: menu"></div>
 
-  <div th:replace="/fragments/scripts :: scripts"></div>
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Panel Estudiante</h1>
+            <p class="text-gray-600 mt-2">Acceso a tu información académica y personal.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <a th:href="@{/gestioncomunicados/bandeja}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
+                <div class="bg-cyan-50 p-4 rounded-lg text-cyan-600 group-hover:bg-cyan-600 group-hover:text-white transition-colors w-fit mb-4">
+                    <i class="fas fa-inbox text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Bandeja de Entrada</h3>
+                <p class="text-sm text-gray-500">Mensajes y comunicados</p>
+            </a>
+
+            <a th:href="@{/estudiante/horario}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
+                <div class="bg-indigo-50 p-4 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors w-fit mb-4">
+                    <i class="fas fa-calendar-alt text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Mi Horario</h3>
+                <p class="text-sm text-gray-500">Tu programa de clases</p>
+            </a>
+
+            <a th:href="@{/estudiante/notas}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
+                <div class="bg-teal-50 p-4 rounded-lg text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition-colors w-fit mb-4">
+                    <i class="fas fa-graduation-cap text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Mis Notas</h3>
+                <p class="text-sm text-gray-500">Calificaciones por bimestre</p>
+            </a>
+
+            <a th:href="@{/estudiante/asistencia}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
+                <div class="bg-lime-50 p-4 rounded-lg text-lime-600 group-hover:bg-lime-600 group-hover:text-white transition-colors w-fit mb-4">
+                    <i class="fas fa-user-check text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Mi Asistencia</h3>
+                <p class="text-sm text-gray-500">Registro de asistencias</p>
+            </a>
+        </div>
+    </main>
+
+    <div th:replace="/fragments/scripts :: scripts"></div>
 </body>
 </html>

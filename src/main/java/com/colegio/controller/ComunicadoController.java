@@ -158,4 +158,20 @@ public class ComunicadoController {
         model.addAttribute("autorMap", autorMap);
         return "comunicados/bandeja";
     }
+
+    @GetMapping("/eliminar/{id}")
+    public String eliminarMensaje(@PathVariable Integer id, HttpSession session, RedirectAttributes redirectAttrs) {
+        Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
+        if (u == null) {
+            redirectAttrs.addFlashAttribute("mensajeError", "Debes iniciar sesión.");
+            return "redirect:/login";
+        }
+        try {
+            comunicadoService.eliminarComunicado(id);
+            redirectAttrs.addFlashAttribute("mensajeExito", "Mensaje eliminado correctamente.");
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("mensajeError", "Error al eliminar el mensaje.");
+        }
+        return "redirect:/gestioncomunicados/bandeja";
+    }
 }

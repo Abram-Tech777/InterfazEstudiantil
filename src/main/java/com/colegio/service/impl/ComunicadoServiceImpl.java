@@ -49,4 +49,9 @@ public class ComunicadoServiceImpl implements ComunicadoService {
     public List<Comunicado> listarTodos() {
         return comunicadoRepository.listarTodosOrdenados();
     }
+
+    @Override
+    public void eliminarComunicado(Integer idComunicado) {
+        comunicadoRepository.deleteById(idComunicado);
+    }
 }

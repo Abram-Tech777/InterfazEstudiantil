@@ -1,19 +1,59 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/fragments/head :: head('Panel Docente')"></head>
-<body>
-  <div th:replace="/fragments/menu :: menu"></div>
+<body class="bg-gray-50 m-0 p-0 min-h-screen flex flex-col">
 
-  <div class="container mt-4">
-    <h1>Panel Docente</h1>
-    <div class="list-group mt-3">
-      <a th:href="@{/gestioncomunicados/nuevo}" class="list-group-item list-group-item-action">Crear Comunicado</a>
-      <a th:href="@{/gestioncomunicados/lista}" class="list-group-item list-group-item-action">Mis Comunicados</a>
-      <a th:href="@{/gestionarhorarios}" class="list-group-item list-group-item-action">Mi Horario</a>
-      <a th:href="@{/docente/asistencia}" class="list-group-item list-group-item-action">Control de Asistencia</a>
-    </div>
-  </div>
+    <div th:replace="/fragments/menu :: menu"></div>
 
-  <div th:replace="/fragments/scripts :: scripts"></div>
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Panel Docente</h1>
+            <p class="text-gray-600 mt-2">Acceso rápido a tus funciones principales como docente.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <a th:href="@{/gestioncomunicados/nuevo}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
+                <div class="bg-green-50 p-4 rounded-lg text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors w-fit mb-4">
+                    <i class="fas fa-pen text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Crear Comunicado</h3>
+                <p class="text-sm text-gray-500">Envía mensajes a padres y estudiantes</p>
+            </a>
+
+            <a th:href="@{/gestioncomunicados/lista}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
+                <div class="bg-blue-50 p-4 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors w-fit mb-4">
+                    <i class="fas fa-list text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Mis Comunicados</h3>
+                <p class="text-sm text-gray-500">Visualiza tu historial de mensajes</p>
+            </a>
+
+            <a th:href="@{/gestionarhorarios}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
+                <div class="bg-purple-50 p-4 rounded-lg text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors w-fit mb-4">
+                    <i class="fas fa-clock text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Mi Horario</h3>
+                <p class="text-sm text-gray-500">Consulta tu programación semanal</p>
+            </a>
+
+            <a th:href="@{/docente/asistencia}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
+                <div class="bg-orange-50 p-4 rounded-lg text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors w-fit mb-4">
+                    <i class="fas fa-clipboard-check text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Control de Asistencia</h3>
+                <p class="text-sm text-gray-500">Registra la asistencia de estudiantes</p>
+            </a>
+
+            <a th:href="@{/docente/evaluaciones}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
+                <div class="bg-pink-50 p-4 rounded-lg text-pink-600 group-hover:bg-pink-600 group-hover:text-white transition-colors w-fit mb-4">
+                    <i class="fas fa-star text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Evaluaciones y Notas</h3>
+                <p class="text-sm text-gray-500">Registra y gestiona las calificaciones</p>
+            </a>
+        </div>
+    </main>
+
+    <div th:replace="/fragments/scripts :: scripts"></div>
 </body>
 </html>

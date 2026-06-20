@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Registrar Notas')"></head>
+<body class="bg-gray-50 m-0 p-0 min-h-screen flex flex-col">
+
+    <div th:replace="fragments/menu :: menu"></div>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Registrar Notas</h1>
+            <p class="text-gray-600 mt-2">
+                <span class="badge-status bg-pink-100 text-pink-700 mr-2">
+                    Bimestre <span th:text="${bimestre}"></span>
+                </span>
+            </p>
+        </div>
+
+        <!-- Class Info -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                    <p class="text-xs text-gray-600 uppercase font-semibold">Día</p>
+                    <p class="text-lg font-bold text-gray-900" th:text="${horario.diaSemana}"></p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-600 uppercase font-semibold">Hora</p>
+                    <p class="text-lg font-bold text-gray-900">
+                        <span th:text="${horario.horaInicio}"></span> - <span th:text="${horario.horaFin}"></span>
+                    </p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-600 uppercase font-semibold">Aula</p>
+                    <p class="text-lg font-bold text-gray-900" th:text="${horario.aula != null ? (horario.aula.grado + ' - ' + horario.aula.seccion) : 'N/A'}"></p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-600 uppercase font-semibold">Curso</p>
+                    <p class="text-lg font-bold text-gray-900" th:text="${horario.curso != null ? horario.curso.nombreCurso : 'N/A'}"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div th:if="${session.mensajeExito}" class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-start">
+            <i class="fas fa-check-circle mr-3 mt-1 text-green-600"></i>
+            <span th:text="${session.mensajeExito}"></span>
+        </div>
+
+        <div th:if="${session.mensajeError}" class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-start">
+            <i class="fas fa-exclamation-circle mr-3 mt-1 text-red-600"></i>
+            <span th:text="${session.mensajeError}"></span>
+        </div>
+
+        <!-- Form -->
+        <form th:action="@{/docente/evaluaciones/guardar}" method="post" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <input type="hidden" name="idHorario" th:value="${horario.idHorario}" />
+            <input type="hidden" name="bimestre" th:value="${bimestre}" />
+
+            <!-- Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-gray-700">
+                    <thead class="bg-gray-800 text-white sticky top-0">
+                        <tr>
+                            <th class="px-6 py-4 text-left font-semibold">#</th>
+                            <th class="px-6 py-4 text-left font-semibold">Alumno</th>
+                            <th class="px-6 py-4 text-center font-semibold">Nota (0-20)</th>
+                            <th class="px-6 py-4 text-left font-semibold">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="a, iter : ${alumnos}" class="border-t hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 font-bold text-gray-900" th:text="${iter.count}"></td>
+                            <td class="px-6 py-4 font-medium text-gray-800" th:text="${a.nombreCompleto}"></td>
+                            <td class="px-6 py-4">
+                                <input type="number" 
+                                       th:name="${'nota_' + a.idAlumno}" 
+                                       class="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition"
+                                       placeholder="0-20"
+                                       step="0.01"
+                                       min="0"
+                                       max="20"
+                                       th:value="${notasMap.containsKey(a.idAlumno) ? notasMap.get(a.idAlumno).nota : ''}" />
+                            </td>
+                            <td class="px-6 py-4">
+                                <span th:if="${notasMap.containsKey(a.idAlumno)}" class="badge-status bg-blue-100 text-blue-700">
+                                    <i class="fas fa-info-circle mr-1"></i>Existente
+                                    <span th:with="dias=${T(java.time.temporal.ChronoUnit).DAYS.between(notasMap.get(a.idAlumno).fechaRegistro, T(java.time.LocalDate).now())}">
+                                        (hace <span th:text="${dias}"></span>d)
+                                    </span>
+                                </span>
+                                <span th:unless="${notasMap.containsKey(a.idAlumno)}" class="badge-status bg-gray-200 text-gray-700">
+                                    <i class="fas fa-minus-circle mr-1"></i>Sin calificar
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Info Box -->
+            <div class="bg-yellow-50 border-t border-yellow-200 px-6 py-4">
+                <p class="text-sm text-yellow-800">
+                    <i class="fas fa-lightbulb text-yellow-600 mr-2"></i>
+                    <strong>Importante:</strong> Las notas pueden editarse dentro de 3 días después del registro. Después de ese período no se pueden modificar.
+                </p>
+            </div>
+
+            <!-- Buttons -->
+            <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex gap-3">
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition flex items-center">
+                    <i class="fas fa-save mr-2"></i>Guardar Notas
+                </button>
+                <a th:href="@{/docente/evaluaciones}" class="border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-2 px-6 rounded-lg transition flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i>Volver
+                </a>
+            </div>
+        </form>
+    </main>
+
+    <div th:replace="fragments/scripts :: scripts"></div>
+</body>
+</html>

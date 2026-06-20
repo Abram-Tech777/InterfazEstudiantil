@@ -1,9 +1,11 @@
 package com.colegio.repository;
 
 import java.util.List;
+import java.time.LocalDateTime;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
 
 import com.colegio.entity.Comunicado;
@@ -25,4 +27,8 @@ public interface ComunicadoRepository extends JpaRepository<Comunicado, Integer>
 
     @Query("SELECT c FROM Comunicado c WHERE c.autor.idUsuario = :idUsuario ORDER BY c.fechaEmision DESC")
     List<Comunicado> listarPorAutor(@Param("idUsuario") int idUsuario);
+
+    @Modifying
+    @Query("DELETE FROM Comunicado c WHERE c.fechaEmision < :fecha")
+    long deleteOlderThan(@Param("fecha") LocalDateTime fecha);
 }

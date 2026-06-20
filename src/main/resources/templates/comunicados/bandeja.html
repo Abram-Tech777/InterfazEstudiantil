@@ -1,27 +1,95 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/fragments/head :: head('Bandeja de Comunicados')"></head>
-<body class="bg-light">
-<div th:replace="/fragments/menu :: menu"></div>
-<div class="container mt-4">
-    <h3>Bandeja de Comunicados</h3>
-    <div th:if="${#lists.isEmpty(comunicados)}" class="alert alert-info">No tienes comunicados.</div>
+<head th:replace="/fragments/head :: head('Bandeja de Entrada')"></head>
+<body class="bg-gray-50 m-0 p-0 min-h-screen flex flex-col">
 
-    <div th:each="c : ${comunicados}" class="card mb-3">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <div>
-                <strong th:text="${c.titulo}"></strong>
-                <div class="text-muted small" th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy HH:mm').format(c.fechaEmision)}"></div>
+    <div th:replace="/fragments/menu :: menu"></div>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Bandeja de Entrada</h1>
+            <p class="text-gray-600 mt-1">Comunicados y mensajes recibidos</p>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(comunicados)}" class="bg-blue-50 border border-blue-200 text-blue-800 px-6 py-8 rounded-lg text-center">
+            <i class="fas fa-inbox text-3xl mb-4"></i>
+            <p class="text-lg font-medium">Sin comunicados</p>
+            <p class="text-sm mt-2">No tienes comunicados en este momento</p>
+        </div>
+
+        <!-- Comunicados List -->
+        <div th:if="${!#lists.isEmpty(comunicados)}" class="space-y-4">
+            <div th:each="c : ${comunicados}" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition card-hover">
+                <div class="bg-gradient-to-r from-blue-50 to-cyan-50 px-6 py-4 border-b border-gray-200">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold text-gray-900" th:text="${c.titulo}"></h3>
+                            <div class="flex items-center mt-2 space-x-4">
+                                <span class="text-sm text-gray-600">
+                                    <i class="fas fa-user-circle mr-1 text-gray-400"></i>
+                                    <strong>De:</strong> <span th:text="${autorMap[c.autor.idUsuario]}"></span>
+                                </span>
+                                <span class="text-sm text-gray-600">
+                                    <i class="fas fa-calendar mr-1 text-gray-400"></i>
+                                    <span th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy hh:mm a').format(c.fechaEmision)}"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="ml-4 flex items-center space-x-3">
+                            <button type="button" class="text-red-600 hover:text-red-700 font-medium delete-btn" th:data-id="${c.idComunicado}" title="Eliminar">
+                                <i class="fas fa-trash text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="px-6 py-4">
+                    <p class="text-gray-700 leading-relaxed" th:text="${c.contenido}"></p>
+                </div>
             </div>
-            <div class="text-end small text-muted" th:text="${autorMap[c.autor.idUsuario]}"></div>
         </div>
-        <div class="card-body">
-            <p th:text="${c.contenido}"></p>
-        </div>
-    </div>
-</div>
 
-<div th:replace="/fragments/scripts :: scripts"></div>
+        <!-- Delete Modal -->
+        <div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm">
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Eliminar mensaje</h3>
+                <p class="text-gray-600 mb-6">¿Estás seguro de que deseas eliminar este mensaje? Esta acción no se puede deshacer.</p>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="cancelDelete" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                        Cancelar
+                    </button>
+                    <button type="button" id="confirmDelete" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let messageIdToDelete = null;
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    messageIdToDelete = this.dataset.id;
+                    document.getElementById('deleteModal').classList.remove('hidden');
+                });
+            });
+            
+            document.getElementById('cancelDelete').addEventListener('click', function() {
+                document.getElementById('deleteModal').classList.add('hidden');
+                messageIdToDelete = null;
+            });
+            
+            document.getElementById('confirmDelete').addEventListener('click', function() {
+                if (messageIdToDelete) {
+                    window.location.href = '/gestioncomunicados/eliminar/' + messageIdToDelete;
+                }
+            });
+        </script>
+    </main>
+
+    <div th:replace="/fragments/scripts :: scripts"></div>
 </body>
 </html>
-

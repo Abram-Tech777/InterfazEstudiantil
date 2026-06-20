@@ -11,5 +11,5 @@ public interface ComunicadoService {
     List<Comunicado> listarPorAula(int idAula);
     List<Comunicado> listarParaAlumno(Alumno alumno);
     List<Comunicado> listarTodos();
-
+    void eliminarComunicado(Integer idComunicado);
 }

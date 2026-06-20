@@ -1,76 +1,96 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{/fragments/head :: head('Formulario de Usuario')}"></head>
-<body class="bg-gray-50 flex flex-col min-h-screen">
+<head th:replace="/fragments/head :: head('Gestión de Usuarios')"></head>
+<body class="bg-gray-50 m-0 p-0 min-h-screen flex flex-col">
 
-    <div th:replace="~{/fragments/menu :: menu}"></div>
+    <div th:replace="/fragments/menu :: menu"></div>
 
-    <main class="flex-grow flex items-center justify-center p-6">
-        <div class="w-full max-w-2xl bg-white rounded-xl shadow-lg overflow-hidden">
-            
-            <div class="bg-gray-800 text-white p-6">
-                <h4 class="text-xl font-bold" th:text="${usuario.idUsuario == 0} ? 'Registrar Nuevo Usuario' : 'Modificar Usuario'">Formulario</h4>
-                <p class="text-sm text-gray-300 mt-1">Completa los campos a continuación.</p>
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Gestión de Usuarios</h1>
+                <p class="text-gray-600 mt-1">Administra las cuentas del sistema</p>
             </div>
+            <a th:href="@{/gestionusuarios/nuevo}" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-6 rounded-lg transition flex items-center">
+                <i class="fas fa-plus mr-2"></i>Nuevo Usuario
+            </a>
+        </div>
 
-            <div class="p-8">
-                <form th:action="@{/gestionusuarios/guardar}" th:object="${usuario}" method="post" class="space-y-6">
-                    
-                    <input type="hidden" th:field="*{idUsuario}" />
-                    <input type="hidden" th:field="*{codUsuario}" />
+        <!-- Messages -->
+        <div th:if="${mensajeExito}" class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-start">
+            <i class="fas fa-check-circle mr-3 mt-1 text-green-600"></i>
+            <span th:text="${mensajeExito}"></span>
+        </div>
 
-                    <div th:if="${usuario.idUsuario != 0}" class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-center mb-6">
-                        <label class="block text-sm font-bold text-gray-500 mb-1">Código de Acceso del Sistema</label>
-                        <span class="text-2xl font-black text-gray-800 tracking-wider" th:text="${usuario.codUsuario}"></span>
-                    </div>
+        <div th:if="${mensajeError}" class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-start">
+            <i class="fas fa-exclamation-circle mr-3 mt-1 text-red-600"></i>
+            <span th:text="${mensajeError}"></span>
+        </div>
 
-                    <div class="grid grid-cols-1 gap-6">
-                        <div>
-                            <label for="nombreCompleto" class="block text-sm font-bold text-gray-700 mb-2">Nombre Completo</label>
-                            <input type="text" id="nombreCompleto" th:field="*{nombreCompleto}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition" placeholder="Ej: Paco Pérez" required />
-                        </div>
+        <!-- Table -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-gray-700">
+                    <thead class="bg-gray-800 text-white sticky top-0">
+                        <tr>
+                            <th class="px-6 py-4 text-left font-semibold">ID</th>
+                            <th class="px-6 py-4 text-left font-semibold">Código</th>
+                            <th class="px-6 py-4 text-left font-semibold">Nombre Completo</th>
+                            <th class="px-6 py-4 text-left font-semibold">Rol</th>
+                            <th class="px-6 py-4 text-left font-semibold">Estado</th>
+                            <th class="px-6 py-4 text-center font-semibold">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(usuarios)}" class="border-t hover:bg-gray-50">
+                            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                                <i class="fas fa-inbox text-3xl mb-2"></i>
+                                <p>No hay usuarios registrados en el sistema</p>
+                            </td>
+                        </tr>
 
-                        <div>
-                            <label for="password" class="block text-sm font-bold text-gray-700 mb-2">Contraseña</label>
-                            <input type="password" id="password" th:field="*{password}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition" placeholder="Asigna una contraseña" required />
-                        </div>
-
-                        <div>
-                            <label for="correo" class="block text-sm font-bold text-gray-700 mb-2">Correo Electrónico (Opcional)</label>
-                            <input type="email" id="correo" th:field="*{correo}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition" placeholder="Ej: usuario@colegio.edu.pe" />
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="rol" class="block text-sm font-bold text-gray-700 mb-2">Rol del Sistema</label>
-                                <select id="rol" th:field="*{rol}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition bg-white" required>
-                                    <option value="">-- Seleccione un Rol --</option>
-                                    <option value="ADMINISTRADOR">Administrador</option>
-                                    <option value="DOCENTE">Docente</option>
-                                    <option value="ESTUDIANTE">Estudiante</option>
-                                </select>
-                            </div>
-
-                            <div th:if="${usuario.idUsuario != 0}">
-                                <label for="estado" class="block text-sm font-bold text-gray-700 mb-2">Estado de la Cuenta</label>
-                                <select id="estado" th:field="*{estado}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition bg-white" required>
-                                    <option value="ACTIVO">ACTIVO</option>
-                                    <option value="INACTIVO">INACTIVO</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-end space-x-4 pt-6 mt-6 border-t border-gray-200">
-                        <a th:href="@{/gestionusuarios}" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-bold transition">Cancelar</a>
-                        <button type="submit" class="px-6 py-3 bg-[#e60000] hover:bg-red-700 text-white rounded-lg font-bold shadow-md transition" th:text="${usuario.idUsuario == 0} ? 'Registrar Cuenta' : 'Guardar Cambios'"></button>
-                    </div>
-
-                </form>
+                        <tr th:each="u : ${usuarios}" class="border-t hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 font-bold text-gray-900" th:text="${u.idUsuario}"></td>
+                            <td class="px-6 py-4 font-mono text-gray-800" th:text="${u.codUsuario}"></td>
+                            <td class="px-6 py-4 text-gray-800" th:text="${u.nombreCompleto}"></td>
+                            <td class="px-6 py-4">
+                                <span th:if="${u.rol == 'ADMINISTRADOR'}" class="badge-status bg-red-100 text-red-700">
+                                    <i class="fas fa-shield-alt mr-1"></i>Administrador
+                                </span>
+                                <span th:if="${u.rol == 'DOCENTE'}" class="badge-status bg-blue-100 text-blue-700">
+                                    <i class="fas fa-chalkboard-user mr-1"></i>Docente
+                                </span>
+                                <span th:if="${u.rol == 'ESTUDIANTE'}" class="badge-status bg-green-100 text-green-700">
+                                    <i class="fas fa-graduation-cap mr-1"></i>Estudiante
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span th:if="${u.estado == 'ACTIVO'}" class="badge-status bg-emerald-100 text-emerald-700">
+                                    <i class="fas fa-check-circle mr-1"></i>Activo
+                                </span>
+                                <span th:if="${u.estado == 'INACTIVO'}" class="badge-status bg-gray-100 text-gray-700">
+                                    <i class="fas fa-ban mr-1"></i>Inactivo
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-center space-x-2">
+                                <a th:href="@{/gestionusuarios/editar/{id}(id=${u.idUsuario})}" 
+                                   class="inline-flex items-center px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded transition text-xs font-medium">
+                                    <i class="fas fa-edit mr-1"></i>Editar
+                                </a>
+                                <a th:href="@{/gestionusuarios/eliminar/{id}(id=${u.idUsuario})}" 
+                                   class="inline-flex items-center px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded transition text-xs font-medium"
+                                   onclick="return confirm('¿Deseas inhabilitar este usuario?');">
+                                    <i class="fas fa-times-circle mr-1"></i>Inhabilitar
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>
 
-    <div th:replace="~{/fragments/scripts :: scripts}"></div>
+    <div th:replace="/fragments/scripts :: scripts"></div>
 </body>
 </html>
