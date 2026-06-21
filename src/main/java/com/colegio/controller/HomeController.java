@@ -9,7 +9,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
 
     @GetMapping("/")
-    public String home(HttpSession session) {
+    public String landing() {
+        return "index";
+    }
+
+    @GetMapping("/panel")
+    public String irAlPanel(HttpSession session) {
         Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
         if (u == null) {
             return "redirect:/login";

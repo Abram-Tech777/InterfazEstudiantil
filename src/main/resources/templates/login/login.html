@@ -1,42 +1,89 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{/fragments/head :: head('Acceso al Sistema')}"></head>
-<body class="m-0 p-0 h-screen flex">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso | Colegio SJL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .video-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden;
+        }
+        .video-container video {
+            width: 200%; height: 100%; object-fit: cover; margin-left: -45%;
+        }
+        .overlay {
+            position: absolute; inset: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 0;
+        }
 
-    <div class="hidden md:flex w-1/2 bg-[#e60000] text-white p-16 flex-col justify-center">
-        <h1 class="text-5xl font-bold mb-8">Intranet Escolar</h1>
-        <p class="text-xl mb-8 opacity-90">Acceso exclusivo para alumnos, docentes y personal administrativo.</p>
-        <ul class="space-y-4">
-            <li><i class="fas fa-arrow-right mr-3"></i> Gestiona tus horarios</li>
-            <li><i class="fas fa-arrow-right mr-3"></i> Visualiza comunicados oficiales</li>
-            <li><i class="fas fa-arrow-right mr-3"></i> Control de asistencia</li>
-        </ul>
+        /* Estilos de tu plantilla de login */
+        .wrapper {
+            width: 100%; max-width: 400px;
+            background: transparent;
+            color: #333; /* Texto oscuro para fondo blanco */
+        }
+        .wrapper h1 { font-size: 36px; text-align: center; margin-bottom: 30px; }
+        .wrapper .input-box { width: 100%; height: 50px; margin: 30px 0; position: relative; }
+        .input-box input {
+            width: 100%; height: 100%; background: transparent;
+            border: 2px solid #ccc; border-radius: 40px;
+            padding: 20px 45px 20px 20px; font-size: 16px; color: #333;
+        }
+        .wrapper .btn {
+            width: 100%; height: 45px; background: #e60000;
+            border: none; border-radius: 40px; cursor: pointer;
+            font-size: 16px; color: #fff; font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-[#010308] text-white font-sans overflow-hidden">
+
+    <div class="video-container">
+        <video src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260606_154941_df1a96e1-a06f-450c-bd02-d863414cc1a0.mp4" 
+               autoplay muted loop playsinline></video>
+        <div class="overlay"></div>
     </div>
 
-    <div class="w-full md:w-1/2 flex items-center justify-center bg-white p-8">
-        <div class="w-full max-w-sm">
-            <div class="text-center mb-10">
-                <h2 class="text-2xl font-bold text-gray-800">Iniciar Sesión</h2>
-                <p class="text-gray-500 text-sm">Ingresa tus credenciales</p>
+    <main class="relative z-10 h-screen flex flex-col md:flex-row">
+        
+        <div class="hidden md:flex w-1/2 p-16 flex-col justify-center items-start">
+            <div class="flex h-16 mb-4">
+                <img th:src="@{/img/letra(I).png}" class="h-full object-contain">
+                <img th:src="@{/img/letra_(n).png}" class="h-full object-contain">
+                <img th:src="@{/img/letra_(t).png}" class="h-full object-contain">
+                <img th:src="@{/img/letra_(r).png}" class="h-full object-contain">
+                <img th:src="@{/img/letra_(a).png}" class="h-full object-contain">
+                <img th:src="@{/img/letra_(n).png}" class="h-full object-contain">
+                <img th:src="@{/img/letra_(e).png}" class="h-full object-contain">
+                <img th:src="@{/img/letra_(t).png}" class="h-full object-contain">
             </div>
-
-            <form th:action="@{/login}" method="post">
-                <div th:if="${error}" class="bg-red-50 text-red-600 p-3 rounded text-center mb-4 text-sm" th:text="${error}"></div>
-                
-                <div class="mb-5">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Código de Usuario</label>
-                    <input type="text" name="codUsuario" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none" required>
-                </div>
-                
-                <div class="mb-8">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Contraseña</label>
-                    <input type="password" name="password" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none" required>
-                </div>
-                
-                <button type="submit" class="w-full bg-[#e60000] hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-lg transition">Ingresar</button>
-            </form>
+            <div class="flex h-16 mb-10">
+                <img th:src="@{/img/letra(E).png}" class="h-full object-contain">
+                <img th:src="@{/img/letra_(s).png}" class="h-full object-contain">
+                <img th:src="@{/img/letra_(C).png}" class="h-full object-contain">
+                <img th:src="@{/img/letra_(o).png}" class="h-full object-contain">
+                <img th:src="@{/img/letra_(l).png}" class="h-full object-contain">
+                <img th:src="@{/img/letra_(a).png}" class="h-full object-contain">
+                <img th:src="@{/img/letra_(r).png}" class="h-full object-contain">
+            </div>
         </div>
-    </div>
-	<div th:replace="~{/fragments/scripts :: scripts}"></div>
+
+        <div class="w-full md:w-1/2 flex items-center justify-center bg-white p-8">
+            <div class="wrapper">
+                <form th:action="@{/login}" method="post">
+                    <h1>Iniciar Sesión</h1>
+                    <div th:if="${error}" class="text-red-600 text-center mb-4" th:text="${error}"></div>
+                    
+                    <div class="input-box">
+                        <input type="text" name="codUsuario" placeholder="Código de Usuario" required>
+                    </div>
+                    <div class="input-box">
+                        <input type="password" name="password" placeholder="Contraseña" required>
+                    </div>
+                    <button type="submit" class="btn">INGRESAR</button>
+                </form>
+            </div>
+        </div>
+    </main>
 </body>
 </html>

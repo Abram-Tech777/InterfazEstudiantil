@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Colegio SJL | La Evolución de la Educación</title>
+
+	<script src="https://cdn.tailwindcss.com"></script>
+
+	<script>
+		tailwind.config = {
+			theme: {
+				extend: {
+					colors: {
+						darkest: '#010308',
+						dark: '#030918',
+						neoncyan: '#00f0ff',
+						neonblue: '#0055ff'
+					}
+				}
+			}
+		}
+	</script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+	
+	<style>
+		.hide-scrollbar::-webkit-scrollbar {
+			display: none;
+		}
+
+		.hide-scrollbar {
+			-ms-overflow-style: none;
+			scrollbar-width: none;
+		}
+	</style>
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<link
+		href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+		rel="stylesheet">
+	<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-darkest text-white selection:bg-neoncyan selection:text-darkest font-sans">
+
+	<header
+		class="fixed top-4 left-6 right-6 z-50 transition-all duration-500 py-4 px-16 rounded-2xl flex items-center justify-between"
+		id="main-header">
+
+		<a href="#" onclick="scrollToTop(event)" class="flex items-center gap-4 cursor-pointer">
+		    <div class="w-14 h-14 flex items-center justify-center overflow-hidden shrink-0">
+		        <img src="img/logo.png" alt="Logo" class="w-18 h-18 object-contain -mt-2">
+		    </div>
+		    <div>
+		        <h1 class="font-display text-2xl leading-none font-bold tracking-wider">Colegio SJL</h1>
+		        <p class="text-[10px] text-neoncyan uppercase tracking-[0.2em] font-bold">San Juan de Lurigancho</p>
+		    </div>
+		</a>
+
+		<nav class="hidden md:flex gap-12 items-center font-medium text-sm">
+			<a href="#filosofia" class="hover:text-neoncyan transition-colors whitespace-nowrap">Nuestra Visión</a>
+			<a href="#niveles" class="hover:text-neoncyan transition-colors">Niveles</a>
+			<a href="#docentes" class="hover:text-neoncyan transition-colors whitespace-nowrap">Plana Docente</a>
+			<a href="#faq" class="hover:text-neoncyan transition-colors">Dudas</a>
+
+			<a href="/login"
+				class="border border-neoncyan text-neoncyan px-8 py-3 rounded-full hover:bg-neoncyan hover:text-darkest transition-all">
+				Ingresar Intranet
+			</a>
+		</nav>
+
+		<button class="md:hidden text-2xl text-neoncyan"><i class="fa-solid fa-bars-staggered"></i></button>
+	</header>
+
+	<section id="hero" class="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-darkest">
+
+		<video id="hero-video"
+			class="absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-500 pointer-events-none"
+			src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260328_065045_c44942da-53c6-4804-b734-f9e07fc22e08.mp4"
+			muted playsinline style="opacity: 0;"></video>
+
+		<div class="absolute inset-0 bg-darkest/70 z-0"></div>
+		<div class="absolute inset-0 bg-neonblue/10 mix-blend-color-dodge z-0"></div>
+
+		<div class="relative z-10 text-center max-w-5xl px-4 mt-16">
+			<div
+				class="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-white/10 bg-black/20 mb-8 overflow-hidden gs-hero-fade">
+				<span class="w-2 h-2 rounded-full bg-neoncyan animate-pulse"></span>
+				<span class="text-xs uppercase tracking-[0.3em] font-bold text-gray-300">Inscripciones Abiertas
+					2025</span>
+			</div>
+
+			<h1 class="text-6xl md:text-[6rem] font-black font-display leading-[0.9] mb-8 split-text-target text-glow">
+				Despierta la Magia <br> del <span class="text-gradient font-bold italic">Conocimiento</span>
+			</h1>
+
+			<p class="text-lg md:text-2xl text-gray-300 max-w-2xl mx-auto mb-12 font-light gs-hero-fade">
+				Una institución vanguardista donde la tecnología de punta se encuentra con valores inquebrantables. El
+				futuro pertenece a quienes se atreven a innovar.
+			</p>
+
+			<div class="gs-hero-fade">
+				<a href="#registro"
+					class="inline-block bg-white text-darkest px-10 py-5 rounded-full font-bold text-lg hover:scale-105 transition-transform duration-300 shadow-[0_0_30px_rgba(255,255,255,0.3)] group">
+					Inicia tu Viaje <i
+						class="fa-solid fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform"></i>
+				</a>
+			</div>
+		</div>
+
+		<div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gs-hero-fade z-20">
+			<span class="text-[10px] text-neoncyan uppercase tracking-[0.3em] font-bold mb-3">Descubre</span>
+
+			<div class="w-[2px] h-24 bg-white/20 relative">
+				<div id="scroll-progress" class="absolute top-0 left-0 w-full bg-neoncyan transition-all duration-75"
+					style="height: 0%;"></div>
+			</div>
+
+			<div class="mt-2 text-neoncyan">
+				<i class="fa-solid fa-chevron-down text-sm"></i>
+			</div>
+		</div>
+	</section>
+
+	<section class="py-16 relative z-10 -mt-10">
+		<div class="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-6">
+			<div class="liquid-glass-darker p-8 rounded-3xl text-center box-glow-hover gs-stat-card">
+				<h3 class="text-5xl font-display font-bold text-neoncyan mb-2">25+</h3>
+				<p class="text-sm text-gray-400 uppercase tracking-widest font-bold">Años de Excelencia</p>
+			</div>
+			<div class="liquid-glass-darker p-8 rounded-3xl text-center box-glow-hover gs-stat-card">
+				<h3 class="text-5xl font-display font-bold text-neoncyan mb-2">100%</h3>
+				<p class="text-sm text-gray-400 uppercase tracking-widest font-bold">Aulas Digitalizadas</p>
+			</div>
+			<div class="liquid-glass-darker p-8 rounded-3xl text-center box-glow-hover gs-stat-card">
+				<h3 class="text-5xl font-display font-bold text-neoncyan mb-2">4.5K</h3>
+				<p class="text-sm text-gray-400 uppercase tracking-widest font-bold">Egresados Líderes</p>
+			</div>
+		</div>
+	</section>
+
+	<section id="filosofia" class="py-32 relative">
+		<div class="max-w-5xl mx-auto px-6 text-center">
+			<i class="fa-solid fa-quote-left text-5xl text-neonblue/40 mb-8 gs-reveal"></i>
+			<h2 class="text-4xl md:text-6xl font-display leading-tight mb-8 gs-reveal">
+				No solo enseñamos a leer libros, enseñamos a <span class="text-neoncyan">escribir el futuro</span>.
+				Nuestro ecosistema educativo fusiona ciencia, arte y código.
+			</h2>
+			<div class="w-24 h-1 bg-gradient-to-r from-neonblue to-neoncyan mx-auto rounded-full gs-reveal"></div>
+		</div>
+	</section>
+
+	<section id="niveles" class="py-24 relative overflow-hidden">
+		<div class="max-w-7xl mx-auto px-6">
+			<div class="mb-16 md:w-1/2 gs-reveal">
+				<h4 class="text-neonblue font-bold tracking-[0.3em] uppercase text-sm mb-2">Trayectoria Escolar</h4>
+				<h2 class="text-5xl font-display font-bold text-white">Tres etapas, <br> un solo objetivo.</h2>
+			</div>
+
+			<div class="grid lg:grid-cols-3 gap-8">
+				<div
+					class="liquid-glass p-10 rounded-[2rem] border-t-4 border-t-neonblue gs-nivel-card relative overflow-hidden group">
+					<div
+						class="absolute -right-10 -top-10 text-9xl text-white/5 font-black font-display group-hover:scale-110 transition-transform duration-500">
+						01</div>
+					<div
+						class="w-16 h-16 rounded-full bg-neonblue/20 flex items-center justify-center mb-8 border border-neonblue/40 shadow-[0_0_15px_rgba(0,85,255,0.4)]">
+						<i class="fa-solid fa-shapes text-2xl text-white"></i>
+					</div>
+					<h3 class="text-3xl font-display font-bold mb-4">Educación Inicial</h3>
+					<p class="text-gray-400 mb-6 leading-relaxed">Estimulación temprana enfocada en la curiosidad.
+						Desarrollamos la motricidad y el amor por el descubrimiento a través del juego inteligente.</p>
+					<ul class="space-y-3 text-sm text-gray-300 font-medium">
+						<li><i class="fa-solid fa-check text-neoncyan mr-2"></i> Ambientes inmersivos</li>
+						<li><i class="fa-solid fa-check text-neoncyan mr-2"></i> Inglés lúdico</li>
+					</ul>
+				</div>
+
+				<div
+					class="liquid-glass p-10 rounded-[2rem] border-t-4 border-t-neoncyan gs-nivel-card relative overflow-hidden group">
+					<div
+						class="absolute -right-10 -top-10 text-9xl text-white/5 font-black font-display group-hover:scale-110 transition-transform duration-500">
+						02</div>
+					<div
+						class="w-16 h-16 rounded-full bg-neoncyan/20 flex items-center justify-center mb-8 border border-neoncyan/40 shadow-[0_0_15px_rgba(0,240,255,0.4)]">
+						<i class="fa-solid fa-atom text-2xl text-white"></i>
+					</div>
+					<h3 class="text-3xl font-display font-bold mb-4">Nivel Primaria</h3>
+					<p class="text-gray-400 mb-6 leading-relaxed">Consolidamos las bases del pensamiento
+						lógico-matemático y la comprensión lectora mediante aulas equipadas con pantallas interactivas.
+					</p>
+					<ul class="space-y-3 text-sm text-gray-300 font-medium">
+						<li><i class="fa-solid fa-check text-neoncyan mr-2"></i> Robótica básica</li>
+						<li><i class="fa-solid fa-check text-neoncyan mr-2"></i> Ciencias aplicadas</li>
+					</ul>
+				</div>
+
+				<div
+					class="liquid-glass p-10 rounded-[2rem] border-t-4 border-t-white gs-nivel-card relative overflow-hidden group">
+					<div
+						class="absolute -right-10 -top-10 text-9xl text-white/5 font-black font-display group-hover:scale-110 transition-transform duration-500">
+						03</div>
+					<div
+						class="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-8 border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+						<i class="fa-solid fa-microchip text-2xl text-white"></i>
+					</div>
+					<h3 class="text-3xl font-display font-bold mb-4">Nivel Secundaria</h3>
+					<p class="text-gray-400 mb-6 leading-relaxed">Formación de alto rendimiento pre-universitario.
+						Preparación exhaustiva con laboratorios STEAM y orientación vocacional especializada.</p>
+					<ul class="space-y-3 text-sm text-gray-300 font-medium">
+						<li><i class="fa-solid fa-check text-neoncyan mr-2"></i> Certificación de sistemas</li>
+						<li><i class="fa-solid fa-check text-neoncyan mr-2"></i> Preparación pre-U intensiva</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="docentes" class="py-24 relative">
+		<div
+			class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-neoncyan to-transparent opacity-50">
+		</div>
+
+		<div class="max-w-[90rem] mx-auto px-6">
+			<div class="text-center mb-16 gs-reveal">
+				<h2 class="text-4xl md:text-5xl font-display font-bold mb-4">Arquitectos del Saber</h2>
+				<p class="text-gray-400 max-w-2xl mx-auto">Una plana docente estrictamente seleccionada. Expertos que no
+					solo transmiten conocimiento, sino que inspiran grandeza.</p>
+			</div>
+
+			<div class="relative lg:px-12">
+
+				<button id="btnPrev"
+					class="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-black/80 border border-neoncyan/30 text-neoncyan hover:bg-neoncyan hover:text-black transition-all disabled:opacity-20 disabled:cursor-not-allowed hidden md:flex">
+					<i class="fa-solid fa-chevron-left text-xl"></i>
+				</button>
+
+				<div id="sliderTrack"
+					class="flex flex-nowrap gap-10 overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar py-4 px-4">
+
+					<div class="relative rounded-2xl overflow-hidden group gs-docente shrink-0 w-[310px] snap-center">
+						<div class="aspect-[3/4] bg-gray-900">
+							<img th:src="@{/img/images1.jpg}" alt="Dr. Carla Mendoza"
+								class="w-full h-full object-cover filter grayscale opacity-70 group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700">
+						</div>
+						<div
+							class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/60 to-transparent flex flex-col justify-end p-6 translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
+							<h4 class="text-2xl font-display font-bold text-neoncyan mb-1">Dr. Carla Mendoza</h4>
+							<p class="text-xs uppercase tracking-widest text-gray-300 font-bold mb-4">Ciencias Físicas
+							</p>
+							<p
+								class="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+								Ex investigador en CERN, aplica métodos prácticos y simulaciones 3D en clase.</p>
+						</div>
+					</div>
+
+					<div class="relative rounded-2xl overflow-hidden group gs-docente shrink-0 w-[310px] snap-center">
+						<div class="aspect-[3/4] bg-gray-900">
+							<img th:src="@{/img/images2.jpg}" alt="Lic. Ana Villalobos"
+								class="w-full h-full object-cover filter grayscale opacity-70 group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700">
+						</div>
+						<div
+							class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/60 to-transparent flex flex-col justify-end p-6 translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
+							<h4 class="text-2xl font-display font-bold text-neoncyan mb-1">Lic. Ana Villalobos</h4>
+							<p class="text-xs uppercase tracking-widest text-gray-300 font-bold mb-4">Matemática Pura
+							</p>
+							<p
+								class="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+								Especialista en lógica y olimpiadas matemáticas internacionales.</p>
+						</div>
+					</div>
+
+					<div class="relative rounded-2xl overflow-hidden group gs-docente shrink-0 w-[310px] snap-center">
+						<div class="aspect-[3/4] bg-gray-900">
+							<img th:src="@{/img/images3.jpg}" alt="Mag. Sofía Castro"
+								class="w-full h-full object-cover filter grayscale opacity-70 group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700">
+						</div>
+						<div
+							class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/60 to-transparent flex flex-col justify-end p-6 translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
+							<h4 class="text-2xl font-display font-bold text-neoncyan mb-1">Mag. Sofía Castro</h4>
+							<p class="text-xs uppercase tracking-widest text-gray-300 font-bold mb-4">Humanidades</p>
+							<p
+								class="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+								Fomenta el debate, la retórica y la literatura crítica a nivel pre-universitario.</p>
+						</div>
+					</div>
+
+					<div class="relative rounded-2xl overflow-hidden group gs-docente shrink-0 w-[310px] snap-center">
+						<div class="aspect-[3/4] bg-gray-900">
+							<img th:src="@{/img/images4.jpg}" alt="Ing. Roberto Silva"
+								class="w-full h-full object-cover filter grayscale opacity-70 group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700">
+						</div>
+						<div
+							class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/60 to-transparent flex flex-col justify-end p-6 translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
+							<h4 class="text-2xl font-display font-bold text-neoncyan mb-1">Ing. Roberto Silva</h4>
+							<p class="text-xs uppercase tracking-widest text-gray-300 font-bold mb-4">Ciencias de la
+								Computación</p>
+							<p
+								class="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+								Líder en innovación tecnológica y algoritmos avanzados para estudiantes.</p>
+						</div>
+					</div>
+
+					<div class="relative rounded-2xl overflow-hidden group gs-docente shrink-0 w-[310px] snap-center">
+						<div class="aspect-[3/4] bg-gray-900">
+							<img th:src="@{/img/images5.jpg}" alt="Lic. María Torres"
+								class="w-full h-full object-cover filter grayscale opacity-70 group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700">
+						</div>
+						<div
+							class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/60 to-transparent flex flex-col justify-end p-6 translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
+							<h4 class="text-2xl font-display font-bold text-neoncyan mb-1">Lic. María Torres</h4>
+							<p class="text-xs uppercase tracking-widest text-gray-300 font-bold mb-4">Ciencias
+								Biológicas</p>
+							<p
+								class="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+								Investigadora en genética, realiza laboratorios interactivos y trabajo de campo.</p>
+						</div>
+					</div>
+
+					<div class="relative rounded-2xl overflow-hidden group gs-docente shrink-0 w-[310px] snap-center">
+						<div class="aspect-[3/4] bg-gray-900">
+							<img th:src="@{/img/images6.jpg}" alt="Dr. Jorge Vargas"
+								class="w-full h-full object-cover filter grayscale opacity-70 group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700">
+						</div>
+						<div
+							class="absolute inset-0 bg-gradient-to-t from-darkest via-darkest/60 to-transparent flex flex-col justify-end p-6 translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
+							<h4 class="text-2xl font-display font-bold text-neoncyan mb-1">Dr. Jorge Vargas</h4>
+							<p class="text-xs uppercase tracking-widest text-gray-300 font-bold mb-4">Química Pura</p>
+							<p
+								class="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+								Desarrolla el pensamiento científico a través de reacciones e hipótesis aplicadas.</p>
+						</div>
+					</div>
+
+				</div>
+
+				<button id="btnNext"
+					class="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-black/80 border border-neoncyan/30 text-neoncyan hover:bg-neoncyan hover:text-black transition-all disabled:opacity-20 disabled:cursor-not-allowed hidden md:flex">
+					<i class="fa-solid fa-chevron-right text-xl"></i>
+				</button>
+
+			</div>
+		</div>
+	</section>
+
+	<section id="faq" class="py-24 relative">
+		<div
+			class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-neoncyan to-transparent opacity-50">
+		</div>
+		<div class="max-w-4xl mx-auto px-6">
+			<h2 class="text-4xl md:text-5xl font-display font-bold text-center mb-16 gs-reveal">Mentes Curiosas</h2>
+
+			<div class="space-y-4">
+				<div class="liquid-glass-darker rounded-2xl overflow-hidden gs-faq-item">
+					<button
+						class="w-full text-left px-8 py-6 flex justify-between items-center font-bold text-lg hover:text-neoncyan transition-colors faq-btn">
+						¿Cuáles son los requisitos de Admisión 2025?
+						<i class="fa-solid fa-plus faq-icon text-neoncyan text-xl"></i>
+					</button>
+					<div class="faq-content px-8 bg-black/40">
+						<p class="text-gray-400 text-sm leading-relaxed pb-6">
+							Los postulantes deben pasar por una entrevista psicológica, examen de conocimientos básicos
+							(para secundaria) y presentar las libretas de notas del año escolar anterior. El proceso es
+							100% digital a través de nuestro portal web.
+						</p>
+					</div>
+				</div>
+
+				<div class="liquid-glass-darker rounded-2xl overflow-hidden gs-faq-item">
+					<button
+						class="w-full text-left px-8 py-6 flex justify-between items-center font-bold text-lg hover:text-neoncyan transition-colors faq-btn">
+						¿Cómo funciona la enseñanza con tecnología integrada?
+						<i class="fa-solid fa-plus faq-icon text-neoncyan text-xl"></i>
+					</button>
+					<div class="faq-content px-8 bg-black/40">
+						<p class="text-gray-400 text-sm leading-relaxed pb-6">
+							SJL provee acceso a una intranet mística (nuestra plataforma). Las aulas cuentan con
+							pizarras interactivas 4K y todos los estudiantes acceden a licencias de software educativo,
+							laboratorios virtuales de ciencia y plataformas de idiomas.
+						</p>
+					</div>
+				</div>
+
+				<div class="liquid-glass-darker rounded-2xl overflow-hidden gs-faq-item">
+					<button
+						class="w-full text-left px-8 py-6 flex justify-between items-center font-bold text-lg hover:text-neoncyan transition-colors faq-btn">
+						¿Cuentan con actividades extracurriculares?
+						<i class="fa-solid fa-plus faq-icon text-neoncyan text-xl"></i>
+					</button>
+					<div class="faq-content px-8 bg-black/40">
+						<p class="text-gray-400 text-sm leading-relaxed pb-6">
+							Por supuesto. Nuestro modelo holístico ofrece talleres de robótica, programación creativa,
+							artes marciales, danza, y ensamblaje de tecnología. Creemos en formar líderes
+							multifacéticos.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<footer class="bg-black border-t border-white/5 pt-20 pb-10 relative z-20">
+		<div class="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-12 mb-16">
+			<div class="md:col-span-2">
+				<div class="flex items-center gap-2 mb-6">
+					<i class="fa-solid fa-book-sparkles text-3xl text-neoncyan"></i>
+					<h2 class="font-display font-bold text-3xl">Colegio SJL</h2>
+				</div>
+				<p class="text-gray-400 max-w-sm mb-8 leading-relaxed">Transformando la educación peruana con
+					tecnología, infraestructura de nivel universitario y valores humanistas.</p>
+				<div class="flex gap-4">
+					<a href="#"
+						class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-neoncyan hover:text-darkest transition-all duration-300"><i
+							class="fa-brands fa-facebook-f"></i></a>
+					<a href="#"
+						class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-neoncyan hover:text-darkest transition-all duration-300"><i
+							class="fa-brands fa-instagram"></i></a>
+					<a href="#"
+						class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-neoncyan hover:text-darkest transition-all duration-300"><i
+							class="fa-brands fa-tiktok"></i></a>
+				</div>
+			</div>
+
+			<div>
+				<h4 class="font-bold mb-6 text-lg text-white">Enlaces Rápidos</h4>
+				<ul class="space-y-4 text-sm text-gray-400">
+					<li><a href="#filosofia" class="hover:text-neoncyan transition-colors">Visión</a></li>
+					<li><a href="#niveles" class="hover:text-neoncyan transition-colors">Niveles Educativos</a></li>
+					<li><a href="#docentes" class="hover:text-neoncyan transition-colors">Plana Docente</a></li>
+					<li><a href="#faq" class="hover:text-neoncyan transition-colors">Admisión</a></li>
+				</ul>
+			</div>
+
+			<div>
+				<h4 class="font-bold mb-6 text-lg text-white">Contacto</h4>
+				<ul class="space-y-4 text-sm text-gray-400">
+					<li class="flex items-start gap-3"><i class="fa-solid fa-location-dot mt-1 text-neoncyan"></i> Av.
+						Tecnológica 1024, SJL</li>
+					<li class="flex items-start gap-3"><i class="fa-solid fa-phone mt-1 text-neoncyan"></i> +51 987 654
+						321</li>
+					<li class="flex items-start gap-3"><i class="fa-solid fa-envelope mt-1 text-neoncyan"></i>
+						admision@colegiosjl.edu.pe</li>
+				</ul>
+			</div>
+		</div>
+
+		<div
+			class="max-w-7xl mx-auto px-6 border-t border-white/5 pt-8 text-center text-xs text-gray-600 font-bold tracking-widest uppercase">
+			&copy; 2025 Colegio SJL. Diseñado para el Futuro.
+		</div>
+	</footer>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+	<script>
+		gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+		gsap.from(".gs-stat-card", {
+		        scrollTrigger: {
+		            trigger: ".gs-stat-card",
+		            start: "top 80%", // Cuando la tarjeta llega al 80% de la pantalla
+		            end: "top 20%",   // Cuando llega al 20%
+		            scrub: true,      // ESTA ES LA CLAVE: vincula la animación al scroll
+		        },
+		        opacity: 0,
+		        y: 100,               // Empieza abajo y sube
+		        scale: 0.8            // Empieza pequeña y crece
+		    });
+		
+		/* -----------------------------------------------------------------
+		   A. EFECTO DE TEXTO CORTADO EN EL HERO (Sin plugins de pago)
+		   ----------------------------------------------------------------- */
+		const textTarget = document.querySelector('.split-text-target');
+		const textContent = textTarget.innerHTML;
+
+		gsap.from(".split-text-target", {
+			y: 100,
+			opacity: 0,
+			rotationX: -45,
+			transformOrigin: "0% 50% -50",
+			duration: 1.5,
+			ease: "power4.out",
+			delay: 0.2
+		});
+
+		// Entradas secundarias del Hero
+		gsap.from(".gs-hero-fade", {
+			y: 30, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out", delay: 0.8
+		});
+
+		/* -----------------------------------------------------------------
+		   B. ANIMACIONES DE SCROLL "MALDITAS"
+		   ----------------------------------------------------------------- */
+		// Reveal genérico para títulos y bloques
+		gsap.utils.toArray(".gs-reveal").forEach(elem => {
+			gsap.from(elem, {
+				scrollTrigger: {trigger: elem, start: "top 85%"},
+				y: 60, opacity: 0, duration: 1, ease: "power3.out"
+			});
+		});
+
+		// Tarjetas de Estadísticas
+		gsap.from(".gs-stat-card", {
+			scrollTrigger: {trigger: ".gs-stat-card", start: "top 90%"},
+			y: 100, opacity: 0, duration: 0.8, stagger: 0.2, ease: "back.out(1.5)"
+		});
+
+		// Tarjetas de Niveles
+		gsap.utils.toArray(".gs-nivel-card").forEach((card, i) => {
+			gsap.from(card, {
+				scrollTrigger: {trigger: card, start: "top 85%"},
+				x: i % 2 === 0 ? -50 : 50,
+				opacity: 0,
+				duration: 1,
+				ease: "power3.out"
+			});
+		});
+
+		// Tarjetas de Docentes
+		gsap.from(".gs-docente", {
+			scrollTrigger: {trigger: "#docentes", start: "top 70%"},
+			y: 80, opacity: 0, duration: 0.8, stagger: 0.15, ease: "power2.out"
+		});
+
+		// FAQ Items
+		gsap.from(".gs-faq-item", {
+			scrollTrigger: {trigger: "#faq", start: "top 80%"},
+			y: 40, opacity: 0, duration: 0.6, stagger: 0.1, ease: "back.out(1.2)"
+		});
+
+		/* -----------------------------------------------------------------
+		   C. ANIMACIONES DEL FORMULARIO DE REGISTRO
+		   ----------------------------------------------------------------- */
+		gsap.from(".gs-form-text", {
+			scrollTrigger: {trigger: "#registro", start: "top 60%"},
+			x: -100, opacity: 0, duration: 1.2, ease: "power4.out"
+		});
+
+		gsap.from(".gs-form-box", {
+			scrollTrigger: {trigger: "#registro", start: "top 60%"},
+			x: 100, opacity: 0, duration: 1.2, ease: "power4.out"
+		});
+
+		gsap.from(".gs-input", {
+			scrollTrigger: {trigger: "#magical-form", start: "top 75%"},
+			y: 30, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power2.out", delay: 0.5
+		});
+
+
+		/* -----------------------------------------------------------------
+		   D. LÓGICA DE INTERACCIÓN (FAQ, Header, Form)
+		   ----------------------------------------------------------------- */
+		// Header de Vidrio
+		const header = document.getElementById('main-header');
+		window.addEventListener('scroll', () => {
+			if (window.scrollY > 50) {
+				header.classList.add('bg-darkest/90', 'backdrop-blur-md', 'shadow-[0_4px_30px_rgba(0,0,0,0.5)]');
+				header.classList.remove('py-4');
+				header.classList.add('py-2');
+			} else {
+				header.classList.remove('bg-darkest/90', 'backdrop-blur-md', 'shadow-[0_4px_30px_rgba(0,0,0,0.5)]', 'py-2');
+				header.classList.add('py-4');
+			}
+		});
+
+		// FAQ Acordeón
+		document.querySelectorAll('.faq-btn').forEach(btn => {
+			btn.addEventListener('click', () => {
+				const item = btn.parentElement;
+				const content = item.querySelector('.faq-content');
+				const isActive = item.classList.contains('active');
+
+				document.querySelectorAll('.gs-faq-item').forEach(other => {
+					other.classList.remove('active');
+					other.querySelector('.faq-content').style.maxHeight = '0';
+				});
+
+				if (!isActive) {
+					item.classList.add('active');
+					content.style.maxHeight = content.scrollHeight + "px";
+				}
+			});
+		});
+
+		// Lógica de Formulario (CON LA CORRECCIÓN A PRUEBA DE BALAS)
+		const form = document.getElementById('magical-form');
+		const loading = document.getElementById('form-loading');
+		const success = document.getElementById('form-success');
+		const successIcon = document.getElementById('success-icon');
+
+		// Este "if" salva la vida del script si el formulario no está en el HTML
+		if (form) {
+			form.addEventListener('submit', (e) => {
+				e.preventDefault();
+				loading.classList.remove('hidden');
+				loading.classList.add('flex');
+
+				setTimeout(() => {
+					loading.classList.add('hidden');
+					loading.classList.remove('flex');
+
+					success.classList.remove('hidden');
+					success.classList.add('flex');
+
+					gsap.fromTo(successIcon,
+						{scale: 0, rotation: -180},
+						{scale: 1, rotation: 0, duration: 0.8, ease: "elastic.out(1, 0.4)"}
+					);
+				}, 2500);
+			});
+		}
+
+		function resetForm() {
+			if (form) form.reset();
+			if (success) {
+				success.classList.add('hidden');
+				success.classList.remove('flex');
+			}
+		}
+
+		/* -----------------------------------------------------------------
+		   E. LÓGICA DEL SLIDER DE DOCENTES (Carrusel con flechas)
+		   ----------------------------------------------------------------- */
+		document.addEventListener('DOMContentLoaded', function () {
+			const track = document.getElementById('sliderTrack');
+			const btnPrev = document.getElementById('btnPrev');
+			const btnNext = document.getElementById('btnNext');
+
+			if (!track || !btnPrev || !btnNext) return;
+
+			function updateButtons() {
+				btnPrev.disabled = track.scrollLeft <= 5;
+				btnNext.disabled = track.scrollLeft >= (track.scrollWidth - track.clientWidth - 5);
+			}
+
+			track.addEventListener('scroll', updateButtons);
+
+			// Ahora el scroll es dinámico: calcula el ancho de la carta + la separación
+			btnNext.addEventListener('click', () => {
+				const card = track.querySelector('.gs-docente');
+				// Obtenemos el gap calculado dinámicamente
+				const gap = parseFloat(window.getComputedStyle(track).gap) || 0;
+				const scrollAmount = card.offsetWidth + gap;
+				track.scrollBy({left: scrollAmount, behavior: 'smooth'});
+			});
+
+			btnPrev.addEventListener('click', () => {
+				const card = track.querySelector('.gs-docente');
+				const gap = parseFloat(window.getComputedStyle(track).gap) || 0;
+				const scrollAmount = card.offsetWidth + gap;
+				track.scrollBy({left: -scrollAmount, behavior: 'smooth'});
+			});
+
+			updateButtons();
+		});
+
+		const video = document.getElementById('hero-video');
+		let fadeOutTimeout;
+
+		// Comienza con fade-in en 0.5s cuando el video está listo
+		video.addEventListener('canplay', () => {
+			video.play().then(() => {
+				video.style.opacity = '1';
+			}).catch(e => console.log("Autoplay prevent detectado:", e));
+		});
+
+		// Lógica de fade-out antes de que termine
+		video.addEventListener('timeupdate', () => {
+			const duration = video.duration;
+			const currentTime = video.currentTime;
+
+			// Si falta medio segundo (0.5s) para terminar, inicia el fade out
+			if (duration > 0 && (duration - currentTime) <= 0.5) {
+				video.style.opacity = '0';
+			}
+		});
+
+		// Cuando termina, espera 100ms y reinicia
+		video.addEventListener('ended', () => {
+			video.style.opacity = '0'; // Asegurar que esté oculto
+
+			setTimeout(() => {
+				video.currentTime = 0;
+				video.play().then(() => {
+					// Fade-in inmediato al reiniciar
+					video.style.opacity = '1';
+				});
+			}, 100); // 100ms de espera como indicaste
+		});
+
+		function scrollToTop(event) {
+		        event.preventDefault();
+		        gsap.to(window, {
+		            duration: 2,
+		            scrollTo: 0,
+		            ease: "power2.inOut"
+		        });
+		    }
+
+		    // 3. Lógica del indicador de progreso (Scroll bar)
+		    window.addEventListener('scroll', () => {
+		        const scrollProgress = document.getElementById('scroll-progress');
+		        if (!scrollProgress) return; // Seguridad por si no encuentra el ID
+
+		        const totalScroll = document.documentElement.scrollTop;
+		        const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+		        const scrollPercent = (totalScroll / windowHeight) * 100;
+
+		        scrollProgress.style.height = scrollPercent + '%';
+
+		        const indicatorContainer = document.querySelector('.gs-hero-fade.z-20');
+		        if (indicatorContainer) {
+		            indicatorContainer.style.opacity = (scrollPercent > 95) ? '0' : '1';
+		        }
+		    });
+
+		    // 4. Forzar inicio arriba al recargar
+		    window.onbeforeunload = function () {
+		        window.scrollTo(0, 0);
+		    };
+	</script>
+</body>
+</html>
