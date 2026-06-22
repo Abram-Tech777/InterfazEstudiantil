@@ -17,13 +17,8 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class LoginController {
 	
-	
-   @Autowired
-    private  UsuarioService usuarioService;
-
-    public LoginController(UsuarioService usuarioService) {
-        this.usuarioService = usuarioService;
-    }
+	@Autowired
+    private UsuarioService usuarioService;
 
     @GetMapping("/login")
     public String mostrarLogin() {

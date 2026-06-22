@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,25 +30,16 @@ import com.colegio.repository.AlumnoRepository;
 @RequestMapping("/gestionaulas")
 public class AulaController {
 
-    private final AulaService aulaService;
-    private final AulaDocenteService aulaDocenteService;
-    private final DocenteRepository docenteRepository;
-    private final AlumnoRepository alumnoRepository;
-    private final com.colegio.service.impl.AulaAlumnoService aulaAlumnoService;
-
-
-    public AulaController(AulaService aulaService,
-                          AulaDocenteService aulaDocenteService,
-                          DocenteRepository docenteRepository,
-                          AlumnoRepository alumnoRepository,
-                          com.colegio.service.impl.AulaAlumnoService aulaAlumnoService) {
-        this.aulaService = aulaService;
-        this.aulaDocenteService = aulaDocenteService;
-        this.docenteRepository = docenteRepository;
-        this.alumnoRepository = alumnoRepository;
-        this.aulaAlumnoService = aulaAlumnoService;
-    }
-
+    @Autowired
+    private AulaService aulaService;
+    @Autowired
+    private AulaDocenteService aulaDocenteService;
+    @Autowired
+    private DocenteRepository docenteRepository;
+    @Autowired
+    private AlumnoRepository alumnoRepository;
+    @Autowired
+    private com.colegio.service.impl.AulaAlumnoService aulaAlumnoService;
 
     @GetMapping
     public String listarAulas(Model model) {

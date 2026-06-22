@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,23 +33,16 @@ public class DocenteController {
     
     private static final Logger logger = LoggerFactory.getLogger(DocenteController.class);
 
-    private final DocenteRepository docenteRepository;
-    private final AulaRepository aulaRepository;
-    private final AulaDocenteRepository aulaDocenteRepository;
-    private final HorarioService horarioService;
-    private final HorarioPDFService horarioPDFService;
-
-    public DocenteController(DocenteRepository docenteRepository,
-                            AulaRepository aulaRepository,
-                            AulaDocenteRepository aulaDocenteRepository,
-                            HorarioService horarioService,
-                            HorarioPDFService horarioPDFService) {
-        this.docenteRepository = docenteRepository;
-        this.aulaRepository = aulaRepository;
-        this.aulaDocenteRepository = aulaDocenteRepository;
-        this.horarioService = horarioService;
-        this.horarioPDFService = horarioPDFService;
-    }
+    @Autowired
+    private DocenteRepository docenteRepository;
+    @Autowired
+    private AulaRepository aulaRepository;
+    @Autowired
+    private AulaDocenteRepository aulaDocenteRepository;
+    @Autowired
+    private HorarioService horarioService;
+    @Autowired
+    private HorarioPDFService horarioPDFService;
 
     @GetMapping("/docente/horario")
     public String verHorario(HttpSession session, Model model, @RequestParam(required = false) Integer idAula) {

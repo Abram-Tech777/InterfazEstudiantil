@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -22,7 +24,7 @@ import jakarta.persistence.EntityNotFoundException;
 @Transactional
 public class UsuarioServiceImpl implements UsuarioService {
 
-	@Autowired
+	private static final Logger logger = LoggerFactory.getLogger(UsuarioServiceImpl.class);
 	private UsuarioRepository usuarioRepository;
 	@Autowired
 	private DocenteRepository docenteRepository;
@@ -125,7 +127,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 			Docente docente = new Docente(nombreCompleto, usuario);
 			docenteRepository.save(docente);
 		} catch (Exception e) {
-			System.err.println("Error al crear Docente para usuario " + usuario.getIdUsuario() + ": " + e.getMessage());
+			logger.error("Error al crear Docente para usuario {}: {}", usuario.getIdUsuario(), e.getMessage());
 		}
 	}
 
@@ -145,7 +147,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	        alumnoRepository.save(alumno);
 	    } catch (Exception e) {
-	        System.err.println("Error al crear Alumno para usuario " + usuario.getIdUsuario() + ": " + e.getMessage());
+	        logger.error("Error al crear Alumno para usuario {}: {}", usuario.getIdUsuario(), e.getMessage());
 	    }
 	}
 

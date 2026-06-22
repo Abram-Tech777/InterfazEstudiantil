@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import jakarta.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,27 +35,17 @@ import com.colegio.service.impl.HorarioService;
 @RequestMapping("/docente/evaluaciones")
 public class EvaluacionController {
 
-    private final DocenteRepository docenteRepository;
-    private final AlumnoRepository alumnoRepository;
-    private final HorarioService horarioService;
-    private final AulaDocenteService aulaDocenteService;
-    private final EvaluacionNotaRepository evaluacionNotaRepository;
+    @Autowired
+    private DocenteRepository docenteRepository;
+    @Autowired
+    private AlumnoRepository alumnoRepository;
+    @Autowired
+    private HorarioService horarioService;
+    @Autowired
+    private AulaDocenteService aulaDocenteService;
+    @Autowired
+    private EvaluacionNotaRepository evaluacionNotaRepository;
 
-    public EvaluacionController(DocenteRepository docenteRepository,
-                                AlumnoRepository alumnoRepository,
-                                HorarioService horarioService,
-                                AulaDocenteService aulaDocenteService,
-                                EvaluacionNotaRepository evaluacionNotaRepository) {
-        this.docenteRepository = docenteRepository;
-        this.alumnoRepository = alumnoRepository;
-        this.horarioService = horarioService;
-        this.aulaDocenteService = aulaDocenteService;
-        this.evaluacionNotaRepository = evaluacionNotaRepository;
-    }
-
-    /**
-     * GET /docente/evaluaciones - Lista horarios del docente para evaluar
-     */
     @GetMapping
     public String listarEvaluaciones(HttpSession session, Model model) {
         Usuario u = (Usuario) session.getAttribute("usuarioLogueado");

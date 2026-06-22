@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{/fragments/head :: head('Mi Horario')}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
+</head>
+<body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
+
+    <aside class="w-72 bg-[#e60000] shadow-[4px_0_24px_rgba(0,0,0,0.2)] flex flex-col h-full z-20 relative">
+        <div class="flex flex-col items-center justify-center pt-8 pb-6 border-b border-red-700">
+            <div class="w-16 h-16 mb-3 flex items-center justify-center">
+                <img th:src="@{/img/logo.png}" alt="Logo" class="w-full h-full object-contain" />
+            </div>
+            <h2 class="text-xl font-bold text-white">Fe y Alegría 32</h2>
+            <p class="text-xs text-red-200 italic">Portal Académico</p>
+        </div>
+
+        <div class="flex items-center gap-4 p-6 border-b border-red-700/40">
+            <div class="w-16 h-16 rounded-full bg-gray-800 overflow-hidden border-2 border-[#e60000] shrink-0">
+                <img th:src="@{/img/image.png}" alt="Perfil" class="w-full h-full object-cover">
+            </div>
+            <div class="flex flex-col gap-0.5">
+                <h3 class="text-base font-bold text-white leading-tight" th:text="${alumno.nombreCompleto}">Juan Perez</h3>
+                <p class="text-xs text-white font-medium" th:text="${alumno.aula.nombre}">1ero Secundaria B</p>
+            </div>
+        </div>
+
+        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto hide-scrollbar">
+            <a th:href="@{/estudiante/panel}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/30 hover:text-white font-medium transition-all">
+                <i class="fas fa-home w-5 text-center"></i> Inicio
+            </a>
+            <a th:href="@{/estudiante/anuncios}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/30 hover:text-white font-medium transition-all">
+                <i class="fas fa-bullhorn w-5 text-center"></i> Anuncios
+            </a>
+            <a th:href="@{/estudiante/notas}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/30 hover:text-white font-medium transition-all">
+                <i class="fas fa-book w-5 text-center"></i> Cursos / Notas
+            </a>
+            <a th:href="@{/estudiante/asistencia}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/30 hover:text-white font-medium transition-all">
+                <i class="fas fa-clipboard-list w-5 text-center"></i> Bitácora
+            </a>
+            <a th:href="@{/estudiante/horario}" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#e60000] text-white font-semibold shadow-md transition-all">
+                <i class="fas fa-calendar-alt w-5 text-center"></i> Horarios
+            </a>
+        </nav>
+        
+        <div class="p-4 border-t border-gray-100">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-3 text-white rounded-xl font-semibold">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+        
+        <header class="h-20 bg-[#e60000] shadow-md px-8 flex items-center justify-between z-10 text-white">
+            <h1 class="text-2xl font-bold">Horario de Clases</h1>
+            <div class="flex gap-3">
+                <button onclick="window.print()" class="px-4 py-2 bg-red-700 hover:bg-red-800 rounded-lg text-sm font-semibold transition-all">
+                    <i class="fas fa-print mr-1"></i> Imprimir
+                </button>
+                <a href="/estudiante/horario/descargar" class="px-4 py-2 bg-white text-[#e60000] hover:bg-gray-100 rounded-lg text-sm font-semibold transition-all">
+                    <i class="fas fa-download mr-1"></i> PDF
+                </a>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+            <div class="max-w-6xl mx-auto">
+                
+                <div class="mb-6">
+                    <p class="text-gray-500 font-medium" th:text="${horarioMatriz != null ? horarioMatriz.aulaNombre + ' - ' + horarioMatriz.aulaGrado : 'Selecciona una sección'}">
+                        1ero Secundaria B
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse text-sm">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-4 text-center font-bold text-gray-600">Hora</th>
+                                    <th class="px-6 py-4 text-center font-bold text-gray-600">Lunes</th>
+                                    <th class="px-6 py-4 text-center font-bold text-gray-600">Martes</th>
+                                    <th class="px-6 py-4 text-center font-bold text-gray-600">Miércoles</th>
+                                    <th class="px-6 py-4 text-center font-bold text-gray-600">Jueves</th>
+                                    <th class="px-6 py-4 text-center font-bold text-gray-600">Viernes</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr th:each="hora : ${horarioMatriz.horas}" class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4 text-center font-bold text-gray-700 bg-gray-50" th:text="${#temporals.format(hora, 'HH:mm')}"></td>
+                                    
+                                    <td class="px-3 py-2" th:each="dia : ${ {'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes'} }">
+                                        <div th:if="${horarioMatriz.obtenerHorario(hora, dia) != null}" 
+                                             class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm hover:border-[#e60000]/30 transition-all">
+                                            <div class="font-bold text-gray-800 text-xs truncate" th:text="${horarioMatriz.obtenerHorario(hora, dia).cursoNombre}"></div>
+                                            <div class="text-[10px] text-gray-500 mt-1 truncate" th:text="${horarioMatriz.obtenerHorario(hora, dia).docenteNombre}"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div th:if="${horarioMatriz == null}" class="p-12 text-center text-gray-400 bg-white rounded-2xl border border-gray-100">
+                    <i class="fas fa-calendar-times text-4xl mb-4"></i>
+                    <p>No se encontraron horarios disponibles para esta sección.</p>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{/fragments/scripts :: scripts}"></div>
+</body>
+</html>

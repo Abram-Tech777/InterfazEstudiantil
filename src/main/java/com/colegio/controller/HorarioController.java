@@ -42,18 +42,6 @@ public class HorarioController {
 	@Autowired
 	private AulaDocenteService aulaDocenteService;
 
-	public HorarioController(HorarioService horarioService,
-	                         AulaRepository aulaRepository,
-	                         DocenteRepository docenteRepository,
-	                         CursoRepository cursoRepository,
-	                         AulaDocenteService aulaDocenteService) {
-	    this.horarioService = horarioService;
-	    this.aulaRepository = aulaRepository;
-	    this.docenteRepository = docenteRepository;
-	    this.cursoRepository = cursoRepository;
-	    this.aulaDocenteService = aulaDocenteService;
-	}
-	
 	@GetMapping
 	public String listarHorarios(Model model, HttpSession session) {
 	    List<Horario> horarios;

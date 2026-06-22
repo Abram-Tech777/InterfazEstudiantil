@@ -7,6 +7,7 @@ import java.util.Optional;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,23 +24,16 @@ import com.colegio.service.impl.HorarioService;
 @Controller
 public class UsuarioPanelController {
 
-    private final AlumnoRepository alumnoRepository;
-    private final DocenteRepository docenteRepository;
-    private final HorarioService horarioService;
-    private final AulaDocenteService aulaDocenteService;
-    private final AsistenciaRepository asistenciaRepository;
-
-    public UsuarioPanelController(AlumnoRepository alumnoRepository,
-                                  DocenteRepository docenteRepository,
-                                  HorarioService horarioService,
-                                  AulaDocenteService aulaDocenteService,
-                                  AsistenciaRepository asistenciaRepository) {
-        this.alumnoRepository = alumnoRepository;
-        this.docenteRepository = docenteRepository;
-        this.horarioService = horarioService;
-        this.aulaDocenteService = aulaDocenteService;
-        this.asistenciaRepository = asistenciaRepository;
-    }
+    @Autowired
+    private AlumnoRepository alumnoRepository;
+    @Autowired
+    private DocenteRepository docenteRepository;
+    @Autowired
+    private HorarioService horarioService;
+    @Autowired
+    private AulaDocenteService aulaDocenteService;
+    @Autowired
+    private AsistenciaRepository asistenciaRepository;
 
     @GetMapping("/docente/asistencia")
     public String controlAsistenciaDocente(HttpSession session, Model model) {

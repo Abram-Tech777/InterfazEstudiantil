@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,29 +37,20 @@ public class EstudianteController {
     
     private static final Logger logger = LoggerFactory.getLogger(EstudianteController.class);
 
-    private final AlumnoRepository alumnoRepository;
-    private final HorarioService horarioService;
-    private final AsistenciaRepository asistenciaRepository;
-    private final EvaluacionNotaRepository evaluacionNotaRepository;
-    private final HorarioPDFService horarioPDFService;
-    private final ComunicadoRepository comunicadoRepository;
-    private final ConductaRepository conductaRepository;
-
-    public EstudianteController(AlumnoRepository alumnoRepository, 
-                                HorarioService horarioService,
-                                AsistenciaRepository asistenciaRepository,
-                                EvaluacionNotaRepository evaluacionNotaRepository,
-                                HorarioPDFService horarioPDFService,
-                                ComunicadoRepository comunicadoRepository,
-                                ConductaRepository conductaRepository) {
-        this.alumnoRepository = alumnoRepository;
-        this.horarioService = horarioService;
-        this.asistenciaRepository = asistenciaRepository;
-        this.evaluacionNotaRepository = evaluacionNotaRepository;
-        this.horarioPDFService = horarioPDFService;
-        this.comunicadoRepository = comunicadoRepository;
-        this.conductaRepository = conductaRepository;
-    }
+    @Autowired
+    private AlumnoRepository alumnoRepository;
+    @Autowired
+    private HorarioService horarioService;
+    @Autowired
+    private AsistenciaRepository asistenciaRepository;
+    @Autowired
+    private EvaluacionNotaRepository evaluacionNotaRepository;
+    @Autowired
+    private HorarioPDFService horarioPDFService;
+    @Autowired
+    private ComunicadoRepository comunicadoRepository;
+    @Autowired
+    private ConductaRepository conductaRepository;
 
     @GetMapping("/estudiante/panel")
     public String mostrarPanel(HttpSession session, Model model) {

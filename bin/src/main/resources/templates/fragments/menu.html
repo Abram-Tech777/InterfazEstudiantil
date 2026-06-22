@@ -1,0 +1,108 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="menu">
+    <!-- Navbar -->
+    <nav class="navbar-custom sticky top-0 z-50 w-full">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo / Brand -->
+                <div class="flex items-center">
+                    <a th:href="@{/}" class="text-white font-bold text-2xl hover:text-gray-200 transition">
+                        <i class="fas fa-graduation-cap mr-2"></i>Colegio
+                    </a>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-1">
+                    <!-- Admin Menu -->
+                    <div class="relative group" 
+                         th:if="${session.usuarioLogueado != null and #strings.equalsIgnoreCase(session.usuarioLogueado.rol,'ADMINISTRADOR')}">
+                        <button class="text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition flex items-center">
+                            <i class="fas fa-cog mr-2"></i>Administrador
+                            <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                        </button>
+                        <div class="absolute left-0 mt-0 w-56 bg-white shadow-lg rounded-lg opacity-0 group-hover:opacity-100 transition pointer-events-none group-hover:pointer-events-auto">
+                            <a th:href="@{/gestionusuarios}" class="block px-4 py-3 text-gray-800 hover:bg-red-50 hover:text-red-600 rounded-t-lg transition">
+                                <i class="fas fa-users mr-2 text-red-600"></i>Gestión de Usuarios
+                            </a>
+                            <a th:href="@{/gestionaulas}" class="block px-4 py-3 text-gray-800 hover:bg-blue-50 hover:text-blue-600 transition">
+                                <i class="fas fa-door-open mr-2 text-blue-600"></i>Gestión de Aulas
+                            </a>
+                            <a th:href="@{/gestioncomunicados/lista}" class="block px-4 py-3 text-gray-800 hover:bg-yellow-50 hover:text-yellow-600 transition">
+                                <i class="fas fa-bullhorn mr-2 text-yellow-600"></i>Comunicados
+                            </a>
+                            <a th:href="@{/gestionarhorarios}" class="block px-4 py-3 text-gray-800 hover:bg-purple-50 hover:text-purple-600 rounded-b-lg transition">
+                                <i class="fas fa-calendar-alt mr-2 text-purple-600"></i>Horarios
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Teacher Menu -->
+                    <div class="relative group"
+                         th:if="${session.usuarioLogueado != null and #strings.equalsIgnoreCase(session.usuarioLogueado.rol,'DOCENTE')}">
+                        <button class="text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition flex items-center">
+                            <i class="fas fa-chalkboard-user mr-2"></i>Docente
+                            <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                        </button>
+                        <div class="absolute left-0 mt-0 w-56 bg-white shadow-lg rounded-lg opacity-0 group-hover:opacity-100 transition pointer-events-none group-hover:pointer-events-auto">
+                            <a th:href="@{/gestioncomunicados/nuevo}" class="block px-4 py-3 text-gray-800 hover:bg-green-50 hover:text-green-600 rounded-t-lg transition">
+                                <i class="fas fa-pen mr-2 text-green-600"></i>Crear Comunicado
+                            </a>
+                            <a th:href="@{/gestioncomunicados/lista}" class="block px-4 py-3 text-gray-800 hover:bg-green-50 hover:text-green-600 transition">
+                                <i class="fas fa-list mr-2 text-green-600"></i>Mis Comunicados
+                            </a>
+                            <a th:href="@{/docente/horario}" class="block px-4 py-3 text-gray-800 hover:bg-indigo-50 hover:text-indigo-600 transition">
+                                <i class="fas fa-clock mr-2 text-indigo-600"></i>Mi Horario
+                            </a>
+                            <a th:href="@{/docente/asistencia}" class="block px-4 py-3 text-gray-800 hover:bg-orange-50 hover:text-orange-600 transition">
+                                <i class="fas fa-clipboard-check mr-2 text-orange-600"></i>Control de Asistencia
+                            </a>
+                            <hr class="my-2" />
+                            <a th:href="@{/docente/evaluaciones}" class="block px-4 py-3 text-gray-800 hover:bg-pink-50 hover:text-pink-600 rounded-b-lg transition">
+                                <i class="fas fa-star mr-2 text-pink-600"></i>Evaluaciones / Notas
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Student Menu -->
+                    <div class="relative group"
+                         th:if="${session.usuarioLogueado != null and #strings.equalsIgnoreCase(session.usuarioLogueado.rol,'ESTUDIANTE')}">
+                        <button class="text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition flex items-center">
+                            <i class="fas fa-book mr-2"></i>Estudiante
+                            <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                        </button>
+                        <div class="absolute left-0 mt-0 w-56 bg-white shadow-lg rounded-lg opacity-0 group-hover:opacity-100 transition pointer-events-none group-hover:pointer-events-auto">
+                            <a th:href="@{/gestioncomunicados/bandeja}" class="block px-4 py-3 text-gray-800 hover:bg-cyan-50 hover:text-cyan-600 rounded-t-lg transition">
+                                <i class="fas fa-inbox mr-2 text-cyan-600"></i>Bandeja de Entrada
+                            </a>
+                            <a th:href="@{/estudiante/notas}" class="block px-4 py-3 text-gray-800 hover:bg-teal-50 hover:text-teal-600 transition">
+                                <i class="fas fa-graduation-cap mr-2 text-teal-600"></i>Mis Notas
+                            </a>
+                            <a th:href="@{/estudiante/asistencia}" class="block px-4 py-3 text-gray-800 hover:bg-lime-50 hover:text-lime-600 rounded-b-lg transition">
+                                <i class="fas fa-user-check mr-2 text-lime-600"></i>Mi Asistencia
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Info & Logout -->
+                <div class="flex items-center space-x-4">
+                    <div th:if="${session.usuarioLogueado != null}" class="hidden sm:flex items-center">
+                        <div class="w-10 h-10 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <span class="text-white ml-3 font-medium text-sm" th:text="${session.usuarioLogueado.nombreCompleto}">Usuario</span>
+                    </div>
+
+                    <form th:action="@{/logout}" method="post" th:if="${session.usuarioLogueado != null}" class="inline">
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Salir
+                        </button>
+                    </form>
+
+                    <a th:href="@{/login}" th:if="${session.usuarioLogueado == null}" class="text-white hover:text-gray-200 font-medium transition">
+                        <i class="fas fa-sign-in-alt mr-1"></i>Iniciar sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+</div>

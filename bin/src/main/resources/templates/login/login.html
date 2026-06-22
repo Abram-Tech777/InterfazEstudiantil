@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{/fragments/head :: head('Acceso al Sistema')}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
+</head>
+<body class="m-0 p-0 h-screen flex relative">
+
+    <nav class="absolute top-8 sm:top-10 left-1/2 transform -translate-x-1/2 z-50">
+        <a th:href="@{/}" class="block hover:scale-110 transition-transform duration-300">
+            <div class="flex items-center justify-center rounded-full w-16 h-16 logo-bg-red p-2.5 shadow-xl">
+                <img th:src="@{/img/logo.png}" alt="Logo" class="w-full h-full object-contain" />
+            </div>
+        </a>
+    </nav>
+
+    <div class="hidden md:flex w-1/2 relative min-h-screen overflow-hidden bg-[#f0f0ee]">
+        
+        <video src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_215831_c6a8989c-d716-4d8d-8745-e972a2eec711.mp4" 
+               autoplay muted loop playsinline 
+               class="absolute inset-0 w-full h-full object-cover z-0"></video>
+               
+        <div class="absolute inset-0 bg-black/20 z-0"></div>
+
+        <div class="relative z-10 flex flex-col min-h-screen w-full">
+
+            <div class="flex-1 flex flex-col items-center justify-center pb-16 px-6 sm:px-8 w-full">
+                
+                <div class="flex flex-row flex-wrap justify-center items-end gap-x-6 sm:gap-x-8 mb-6 drop-shadow-2xl w-full">
+                    
+					<div class="flex flex-row justify-center items-end gap-1 w-full">
+					    <img th:src="@{/img/letra(I).png}" class="h-16 sm:h-20 anim-tosca delay-1">
+					    <img th:src="@{/img/letra_(n).png}" class="h-10 sm:h-14 anim-tosca delay-2">
+					    <img th:src="@{/img/letra_(t).png}" class="h-10 sm:h-14 anim-tosca delay-3">
+					    <img th:src="@{/img/letra_(r).png}" class="h-10 sm:h-14 anim-tosca delay-4">
+					    <img th:src="@{/img/letra_(a).png}" class="h-10 sm:h-14 anim-tosca delay-1">
+					    <img th:src="@{/img/letra_(n).png}" class="h-10 sm:h-14 anim-tosca delay-2">
+					    <img th:src="@{/img/letra_(e).png}" class="h-10 sm:h-14 anim-tosca delay-3">
+					    <img th:src="@{/img/letra_(t).png}" class="h-10 sm:h-14 anim-tosca delay-4">
+					</div>
+
+					<div class="flex flex-row justify-center items-end gap-1 w-full mt-2">
+					    <img th:src="@{/img/letra(E).png}" class="h-16 sm:h-20 anim-tosca delay-2">
+					    <img th:src="@{/img/letra_(s).png}" class="h-12 sm:h-16 anim-tosca delay-3">
+					    <img th:src="@{/img/letra_(C).png}" class="h-12 sm:h-16 anim-tosca delay-4">
+					    <img th:src="@{/img/letra_(o).png}" class="h-12 sm:h-16 anim-tosca delay-1">
+					    <img th:src="@{/img/letra_(l).png}" class="h-12 sm:h-16 anim-tosca delay-2">
+					    <img th:src="@{/img/letra_(a).png}" class="h-12 sm:h-16 anim-tosca delay-3">
+					    <img th:src="@{/img/letra_(r).png}" class="h-12 sm:h-16 anim-tosca delay-4">
+					</div>
+                    
+                </div>
+
+                <div class="w-full max-w-lg bg-black/40 backdrop-blur-md p-8 sm:p-10 rounded-3xl border border-white/10 shadow-2xl flex flex-col items-center text-center">
+                    
+                    <p class="text-base sm:text-lg text-white font-medium mb-6 drop-shadow-md">
+                        Acceso exclusivo para alumnos, docentes y personal administrativo.
+                    </p>
+                    
+					<div class="mb-10 text-center">
+					    <h2 class="text-3xl sm:text-4xl font-bold text-white mb-2">
+					        <span class="typewriter-text">Bienvenido a tu Intranet</span>
+					    </h2>
+					</div>
+
+					<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-lg">
+					    
+					    <div class="feature-card bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10 flex items-center gap-4">
+					        <div class="bg-[#e60000] p-3 rounded-lg text-white"><i class="fas fa-calendar-alt"></i></div>
+					        <div>
+					            <h4 class="text-white font-bold text-sm">Horarios</h4>
+					            <p class="text-gray-300 text-xs">Gestiona tu carga académica.</p>
+					        </div>
+					    </div>
+
+					    <div class="feature-card bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10 flex items-center gap-4">
+					        <div class="bg-[#e60000] p-3 rounded-lg text-white"><i class="fas fa-bullhorn"></i></div>
+					        <div>
+					            <h4 class="text-white font-bold text-sm">Comunicados</h4>
+					            <p class="text-gray-300 text-xs">Noticias en tiempo real.</p>
+					        </div>
+					    </div>
+
+					    <div class="feature-card bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10 flex items-center gap-4">
+					        <div class="bg-[#e60000] p-3 rounded-lg text-white"><i class="fas fa-check-circle"></i></div>
+					        <div>
+					            <h4 class="text-white font-bold text-sm">Asistencia</h4>
+					            <p class="text-gray-300 text-xs">Controla tus registros.</p>
+					        </div>
+					    </div>
+
+					    <div class="feature-card bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10 flex items-center gap-4">
+					        <div class="bg-[#e60000] p-3 rounded-lg text-white"><i class="fas fa-user-graduate"></i></div>
+					        <div>
+					            <h4 class="text-white font-bold text-sm">Seguimiento</h4>
+					            <p class="text-gray-300 text-xs">Notas y desempeño.</p>
+					        </div>
+					    </div>
+
+					</div>
+                    
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+	<div class="w-full md:w-1/2 flex items-center justify-center bg-[#e60000] p-8 overflow-hidden">
+	        
+	        <div class="relative w-full max-w-[420px] flex items-center justify-center">
+
+				<div class="util-escolar pos-1">✏️</div>
+				            <div class="util-escolar pos-2">📐</div>
+				            <div class="util-escolar pos-3">📓</div> <div class="util-escolar pos-4">✂️</div>
+				            <div class="util-escolar pos-5">📏</div>
+				            <div class="util-escolar pos-6">🍎</div>
+				            <div class="util-escolar pos-7">🖍️</div>
+				            <div class="util-escolar pos-8">🎒</div>
+				            <div class="util-escolar pos-9">🖌️</div>
+
+	            <div class="wrapper w-full relative z-10">
+	                <form th:action="@{/login}" method="post">
+	                    <h1>Iniciar Sesión</h1>
+	                    
+	                    <div th:if="${error}" class="bg-white text-red-600 font-bold p-3 rounded-lg text-center mb-6 text-sm shadow-md" th:text="${error}"></div>
+	                    
+	                    <div class="input-box">
+	                        <input type="text" name="codUsuario" placeholder="Código de Usuario" required>
+	                        <i class="fas fa-user"></i>
+	                    </div>
+	                    
+	                    <div class="input-box">
+	                        <input type="password" name="password" placeholder="Contraseña" required>
+	                        <i class="fas fa-lock"></i>
+	                    </div>
+	                    
+	                    <button type="submit" class="btn">INGRESAR</button>
+	                   
+	                </form>
+	            </div>
+	            
+	        </div>
+
+	    </div>
+    
+    <div th:replace="~{/fragments/scripts :: scripts}"></div>
+</body>
+</html>
