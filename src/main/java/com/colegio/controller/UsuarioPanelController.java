@@ -51,8 +51,19 @@ public class UsuarioPanelController {
             return "docente/asistencia";
         }
         Docente d = docenteOpt.get();
+        
+        // Obtener horarios del docente
+        // Si hay aulas asignadas, filtrar por esas aulas; si no, traer todos los horarios del docente
+        List<Horario> horarios;
         List<Integer> aulasAsignadas = aulaDocenteService.listarAulasDelDocente(d.getIdDocente());
-        List<Horario> horarios = horarioService.findHorarioRepository().findByDocenteAndAulasAsignadas(d.getIdDocente(), aulasAsignadas);
+        
+        if (aulasAsignadas != null && !aulasAsignadas.isEmpty()) {
+            horarios = horarioService.findHorarioRepository().findByDocenteAndAulasAsignadas(d.getIdDocente(), aulasAsignadas);
+        } else {
+            // Si no hay aulas asignadas en aula_docente, traer todos los horarios donde aparece como docente
+            horarios = horarioService.findHorarioRepository().findByIdDocente(d.getIdDocente());
+        }
+        
         model.addAttribute("horarios", horarios);
         return "docente/asistencia";
     }
@@ -96,7 +107,11 @@ public class UsuarioPanelController {
 
             for (Alumno a : alumnos) {
                 String estado = request.getParameter("estado_" + a.getIdAlumno());
-                if (estado == null || estado.isBlank()) estado = "FALTA";
+                String horaLlegadaStr = request.getParameter("horaLlegada_" + a.getIdAlumno());
+                
+                if (estado == null || estado.isBlank()) {
+                    estado = "AUSENCIA"; // Por defecto, si no se marca algo, es ausencia
+                }
 
                 Optional<Asistencia> existing = asistenciaRepository
                     .findByAlumno_IdAlumnoAndHorario_IdHorarioAndFecha(a.getIdAlumno(), idHorario, fecha);
@@ -104,15 +119,28 @@ public class UsuarioPanelController {
                 Asistencia asistencia;
                 if (existing.isPresent()) {
                     asistencia = existing.get();
-                    asistencia.setEstado(estado);
                 } else {
                     asistencia = new Asistencia();
                     asistencia.setAlumno(a);
                     asistencia.setHorario(h);
                     asistencia.setCurso(curso);
                     asistencia.setFecha(fecha);
+                }
+                
+                // Si se proporciona hora de llegada, parsearla y determinar estado automáticamente
+                if (horaLlegadaStr != null && !horaLlegadaStr.isBlank()) {
+                    try {
+                        asistencia.setHoraLlegada(java.time.LocalTime.parse(horaLlegadaStr));
+                        asistencia.determinarEstado(); // Calcula automáticamente si fue presente, retardo o ausencia
+                    } catch (java.time.format.DateTimeParseException e) {
+                        // Si la hora no es válida, usar el estado manual
+                        asistencia.setEstado(estado);
+                    }
+                } else {
+                    // Si no hay hora de llegada, usar el estado manual
                     asistencia.setEstado(estado);
                 }
+                
                 asistenciaRepository.save(asistencia);
             }
 

@@ -34,7 +34,7 @@
                     </thead>
                     <tbody>
                         <tr th:each="asistencia : ${asistencias}" class="border-t hover:bg-gray-50 transition"
-                            th:class="${asistencia.estado == 'ASISTIO' ? 'bg-green-50' : (asistencia.estado == 'TARDE' ? 'bg-yellow-50' : 'bg-red-50')}">
+                            th:class="${asistencia.estado == 'PRESENTE' ? 'bg-green-50' : (asistencia.estado == 'RETARDO' ? 'bg-yellow-50' : 'bg-red-50')}">
                             <td class="px-6 py-4 font-medium text-gray-800" th:text="${asistencia.curso != null ? asistencia.curso.nombreCurso : 'N/A'}"></td>
                             <td class="px-6 py-4 text-gray-700" th:text="${asistencia.horario != null && asistencia.horario.docente != null ? asistencia.horario.docente.getNombre() + ' ' + asistencia.horario.docente.getApellido() : 'N/A'}"></td>
                             <td class="px-6 py-4" th:text="${#temporals.format(asistencia.fecha, 'dd/MM/yyyy')}"></td>
@@ -42,14 +42,14 @@
                                 <span class="badge-status bg-purple-100 text-purple-700" th:text="${asistencia.horario != null ? asistencia.horario.diaSemana : 'N/A'}"></span>
                             </td>
                             <td class="px-6 py-4 text-center">
-                                <span th:if="${asistencia.estado == 'ASISTIO'}" class="badge-status bg-green-100 text-green-700">
+                                <span th:if="${asistencia.estado == 'PRESENTE'}" class="badge-status bg-green-100 text-green-700">
                                     <i class="fas fa-check-circle mr-1"></i>Presente
                                 </span>
-                                <span th:if="${asistencia.estado == 'TARDE'}" class="badge-status bg-yellow-100 text-yellow-700">
-                                    <i class="fas fa-clock mr-1"></i>Tarde
+                                <span th:if="${asistencia.estado == 'RETARDO'}" class="badge-status bg-yellow-100 text-yellow-700">
+                                    <i class="fas fa-clock mr-1"></i>Retardo
                                 </span>
-                                <span th:if="${asistencia.estado == 'FALTA'}" class="badge-status bg-red-100 text-red-700">
-                                    <i class="fas fa-times-circle mr-1"></i>Ausente
+                                <span th:if="${asistencia.estado == 'AUSENCIA'}" class="badge-status bg-red-100 text-red-700">
+                                    <i class="fas fa-times-circle mr-1"></i>Ausencia
                                 </span>
                             </td>
                         </tr>
@@ -61,15 +61,15 @@
         <!-- Summary Stats -->
         <div th:if="${asistencias != null and !asistencias.isEmpty()}" class="grid grid-cols-3 gap-4 mt-8">
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
-                <div class="text-3xl font-bold text-green-600" th:text="${#lists.size(asistencias.?[estado == 'ASISTIO'])}"></div>
+                <div class="text-3xl font-bold text-green-600" th:text="${presentes}"></div>
                 <p class="text-gray-600 text-sm mt-2">Presentes</p>
             </div>
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
-                <div class="text-3xl font-bold text-yellow-600" th:text="${#lists.size(asistencias.?[estado == 'TARDE'])}"></div>
+                <div class="text-3xl font-bold text-yellow-600" th:text="${retardos}"></div>
                 <p class="text-gray-600 text-sm mt-2">Retardos</p>
             </div>
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
-                <div class="text-3xl font-bold text-red-600" th:text="${#lists.size(asistencias.?[estado == 'FALTA'])}"></div>
+                <div class="text-3xl font-bold text-red-600" th:text="${ausencias}"></div>
                 <p class="text-gray-600 text-sm mt-2">Ausencias</p>
             </div>
         </div>

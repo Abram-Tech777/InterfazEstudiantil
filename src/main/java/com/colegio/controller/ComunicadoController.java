@@ -2,12 +2,20 @@ package com.colegio.controller;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.io.IOException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 import com.colegio.entity.*;
 import com.colegio.repository.*;
@@ -52,6 +60,7 @@ public class ComunicadoController {
     @PostMapping("/guardar")
     public String guardar(@ModelAttribute("comunicado") Comunicado c,
                           @RequestParam(value = "destinoTipo", required = false) String destinoTipo,
+                          @RequestParam(value = "archivo", required = false) MultipartFile archivo,
                           HttpSession session, Model model, RedirectAttributes redirectAttrs) {
         Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
         if (u == null || (!"DOCENTE".equalsIgnoreCase(u.getRol()) && !"ADMINISTRADOR".equalsIgnoreCase(u.getRol()))) {
@@ -78,6 +87,17 @@ public class ComunicadoController {
             } else if ("GLOBAL".equalsIgnoreCase(destinoTipo)) {
                 c.setAula(null);
                 c.setGrado(null);
+            }
+
+            // Procesar archivo si existe - Guardar en BD
+            if (archivo != null && !archivo.isEmpty()) {
+                try {
+                    c.setArchivoData(archivo.getBytes());
+                    c.setArchivoNombre(archivo.getOriginalFilename());
+                    c.setArchivoTipo(archivo.getContentType());
+                } catch (IOException e) {
+                    throw new IllegalArgumentException("Error al procesar archivo: " + e.getMessage());
+                }
             }
 
             c.setAutor(u);
@@ -173,5 +193,67 @@ public class ComunicadoController {
             redirectAttrs.addFlashAttribute("mensajeError", "Error al eliminar el mensaje.");
         }
         return "redirect:/gestioncomunicados/bandeja";
+    }
+
+    @GetMapping("/descargar/{id}")
+    public ResponseEntity<Resource> descargarArchivo(@PathVariable Integer id) throws Exception {
+        try {
+            Comunicado com = comunicadoService.obtenerComunicadoPorId(id);
+            if (com == null) {
+                return ResponseEntity.notFound().build();
+            }
+            if (com.getArchivoData() == null || com.getArchivoData().length == 0) {
+                return ResponseEntity.badRequest().build();
+            }
+            
+            String nombreArchivo = com.getArchivoNombre();
+            String tipoArchivo = com.getArchivoTipo();
+            
+            // Validar que el tipo sea válido
+            if (tipoArchivo == null || tipoArchivo.isEmpty()) {
+                tipoArchivo = "application/octet-stream";
+            }
+            
+            ByteArrayResource resource = new ByteArrayResource(com.getArchivoData());
+            
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + nombreArchivo + "\"")
+                    .header(HttpHeaders.CONTENT_TYPE, tipoArchivo)
+                    .contentType(MediaType.parseMediaType(tipoArchivo))
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @GetMapping("/abrir/{id}")
+    public ResponseEntity<Resource> abrirArchivo(@PathVariable Integer id) throws Exception {
+        try {
+            Comunicado com = comunicadoService.obtenerComunicadoPorId(id);
+            if (com == null) {
+                return ResponseEntity.notFound().build();
+            }
+            if (com.getArchivoData() == null || com.getArchivoData().length == 0) {
+                return ResponseEntity.badRequest().build();
+            }
+            
+            String nombreArchivo = com.getArchivoNombre();
+            String tipoArchivo = com.getArchivoTipo();
+            
+            // Validar que el tipo sea válido
+            if (tipoArchivo == null || tipoArchivo.isEmpty()) {
+                tipoArchivo = "application/octet-stream";
+            }
+            
+            ByteArrayResource resource = new ByteArrayResource(com.getArchivoData());
+            
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + nombreArchivo + "\"")
+                    .header(HttpHeaders.CONTENT_TYPE, tipoArchivo)
+                    .contentType(MediaType.parseMediaType(tipoArchivo))
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
     }
 }

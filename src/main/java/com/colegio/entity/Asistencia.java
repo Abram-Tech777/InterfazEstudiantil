@@ -2,6 +2,7 @@ package com.colegio.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "asistencia")
@@ -26,6 +27,9 @@ public class Asistencia {
 
     @Column(name = "fecha", nullable = false)
     private LocalDate fecha;
+
+    @Column(name = "hora_llegada")
+    private LocalTime horaLlegada;
 
     @Column(name = "estado", length = 15)
     private String estado;
@@ -89,6 +93,29 @@ public class Asistencia {
 		this.observaciones = observaciones;
 	}
 
-	
+	public LocalTime getHoraLlegada() {
+		return horaLlegada;
+	}
+
+	public void setHoraLlegada(LocalTime horaLlegada) {
+		this.horaLlegada = horaLlegada;
+	}
+
+	/**
+	 * Determina el estado automáticamente basado en la hora de llegada vs hora de inicio
+	 */
+	public void determinarEstado() {
+		if (horaLlegada == null) {
+			this.estado = "AUSENCIA";
+		} else if (horario != null && horario.getHoraInicio() != null) {
+			if (horaLlegada.isAfter(horario.getHoraInicio())) {
+				this.estado = "RETARDO";
+			} else {
+				this.estado = "PRESENTE";
+			}
+		} else {
+			this.estado = "PRESENTE";
+		}
+	}
 
 }

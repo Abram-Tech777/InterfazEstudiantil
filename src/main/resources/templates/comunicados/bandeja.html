@@ -20,36 +20,69 @@
         </div>
 
         <!-- Comunicados List -->
-        <div th:if="${!#lists.isEmpty(comunicados)}" class="space-y-4">
-            <div th:each="c : ${comunicados}" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition card-hover">
-                <div class="bg-gradient-to-r from-blue-50 to-cyan-50 px-6 py-4 border-b border-gray-200">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <h3 class="text-lg font-bold text-gray-900" th:text="${c.titulo}"></h3>
-                            <div class="flex items-center mt-2 space-x-4">
-                                <span class="text-sm text-gray-600">
-                                    <i class="fas fa-user-circle mr-1 text-gray-400"></i>
-                                    <strong>De:</strong> <span th:text="${autorMap[c.autor.idUsuario]}"></span>
-                                </span>
-                                <span class="text-sm text-gray-600">
-                                    <i class="fas fa-calendar mr-1 text-gray-400"></i>
-                                    <span th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy hh:mm a').format(c.fechaEmision)}"></span>
-                                </span>
-                            </div>
-                        </div>
-                        <div class="ml-4 flex items-center space-x-3">
-                            <button type="button" class="text-red-600 hover:text-red-700 font-medium delete-btn" th:data-id="${c.idComunicado}" title="Eliminar">
-                                <i class="fas fa-trash text-lg"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="px-6 py-4">
-                    <p class="text-gray-700 leading-relaxed" th:text="${c.contenido}"></p>
-                </div>
-            </div>
-        </div>
+         <div th:if="${!#lists.isEmpty(comunicados)}" class="space-y-6">
+             <div th:each="c : ${comunicados}" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition card-hover">
+                 <!-- Header Mensaje -->
+                 <div class="bg-blue-50 px-6 py-4 border-b border-gray-200">
+                     <div class="flex justify-between items-start">
+                         <div class="flex-1">
+                             <h3 class="text-lg font-bold text-gray-900" th:text="${c.titulo}"></h3>
+                             <div class="flex items-center mt-2 space-x-6 flex-wrap">
+                                 <span class="text-sm text-gray-600">
+                                     <strong>De:</strong> 
+                                     <span th:text="${autorMap[c.autor.idUsuario] != null ? autorMap[c.autor.idUsuario] : c.autor.nombreCompleto}"></span>
+                                 </span>
+                                 <span class="text-sm text-gray-600">
+                                     <span th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy hh:mm a').format(c.fechaEmision)}"></span>
+                                 </span>
+                             </div>
+                         </div>
+                         <div class="ml-4 flex items-center space-x-3">
+                             <button type="button" class="text-red-600 hover:text-red-700 font-medium delete-btn" th:data-id="${c.idComunicado}" title="Eliminar">
+                                 <i class="fas fa-trash text-lg"></i>
+                             </button>
+                         </div>
+                     </div>
+                 </div>
+                 
+                 <!-- Contenido Mensaje -->
+                 <div class="px-6 py-4 bg-white border-b border-gray-100">
+                     <p class="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm" th:text="${c.contenido}"></p>
+                 </div>
+
+                 <!-- Archivo Adjunto -->
+                 <div th:if="${c.archivoData != null and c.archivoNombre != null and c.archivoNombre != ''}" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                     <div class="flex items-center justify-between p-4 rounded-lg">
+                         <div class="flex items-center flex-1 min-w-0">
+                             <i class="fas fa-file text-2xl mr-4 flex-shrink-0" 
+                                th:classappend="${c.archivoNombre.toLowerCase().contains('.pdf') ? 'text-red-600' : 
+                                               c.archivoNombre.toLowerCase().contains('.doc') or c.archivoNombre.toLowerCase().contains('.docx') ? 'text-blue-600' : 
+                                               'text-yellow-600'}"></i>
+                             <div class="flex-1 min-w-0">
+                                 <p class="font-medium text-gray-900 truncate" th:text="${c.archivoNombre}"></p>
+                                 <p class="text-xs text-gray-500 mt-1">
+                                     <span th:text="${#numbers.formatDecimal(c.archivoData.length / 1024.0, 1, 2)}"></span> KB
+                                 </p>
+                             </div>
+                         </div>
+                         <div class="flex items-center space-x-3 ml-4 flex-shrink-0">
+                             <a th:href="@{/gestioncomunicados/abrir/{id}(id=${c.idComunicado})}" 
+                                target="_blank" 
+                                class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition font-medium flex items-center whitespace-nowrap text-sm"
+                                th:title="'Abrir ' + ${c.archivoNombre}">
+                                 <i class="fas fa-eye mr-1"></i>Abrir
+                             </a>
+                             <a th:href="@{/gestioncomunicados/descargar/{id}(id=${c.idComunicado})}" 
+                                download 
+                                class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md transition font-medium flex items-center whitespace-nowrap text-sm"
+                                th:title="'Descargar ' + ${c.archivoNombre}">
+                                 <i class="fas fa-download mr-1"></i>Descargar
+                             </a>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </div>
 
         <!-- Delete Modal -->
         <div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

@@ -42,15 +42,33 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 
 	    if (usuario.getIdUsuario() == 0) {
+	        // Normalizar rol primero
+	        if (usuario.getRol() != null) {
+	            String r = usuario.getRol().trim();
+	            if ("ADMINISTRADOR".equalsIgnoreCase(r)) {
+	                usuario.setRol("ADMINISTRADOR");
+	            } else if ("ALUMNO".equalsIgnoreCase(r) || "ESTUDIANTE".equalsIgnoreCase(r)) {
+	                usuario.setRol("ESTUDIANTE");
+	            } else if ("DOCENTE".equalsIgnoreCase(r)) {
+	                usuario.setRol("DOCENTE");
+	            } else {
+	                usuario.setRol(r.toUpperCase());
+	            }
+	        }
+
+	        // Determinar prefijo según el rol normalizado
+	        char letraRol = obtenerLetraRol(usuario.getRol());
 	        int anioActual = LocalDate.now().getYear();
-	        String prefijo = "C" + anioActual; 
+	        String prefijo = letraRol + String.valueOf(anioActual);
 
-
+	        // Buscar el último código con este prefijo para este rol específico
 	        Optional<Usuario> ultimoOpt = usuarioRepository.findTopByCodUsuarioStartingWithOrderByCodUsuarioDesc(prefijo);
-            int siguienteNumero = 1;
+	        int siguienteNumero = 1;
 	        if (ultimoOpt.isPresent()) {
 	            String ultimoCodigo = ultimoOpt.get().getCodUsuario();
-	            if (ultimoCodigo != null && ultimoCodigo.length() >= 8) {
+	            if (ultimoCodigo != null && ultimoCodigo.length() >= 6) {
+	                // Extraer parte numérica: formato es LETRAAAOXXX
+	                // Posición 1: Letra, Posición 2-5: Año, Posición 6-8: Número
 	                String parteNumerica = ultimoCodigo.substring(5); 
 	                try {
 	                    siguienteNumero = Integer.parseInt(parteNumerica) + 1;
@@ -60,25 +78,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 	            }
 	        }
 
-
+	        // Intentar generar un código único
 	        int maxAttempts = 5;
 	        for (int attempt = 0; attempt < maxAttempts; attempt++) {
-            String nuevoCodigo = String.format("C%d%03d", anioActual, siguienteNumero + attempt);
-            usuario.setCodUsuario(nuevoCodigo);
-            usuario.setEstado("ACTIVO");
-
-            if (usuario.getRol() != null) {
-                String r = usuario.getRol().trim();
-                if ("ADMINISTRADOR".equalsIgnoreCase(r) || "ADMINISTRADOR".equalsIgnoreCase(r)) {
-                    usuario.setRol("ADMINISTRADOR");
-                } else if ("ALUMNO".equalsIgnoreCase(r) || "ESTUDIANTE".equalsIgnoreCase(r)) {
-                    usuario.setRol("ESTUDIANTE");
-                } else if ("DOCENTE".equalsIgnoreCase(r)) {
-                    usuario.setRol("DOCENTE");
-                } else {
-                    usuario.setRol(r.toUpperCase());
-                }
-            }
+	            String nuevoCodigo = String.format("%c%d%03d", letraRol, anioActual, siguienteNumero + attempt);
+	            usuario.setCodUsuario(nuevoCodigo);
+	            usuario.setEstado("ACTIVO");
 
 	            try {
 	                Usuario usuarioGuardado = usuarioRepository.save(usuario);
@@ -194,6 +199,29 @@ public class UsuarioServiceImpl implements UsuarioService {
 				.orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + id));
 		existente.setEstado("INACTIVO");
 		usuarioRepository.save(existente);
+	}
+
+	/**
+	 * Obtiene la letra de prefijo según el rol del usuario
+	 * @param rol El rol del usuario (ADMINISTRADOR, DOCENTE, ESTUDIANTE)
+	 * @return 'A' para ADMINISTRADOR, 'D' para DOCENTE, 'E' para ESTUDIANTE
+	 */
+	private char obtenerLetraRol(String rol) {
+		if (rol == null) {
+			return 'E'; // Valor por defecto
+		}
+		
+		switch(rol.toUpperCase()) {
+			case "ADMINISTRADOR":
+				return 'A';
+			case "DOCENTE":
+				return 'D';
+			case "ESTUDIANTE":
+			case "ALUMNO":
+				return 'E';
+			default:
+				return 'E'; // Valor por defecto para roles desconocidos
+		}
 	}
 
 }

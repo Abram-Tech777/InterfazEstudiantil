@@ -16,7 +16,7 @@ public class Usuario {
     @Column(name = "id_usuario")
     private int idUsuario;
 
-    @Column(name = "nombre_completo",nullable = false,length = 50)
+    @Column(name = "nombre_completo",nullable = false,length = 100)
     private String nombreCompleto;
     
     @Column(name = "cod_usuario", nullable = false, length = 50, unique = true)

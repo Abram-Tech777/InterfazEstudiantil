@@ -34,6 +34,18 @@ public class Comunicado {
     @Column(name = "fecha_emision")
     private LocalDateTime fechaEmision;
 
+    @Column(name = "ruta_adjunto", nullable = true, length = 500)
+    private String rutaAdjunto;
+
+    @Column(name = "archivo_data", columnDefinition = "LONGBLOB")
+    private byte[] archivoData;
+
+    @Column(name = "archivo_nombre", nullable = true, length = 255)
+    private String archivoNombre;
+
+    @Column(name = "archivo_tipo", nullable = true, length = 100)
+    private String archivoTipo;
+
     public Comunicado() {}
 
     // Getters / Setters
@@ -57,4 +69,16 @@ public class Comunicado {
 
     public LocalDateTime getFechaEmision() { return fechaEmision; }
     public void setFechaEmision(LocalDateTime fechaEmision) { this.fechaEmision = fechaEmision; }
+
+    public String getRutaAdjunto() { return rutaAdjunto; }
+    public void setRutaAdjunto(String rutaAdjunto) { this.rutaAdjunto = rutaAdjunto; }
+
+    public byte[] getArchivoData() { return archivoData; }
+    public void setArchivoData(byte[] archivoData) { this.archivoData = archivoData; }
+
+    public String getArchivoNombre() { return archivoNombre; }
+    public void setArchivoNombre(String archivoNombre) { this.archivoNombre = archivoNombre; }
+
+    public String getArchivoTipo() { return archivoTipo; }
+    public void setArchivoTipo(String archivoTipo) { this.archivoTipo = archivoTipo; }
 }

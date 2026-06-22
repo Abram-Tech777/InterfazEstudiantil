@@ -1,5 +1,6 @@
 package com.colegio.service.impl;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -13,4 +14,5 @@ public interface HorarioService {
     Horario updateHorario(int id, Horario horario);
     void deleteHorario(int id);
     HorarioRepository findHorarioRepository();
+    List<Horario> findHorariosActivos(int idAula, LocalDate fecha);
 }

@@ -68,16 +68,4 @@ public class LoginController {
         session.invalidate();
         return "redirect:/login";
     }
-    
-    @GetMapping("/panel-docente")
-    @org.springframework.web.bind.annotation.ResponseBody
-    public String panelDocente() {
-        return "redirect:/panel.html";
-    }
-
-    @GetMapping("/panel-alumno")
-    @org.springframework.web.bind.annotation.ResponseBody
-    public String panelAlumno() {
-        return "<h1>Bienvenido Panel Alumno</h1><p>Próximamente disponible de la mano de Ale.</p><a href='/logout'>Cerrar Sesión</a>";
-    }
 }

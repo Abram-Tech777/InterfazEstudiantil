@@ -1,5 +1,6 @@
 package com.colegio.service.impl;
 
+import java.time.LocalDate;
 import java.util.List;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -23,13 +24,19 @@ public class HorarioServiceImpl implements HorarioService {
         if (horario.getHoraInicio() == null || horario.getHoraFin() == null || !horario.getHoraInicio().isBefore(horario.getHoraFin())) {
             throw new IllegalArgumentException("La hora de inicio debe ser anterior a la hora de fin.");
         }
+        if (horario.getAula() == null || horario.getAula().getIdAula() <= 0) {
+            throw new IllegalArgumentException("Debe especificar un aula valida.");
+        }
+        if (horario.getDocente() == null || horario.getDocente().getIdDocente() <= 0) {
+            throw new IllegalArgumentException("Debe especificar un docente valido.");
+        }
         var choqueAula = horarioRepository.buscarChoqueAula(horario.getAula().getIdAula(), horario.getDiaSemana(), horario.getHoraInicio(), horario.getHoraFin());
         if (!choqueAula.isEmpty()) {
-            throw new IllegalArgumentException("Ya existe un horario para esa aula en ese día y hora.");
+            throw new IllegalArgumentException("Ya existe un horario para esa aula en ese dia y hora.");
         }
-        var choqueDocente = horarioRepository.buscarChoqueDocente(horario.getIdDocente(), horario.getDiaSemana(), horario.getHoraInicio(), horario.getHoraFin());
+        var choqueDocente = horarioRepository.buscarChoqueDocente(horario.getDocente().getIdDocente(), horario.getDiaSemana(), horario.getHoraInicio(), horario.getHoraFin());
         if (!choqueDocente.isEmpty()) {
-            throw new IllegalArgumentException("El docente ya tiene un horario asignado en ese día y hora.");
+            throw new IllegalArgumentException("El docente ya tiene un horario asignado en ese dia y hora.");
         }
 
         return horarioRepository.save(horario);
@@ -57,20 +64,26 @@ public class HorarioServiceImpl implements HorarioService {
             throw new IllegalArgumentException("La hora de inicio debe ser anterior a la hora de fin.");
         }
 
+        if (horario.getAula() == null || horario.getAula().getIdAula() <= 0) {
+            throw new IllegalArgumentException("Debe especificar un aula valida.");
+        }
+        if (horario.getDocente() == null || horario.getDocente().getIdDocente() <= 0) {
+            throw new IllegalArgumentException("Debe especificar un docente valido.");
+        }
 
         var choqueAula = horarioRepository.buscarChoqueAula(horario.getAula().getIdAula(), horario.getDiaSemana(), horario.getHoraInicio(), horario.getHoraFin());
         if (!choqueAula.isEmpty() && choqueAula.get(0).getIdHorario() != id) {
             throw new IllegalArgumentException("Otra entrada de horario ya usa esa aula en ese momento.");
         }
 
-        var choqueDocente = horarioRepository.buscarChoqueDocente(horario.getIdDocente(), horario.getDiaSemana(), horario.getHoraInicio(), horario.getHoraFin());
+        var choqueDocente = horarioRepository.buscarChoqueDocente(horario.getDocente().getIdDocente(), horario.getDiaSemana(), horario.getHoraInicio(), horario.getHoraFin());
         if (!choqueDocente.isEmpty() && choqueDocente.get(0).getIdHorario() != id) {
-            throw new IllegalArgumentException("El docente ya tiene otro horario en ese día y hora.");
+            throw new IllegalArgumentException("El docente ya tiene otro horario en ese dia y hora.");
         }
 
         existing.setAula(horario.getAula());
-        existing.setIdDocente(horario.getIdDocente());
-        existing.setIdCurso(horario.getIdCurso());
+        existing.setDocente(horario.getDocente());
+        existing.setCurso(horario.getCurso());
         existing.setDiaSemana(horario.getDiaSemana());
         existing.setHoraInicio(horario.getHoraInicio());
         existing.setHoraFin(horario.getHoraFin());
@@ -89,5 +102,11 @@ public class HorarioServiceImpl implements HorarioService {
     @Override
     public HorarioRepository findHorarioRepository() {
         return horarioRepository;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Horario> findHorariosActivos(int idAula, LocalDate fecha) {
+        return horarioRepository.findHorariosActivos(idAula, fecha);
     }
 }

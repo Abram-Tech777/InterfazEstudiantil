@@ -2,6 +2,7 @@ package com.colegio.entity;
 
 
 import java.time.LocalTime;
+import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -45,6 +46,17 @@ public class Horario {
     @Column(name = "hora_fin", nullable = false)
     private LocalTime horaFin;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @Column(name = "fecha_inicio")
+    private LocalDate fechaInicio;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @Column(name = "fecha_fin")
+    private LocalDate fechaFin;
+
+    @Column(name = "activo")
+    private Boolean activo;
+
     public Horario() {}
 
 
@@ -84,4 +96,13 @@ public class Horario {
 
     public LocalTime getHoraFin() { return horaFin; }
     public void setHoraFin(LocalTime horaFin) { this.horaFin = horaFin; }
+
+    public LocalDate getFechaInicio() { return fechaInicio; }
+    public void setFechaInicio(LocalDate fechaInicio) { this.fechaInicio = fechaInicio; }
+
+    public LocalDate getFechaFin() { return fechaFin; }
+    public void setFechaFin(LocalDate fechaFin) { this.fechaFin = fechaFin; }
+
+    public Boolean getActivo() { return activo != null ? activo : true; }
+    public void setActivo(Boolean activo) { this.activo = activo; }
 }

@@ -67,10 +67,13 @@ public class HorarioController {
 	        if (docenteOpt.isPresent()) {
 	            Docente docente = docenteOpt.get();
 	            List<Integer> aulasAsignadas = aulaDocenteService.listarAulasDelDocente(docente.getIdDocente());
-	            if (!aulasAsignadas.isEmpty()) {
+	            
+	            // Si hay aulas asignadas, filtrar por esas aulas; si no, traer todos los horarios del docente
+	            if (aulasAsignadas != null && !aulasAsignadas.isEmpty()) {
 	                horarios = horarioService.findHorarioRepository().findByDocenteAndAulasAsignadas(docente.getIdDocente(), aulasAsignadas);
 	            } else {
-	                horarios = List.of(); 
+	                // Si no hay aulas asignadas, traer todos los horarios donde aparece como docente
+	                horarios = horarioService.findHorarioRepository().findByIdDocente(docente.getIdDocente());
 	            }
 	        } else {
 	            horarios = List.of();

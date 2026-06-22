@@ -20,7 +20,7 @@
 
         <!-- Form Card -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <form id="formComunicado" th:action="@{/gestioncomunicados/guardar}" th:object="${comunicado}" method="post" class="p-8">
+            <form id="formComunicado" th:action="@{/gestioncomunicados/guardar}" th:object="${comunicado}" method="post" enctype="multipart/form-data" class="p-8">
                 <input type="hidden" th:field="*{idComunicado}" />
 
                 <!-- Destination Type -->
@@ -78,6 +78,21 @@
                     </p>
                 </div>
 
+                <!-- File Upload -->
+                <div class="mb-8 p-6 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 transition">
+                    <label class="block text-sm font-bold text-gray-900 mb-3 cursor-pointer flex items-center">
+                        <i class="fas fa-paperclip mr-2 text-blue-600"></i>Adjuntar Archivo (Opcional)
+                    </label>
+                    <input type="file" id="archivo" name="archivo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif" />
+                    <div id="fileInfo" class="mt-3 text-sm text-gray-600 hidden">
+                        <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                        <span id="fileName"></span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-3">
+                        <i class="fas fa-info-circle mr-1"></i>Formatos permitidos: PDF, Word (.doc, .docx), Imágenes (.jpg, .png, .gif)
+                    </p>
+                </div>
+
                 <!-- Buttons -->
                 <div class="flex gap-3 pt-6 border-t border-gray-200">
                     <a th:href="@{/gestioncomunicados/lista}" class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg transition font-medium flex items-center justify-center">
@@ -109,6 +124,9 @@
             const radios = document.querySelectorAll('input[name="destinoTipo"]');
             const aulaBlock = document.getElementById('selectAulaBlock');
             const gradoBlock = document.getElementById('selectGradoBlock');
+            const fileInput = document.getElementById('archivo');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
             
             function update() {
                 const v = document.querySelector('input[name="destinoTipo"]:checked').value;
@@ -118,6 +136,16 @@
             
             radios.forEach(r => r.addEventListener('change', update));
             update();
+            
+            // Manejar cambio de archivo
+            fileInput.addEventListener('change', function () {
+                if (this.files && this.files[0]) {
+                    fileName.textContent = this.files[0].name + ' (' + (this.files[0].size / 1024).toFixed(2) + ' KB)';
+                    fileInfo.classList.remove('hidden');
+                } else {
+                    fileInfo.classList.add('hidden');
+                }
+            });
         });
     </script>
 
