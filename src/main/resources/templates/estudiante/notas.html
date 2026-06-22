@@ -1,79 +1,93 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/fragments/head :: head('Mis Notas')"></head>
-<body class="bg-gray-50 m-0 p-0 min-h-screen flex flex-col">
+<head th:replace="~{/fragments/head :: head('Mis Notas - Estudiante')}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
+</head>
+<body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
 
-    <div th:replace="/fragments/menu :: menu"></div>
-
-    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Mis Notas</h1>
-            <p class="text-gray-600 mt-1">Calificaciones por bimestre</p>
+    <aside class="w-72 bg-[#e60000] shadow-[4px_0_24px_rgba(0,0,0,0.2)] flex flex-col h-full z-20 relative">
+        <div class="flex flex-col items-center justify-center pt-8 pb-6 border-b border-red-700">
+            <div class="w-16 h-16 mb-3 flex items-center justify-center">
+                <img th:src="@{/img/logo.png}" alt="Logo" class="w-full h-full object-contain" />
+            </div>
+            <h2 class="text-xl font-bold text-white">Fe y Alegría 32</h2>
+            <p class="text-xs text-red-200 italic">Portal Académico</p>
         </div>
 
-        <!-- Empty State -->
-        <div th:if="${notas == null or notas.isEmpty()}" class="bg-blue-50 border border-blue-200 text-blue-800 px-6 py-8 rounded-lg text-center">
-            <i class="fas fa-file-alt text-3xl mb-4"></i>
-            <p class="text-lg font-medium">Sin notas registradas</p>
-            <p class="text-sm mt-2">Tu docente subirá las calificaciones próximamente</p>
-        </div>
-
-        <!-- Table -->
-        <div th:if="${notas != null and !notas.isEmpty()}" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm text-gray-700">
-                    <thead class="bg-gray-800 text-white sticky top-0">
-                        <tr>
-                            <th class="px-6 py-4 text-left font-semibold">Curso</th>
-                            <th class="px-6 py-4 text-center font-semibold">Bimestre</th>
-                            <th class="px-6 py-4 text-center font-semibold">Nota</th>
-                            <th class="px-6 py-4 text-left font-semibold">Docente</th>
-                            <th class="px-6 py-4 text-left font-semibold">Fecha Registro</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="nota : ${notas}" class="border-t hover:bg-gray-50 transition">
-                            <td class="px-6 py-4 font-medium text-gray-800" th:text="${nota.curso != null ? nota.curso.nombreCurso : 'N/A'}"></td>
-                            <td class="px-6 py-4 text-center">
-                                <span class="badge-status bg-purple-100 text-purple-700 font-bold">B<span th:text="${nota.bimestre}"></span></span>
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                <span th:if="${nota.nota != null}" class="badge-status text-white font-bold"
-                                      th:classappend="${nota.nota.doubleValue() >= 13 ? 'bg-green-600' : nota.nota.doubleValue() >= 11 ? 'bg-blue-600' : nota.nota.doubleValue() >= 10 ? 'bg-yellow-600' : 'bg-red-600'}">
-                                    <i class="fas fa-star mr-1"></i><span th:text="${nota.nota}"></span>
-                                </span>
-                                <span th:unless="${nota.nota != null}" class="badge-status bg-gray-300 text-gray-700">N/A</span>
-                            </td>
-                            <td class="px-6 py-4 text-gray-700" th:text="${nota.docente != null ? nota.docente.getNombre() + ' ' + nota.docente.getApellido() : 'N/A'}"></td>
-                            <td class="px-6 py-4 text-gray-600" th:text="${#temporals.format(nota.fechaRegistro, 'dd/MM/yyyy')}"></td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="flex items-center gap-4 p-6 border-b border-red-700/40">
+            <div class="w-16 h-16 rounded-full bg-gray-800 overflow-hidden border-2 border-[#e60000] shrink-0">
+                <img th:src="@{/img/image.png}" alt="Perfil" class="w-full h-full object-cover">
+            </div>
+            <div class="flex flex-col gap-0.5">
+                <h3 class="text-base font-bold text-white leading-tight" th:text="${alumno.nombreCompleto}">Juan Perez</h3>
+                <p class="text-xs text-white font-medium" th:text="${alumno.aula.nombre}">1ero Secundaria B</p>
             </div>
         </div>
 
-        <!-- Grade Legend -->
-        <div th:if="${notas != null and !notas.isEmpty()}" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-                <div class="text-lg font-bold text-green-600">13 - 20</div>
-                <p class="text-xs text-green-700 mt-1">Muy Bueno</p>
-            </div>
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-                <div class="text-lg font-bold text-blue-600">11 - 12</div>
-                <p class="text-xs text-blue-700 mt-1">Bueno</p>
-            </div>
-            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
-                <div class="text-lg font-bold text-yellow-600">10</div>
-                <p class="text-xs text-yellow-700 mt-1">Regular</p>
-            </div>
-            <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-                <div class="text-lg font-bold text-red-600">0 - 9</div>
-                <p class="text-xs text-red-700 mt-1">Insuficiente</p>
+        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto hide-scrollbar">
+            <a th:href="@{/estudiante/panel}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/30 hover:text-white font-medium transition-all">
+                <i class="fas fa-home w-5 text-center"></i> Inicio
+            </a>
+            <a th:href="@{/estudiante/anuncios}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/30 hover:text-white font-medium transition-all">
+                <i class="fas fa-bullhorn w-5 text-center"></i> Anuncios
+            </a>
+            <a th:href="@{/estudiante/notas}" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#e60000] text-white font-semibold shadow-md transition-all">
+                <i class="fas fa-book w-5 text-center"></i> Cursos / Notas
+            </a>
+            <a th:href="@{/estudiante/asistencia}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/30 hover:text-white font-medium transition-all">
+                <i class="fas fa-clipboard-list w-5 text-center"></i> Bitácora
+            </a>
+            <a th:href="@{/estudiante/horario}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/30 hover:text-white font-medium transition-all">
+                <i class="fas fa-calendar-alt w-5 text-center"></i> Horarios
+            </a>
+        </nav>
+        
+        <div class="p-4 border-t border-gray-100">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-3 text-white rounded-xl font-semibold">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+        <header class="h-20 bg-[#e60000] shadow-md px-8 flex items-center justify-between z-10 text-white">
+            <h1 class="text-2xl font-bold">Mis Calificaciones</h1>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+            <div class="w-[95%] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <div th:each="n : ${notas}" class="bg-white p-6 rounded-2xl shadow-sm border-l-4 hover:shadow-md transition-shadow"
+                     th:classappend="${n.nota >= 11 ? 'border-green-500' : 'border-red-500'}">
+                    
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800" th:text="${n.curso.nombreCurso}">Nombre Curso</h3>
+                            <p class="text-xs text-gray-400 font-semibold uppercase mt-1" th:text="${n.tipoEvaluacion}">Tipo Evaluación</p>
+                        </div>
+                        <div class="text-3xl font-black" 
+                             th:text="${n.nota}"
+                             th:classappend="${n.nota >= 11 ? 'text-green-600' : 'text-red-600'}">15</div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-50">
+                        <span><i class="fas fa-calendar-alt mr-2 text-gray-300"></i><span th:text="${#temporals.format(n.fechaRegistro, 'dd/MM/yyyy')}">Fecha</span></span>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider" 
+                              th:classappend="${n.nota >= 11 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}"
+                              th:text="${n.nota >= 11 ? 'Aprobado' : 'Desaprobado'}">Estado</span>
+                    </div>
+                </div>
+
+                <div th:if="${#lists.isEmpty(notas)}" class="col-span-full p-12 text-center text-gray-400 bg-white rounded-2xl border-2 border-dashed border-gray-200">
+                    <i class="fas fa-folder-open text-5xl mb-4 text-gray-300"></i>
+                    <p class="text-lg font-medium">No hay notas registradas en este periodo.</p>
+                </div>
             </div>
         </div>
     </main>
 
-    <div th:replace="/fragments/scripts :: scripts"></div>
+    <div th:replace="~{/fragments/scripts :: scripts}"></div>
 </body>
 </html>

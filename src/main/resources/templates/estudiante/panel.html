@@ -1,51 +1,258 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/fragments/head :: head('Panel Estudiante')"></head>
-<body class="bg-gray-50 m-0 p-0 min-h-screen flex flex-col">
+<head th:replace="~{/fragments/head :: head('Panel de Estudiante')}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
+</head>
+<body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
 
-    <div th:replace="/fragments/menu :: menu"></div>
+    <aside class="w-72 bg-[#e60000] shadow-[4px_0_24px_rgba(0,0,0,0.2)] flex flex-col h-full z-20 relative">
+        
+		<div class="flex flex-col items-center justify-center pt-8 pb-6 border-b border-red-700">
+		        <div class="w-16 h-16 mb-3 flex items-center justify-center">
+		            <img th:src="@{/img/logo.png}" alt="Logo" class="w-full h-full object-contain" />
+		        </div>
+			<h2 class="text-xl font-bold text-white">Fe y Alegría 32</h2>
+			        <p class="text-xs text-red-200 italic">Portal Académico</p>
+			    </div>
 
-    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Panel Estudiante</h1>
-            <p class="text-gray-600 mt-2">Acceso a tu información académica y personal.</p>
+				<div class="flex items-center gap-4 p-6 border-b border-red-700/40">
+				    
+				    <div class="w-16 h-16 rounded-full bg-gray-800 overflow-hidden border-2 border-[#e60000] shrink-0">
+				        <img th:src="@{/img/image.png}" alt="Perfil" class="w-full h-full object-cover">
+				    </div>
+				    
+					<div class="flex flex-col gap-0.5">
+					                <h3 class="text-base font-bold text-white leading-tight" th:text="${alumno.nombreCompleto}">Juan Perez</h3>
+					                <p class="text-xs text-white font-medium" th:text="${alumno.aula.nombre}">1ero Secundaria B</p>
+					            </div>
+
+				</div>
+
+				<nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto hide-scrollbar">
+				    <a th:href="@{/estudiante/panel}" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#e60000] text-white font-semibold shadow-md transition-all">
+				        <i class="fas fa-home w-5 text-center"></i> Inicio
+				    </a>
+				    
+				    <a th:href="@{/estudiante/anuncios}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/30 hover:text-white font-medium transition-all">
+				        <i class="fas fa-bullhorn w-5 text-center"></i> Anuncios
+				    </a>
+				    
+				    <a th:href="@{/estudiante/notas}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/30 hover:text-white font-medium transition-all">
+				        <i class="fas fa-book w-5 text-center"></i> Cursos / Notas
+				    </a>
+				    
+				    <a th:href="@{/estudiante/asistencia}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/30 hover:text-white font-medium transition-all">
+				        <i class="fas fa-clipboard-list w-5 text-center"></i> Bitácora
+				    </a>
+				    
+				    <a th:href="@{/estudiante/horario}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/30 hover:text-white font-medium transition-all">
+				        <i class="fas fa-calendar-alt w-5 text-center"></i> Horarios
+				    </a>
+				</nav>
+        
+        <div class="p-4 border-t border-gray-100">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-3 text-white rounded-xl font-semibold">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </form>
         </div>
+    </aside>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <a th:href="@{/gestioncomunicados/bandeja}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
-                <div class="bg-cyan-50 p-4 rounded-lg text-cyan-600 group-hover:bg-cyan-600 group-hover:text-white transition-colors w-fit mb-4">
-                    <i class="fas fa-inbox text-2xl"></i>
-                </div>
-                <h3 class="text-lg font-bold text-gray-800 mb-2">Bandeja de Entrada</h3>
-                <p class="text-sm text-gray-500">Mensajes y comunicados</p>
-            </a>
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+        
+		<header class="h-20 bg-[#e60000] shadow-md px-8 flex items-center justify-between z-10 text-white">
+		    <h1 class="text-2xl font-bold">Dashboard</h1>
+            
+            <div class="flex items-center gap-6">
+                <button class="text-red-200 hover:text-white transition-colors text-xl">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+            </div>
+        </header>
 
-            <a th:href="@{/estudiante/horario}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
-                <div class="bg-indigo-50 p-4 rounded-lg text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors w-fit mb-4">
-                    <i class="fas fa-calendar-alt text-2xl"></i>
-                </div>
-                <h3 class="text-lg font-bold text-gray-800 mb-2">Mi Horario</h3>
-                <p class="text-sm text-gray-500">Tu programa de clases</p>
-            </a>
+        <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+            
+            <div class="w-[95%] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+				<section class="lg:col-span-3 relative group">
+					<div class="flex justify-between items-end mb-4">
+					    <h2 class="text-xl font-bold text-gray-800">Anuncios Recientes</h2>
+					    <a th:href="@{/estudiante/anuncios}" class="text-sm font-semibold text-[#e60000] hover:underline">Ver Todo</a>
+					</div>
 
-            <a th:href="@{/estudiante/notas}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
-                <div class="bg-teal-50 p-4 rounded-lg text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition-colors w-fit mb-4">
-                    <i class="fas fa-graduation-cap text-2xl"></i>
-                </div>
-                <h3 class="text-lg font-bold text-gray-800 mb-2">Mis Notas</h3>
-                <p class="text-sm text-gray-500">Calificaciones por bimestre</p>
-            </a>
+				    <div class="relative">
+				        <button id="prevBtn" onclick="scrollAnuncios(-300)" class="nav-arrow absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 bg-white p-3 rounded-full shadow-lg text-[#e60000] hover:bg-[#e60000] hover:text-white transition-all hidden">
+				            <i class="fas fa-chevron-left"></i>
+				        </button>
 
-            <a th:href="@{/estudiante/asistencia}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
-                <div class="bg-lime-50 p-4 rounded-lg text-lime-600 group-hover:bg-lime-600 group-hover:text-white transition-colors w-fit mb-4">
-                    <i class="fas fa-user-check text-2xl"></i>
-                </div>
-                <h3 class="text-lg font-bold text-gray-800 mb-2">Mi Asistencia</h3>
-                <p class="text-sm text-gray-500">Registro de asistencias</p>
-            </a>
+						<div id="anunciosScroll" class="flex gap-4 overflow-x-auto pb-4 scroll-smooth hide-scrollbar transition-all">
+						    
+						    <div th:each="anuncio : ${anuncios}" class="min-w-[300px] dash-card p-5 border-l-4 border-[#e60000]">
+						        <span th:text="${#temporals.format(anuncio.fechaEmision, 'dd MMM, HH:mm a')}" 
+						              class="text-xs font-bold text-gray-400 mb-1 block"></span>
+						        
+						        <h3 th:text="${anuncio.titulo}" class="font-bold text-gray-800 mb-2"></h3>
+						        
+						        <p th:text="${anuncio.contenido}" class="text-sm text-gray-600 line-clamp-2"></p>
+						    </div>
+
+						    <div th:if="${#lists.isEmpty(anuncios)}" class="p-5 text-gray-500">
+						        No hay anuncios recientes.
+						    </div>
+						</div>
+
+				        <button id="nextBtn" onclick="scrollAnuncios(300)" class="nav-arrow absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 bg-white p-3 rounded-full shadow-lg text-[#e60000] hover:bg-[#e60000] hover:text-white transition-all hidden">
+				            <i class="fas fa-chevron-right"></i>
+				        </button>
+				    </div>
+				</section>
+
+                <section class="lg:col-span-2 dash-card p-6 flex flex-col justify-between">
+                    <h2 class="text-xl font-bold text-gray-800 mb-6">Asistencia General</h2>
+                    
+                    <div class="flex items-center justify-between px-4 sm:px-10">
+                        <div class="text-center">
+                            <p class="text-gray-500 text-sm font-semibold mb-1">Días Asistidos</p>
+                            <div class="text-5xl font-black text-gray-800">
+                                18<span class="text-2xl text-gray-400">/43</span>
+                            </div>
+                        </div>
+                        
+                        <div class="relative w-32 h-32 rounded-full flex items-center justify-center bg-gray-100"
+                             style="background: conic-gradient(#e60000 0% 42%, #f3f4f6 42% 100%);">
+                            <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-inner">
+                                <span class="font-bold text-xl text-gray-800">42%</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+				<section class="lg:col-span-1 lg:row-span-2 dash-card p-6 flex flex-col">
+				    <div class="flex justify-between items-center mb-6">
+				        <h2 class="text-xl font-bold text-gray-800">Conducta</h2>
+				        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full border border-green-200">
+				            Excelente
+				        </span>
+				    </div>
+				    
+				    <div class="space-y-4 flex-1 overflow-y-auto hide-scrollbar pr-2 max-h-[380px]">
+				        
+				        <div class="p-4 rounded-xl border border-gray-100 bg-gray-50">
+				            <div class="flex items-center gap-3 mb-2">
+				                <i class="fas fa-star text-yellow-400"></i>
+				                <span class="font-bold text-sm text-gray-800">Participación</span>
+				            </div>
+				            <p class="text-xs text-gray-600">Excelente aporte en la clase de Historia.</p>
+				        </div>
+				        
+				        <div class="p-4 rounded-xl border border-gray-100 bg-gray-50">
+				            <div class="flex items-center gap-3 mb-2">
+				                <i class="fas fa-hands-helping text-blue-500"></i>
+				                <span class="font-bold text-sm text-gray-800">Compañerismo</span>
+				            </div>
+				            <p class="text-xs text-gray-600">Ayudó a un compañero con sus tareas.</p>
+				        </div>
+
+				        <div class="p-4 rounded-xl border border-gray-100 bg-gray-50">
+				            <div class="flex items-center gap-3 mb-2">
+				                <i class="fas fa-clock text-green-500"></i>
+				                <span class="font-bold text-sm text-gray-800">Puntualidad</span>
+				            </div>
+				            <p class="text-xs text-gray-600">Ingreso temprano a las aulas virtuales y presenciales de la institución.</p>
+				        </div>
+
+				        <div class="p-4 rounded-xl border border-gray-100 bg-gray-50">
+				            <div class="flex items-center gap-3 mb-2">
+				                <i class="fas fa-check-circle text-purple-500"></i>
+				                <span class="font-bold text-sm text-gray-800">Responsabilidad</span>
+				            </div>
+				            <p class="text-xs text-gray-600">Cumplimiento impecable en la entrega oportuna de los proyectos del bimestre.</p>
+				        </div>
+				        
+				    </div>
+				</section>
+
+                <section class="lg:col-span-2 dash-card p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-6">Reconocimientos</h2>
+                    
+                    <div class="flex flex-wrap gap-6 justify-around">
+                        <div class="flex flex-col items-center group cursor-pointer">
+                            <div class="w-16 h-16 rounded-2xl bg-yellow-50 border-2 border-yellow-200 flex items-center justify-center mb-2 group-hover:-translate-y-2 transition-transform">
+                                <i class="fas fa-trophy text-2xl text-yellow-500"></i>
+                            </div>
+                            <span class="text-xs font-bold text-gray-600">1er Puesto</span>
+                        </div>
+                        
+                        <div class="flex flex-col items-center group cursor-pointer">
+                            <div class="w-16 h-16 rounded-2xl bg-blue-50 border-2 border-blue-200 flex items-center justify-center mb-2 group-hover:-translate-y-2 transition-transform">
+                                <i class="fas fa-medal text-2xl text-blue-500"></i>
+                            </div>
+                            <span class="text-xs font-bold text-gray-600">Matemáticas</span>
+                        </div>
+
+                        <div class="flex flex-col items-center group cursor-pointer">
+                            <div class="w-16 h-16 rounded-2xl bg-green-50 border-2 border-green-200 flex items-center justify-center mb-2 group-hover:-translate-y-2 transition-transform">
+                                <i class="fas fa-leaf text-2xl text-green-500"></i>
+                            </div>
+                            <span class="text-xs font-bold text-gray-600">Ecológico</span>
+                        </div>
+                        
+                        <div class="flex flex-col items-center group cursor-pointer opacity-40 grayscale">
+                            <div class="w-16 h-16 rounded-2xl bg-gray-100 border-2 border-gray-200 flex items-center justify-center mb-2">
+                                <i class="fas fa-lock text-xl text-gray-400"></i>
+                            </div>
+                            <span class="text-xs font-bold text-gray-500">Bloqueado</span>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
         </div>
     </main>
+    
+    <div th:replace="~{/fragments/scripts :: scripts}"></div>
+	
+	<script>
+	    const container = document.getElementById('anunciosScroll');
+	    const prevBtn = document.getElementById('prevBtn');
+	    const nextBtn = document.getElementById('nextBtn');
 
-    <div th:replace="/fragments/scripts :: scripts"></div>
+	    function updateScrollStatus() {
+	        if (!container) return;
+
+	        // 1. ¿Existe desbordamiento? (¿Hay contenido oculto?)
+	        const isOverflowing = container.scrollWidth > container.clientWidth;
+
+	        // 2. Lógica para Flecha IZQUIERDA
+	        // Se oculta si NO hay scroll o si estamos al puro principio
+	        if (!isOverflowing || container.scrollLeft <= 0) {
+	            prevBtn.classList.add('hidden');
+	        } else {
+	            prevBtn.classList.remove('hidden');
+	        }
+
+	        // 3. Lógica para Flecha DERECHA
+	        // Se oculta si NO hay scroll o si llegamos al final (con margen de 5px)
+	        if (!isOverflowing || (container.scrollLeft + container.clientWidth >= container.scrollWidth - 5)) {
+	            nextBtn.classList.add('hidden');
+	        } else {
+	            nextBtn.classList.remove('hidden');
+	        }
+	    }
+
+	    // Funcionalidad de scroll
+	    function scrollAnuncios(offset) {
+	        container.scrollBy({ left: offset, behavior: 'smooth' });
+	    }
+
+	    // --- EVENTOS ---
+	    // Detecta scroll en tiempo real mientras el usuario desliza
+	    container.addEventListener('scroll', updateScrollStatus);
+
+	    // Ajustes iniciales al cargar y si cambian el tamaño de la ventana
+	    window.addEventListener('load', updateScrollStatus);
+	    window.addEventListener('resize', updateScrollStatus);
+	</script>
 </body>
 </html>

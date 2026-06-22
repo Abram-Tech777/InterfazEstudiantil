@@ -1,143 +1,118 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/fragments/head :: head('Mi Horario')"></head>
-<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 m-0 p-0 min-h-screen flex flex-col">
+<head th:replace="~{/fragments/head :: head('Mi Horario')}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
+</head>
+<body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
 
-    <div th:replace="fragments/menu :: menu"></div>
-
-    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Header -->
-        <div class="mb-8 flex justify-between items-center">
-            <div>
-                <h1 class="text-4xl font-bold text-gray-900">📚 Mi Horario</h1>
-                <p class="text-gray-600 mt-2 text-lg" th:text="${horarioMatriz != null ? horarioMatriz.aulaNombre + ' - ' + horarioMatriz.aulaGrado : 'Tu programa semanal'}"></p>
+    <aside class="w-72 bg-[#e60000] shadow-[4px_0_24px_rgba(0,0,0,0.2)] flex flex-col h-full z-20 relative">
+        <div class="flex flex-col items-center justify-center pt-8 pb-6 border-b border-red-700">
+            <div class="w-16 h-16 mb-3 flex items-center justify-center">
+                <img th:src="@{/img/logo.png}" alt="Logo" class="w-full h-full object-contain" />
             </div>
-            <div th:if="${horarioMatriz != null}" class="flex gap-3">
-                <button onclick="window.print()" class="inline-flex items-center px-5 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 rounded-lg transition font-semibold shadow-md hover:shadow-lg">
-                    <i class="fas fa-print mr-2"></i>Imprimir
+            <h2 class="text-xl font-bold text-white">Fe y Alegría 32</h2>
+            <p class="text-xs text-red-200 italic">Portal Académico</p>
+        </div>
+
+        <div class="flex items-center gap-4 p-6 border-b border-red-700/40">
+            <div class="w-16 h-16 rounded-full bg-gray-800 overflow-hidden border-2 border-[#e60000] shrink-0">
+                <img th:src="@{/img/image.png}" alt="Perfil" class="w-full h-full object-cover">
+            </div>
+            <div class="flex flex-col gap-0.5">
+                <h3 class="text-base font-bold text-white leading-tight" th:text="${alumno.nombreCompleto}">Juan Perez</h3>
+                <p class="text-xs text-white font-medium" th:text="${alumno.aula.nombre}">1ero Secundaria B</p>
+            </div>
+        </div>
+
+        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto hide-scrollbar">
+            <a th:href="@{/estudiante/panel}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/30 hover:text-white font-medium transition-all">
+                <i class="fas fa-home w-5 text-center"></i> Inicio
+            </a>
+            <a th:href="@{/estudiante/anuncios}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/30 hover:text-white font-medium transition-all">
+                <i class="fas fa-bullhorn w-5 text-center"></i> Anuncios
+            </a>
+            <a th:href="@{/estudiante/notas}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/30 hover:text-white font-medium transition-all">
+                <i class="fas fa-book w-5 text-center"></i> Cursos / Notas
+            </a>
+            <a th:href="@{/estudiante/asistencia}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-red-100 hover:bg-red-700/30 hover:text-white font-medium transition-all">
+                <i class="fas fa-clipboard-list w-5 text-center"></i> Bitácora
+            </a>
+            <a th:href="@{/estudiante/horario}" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-[#e60000] text-white font-semibold shadow-md transition-all">
+                <i class="fas fa-calendar-alt w-5 text-center"></i> Horarios
+            </a>
+        </nav>
+        
+        <div class="p-4 border-t border-gray-100">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-3 text-white rounded-xl font-semibold">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                 </button>
-                <a href="/estudiante/horario/descargar" class="inline-flex items-center px-5 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 rounded-lg transition font-semibold shadow-md hover:shadow-lg">
-                    <i class="fas fa-download mr-2"></i>Descargar PDF
+            </form>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+        
+        <header class="h-20 bg-[#e60000] shadow-md px-8 flex items-center justify-between z-10 text-white">
+            <h1 class="text-2xl font-bold">Horario de Clases</h1>
+            <div class="flex gap-3">
+                <button onclick="window.print()" class="px-4 py-2 bg-red-700 hover:bg-red-800 rounded-lg text-sm font-semibold transition-all">
+                    <i class="fas fa-print mr-1"></i> Imprimir
+                </button>
+                <a href="/estudiante/horario/descargar" class="px-4 py-2 bg-white text-[#e60000] hover:bg-gray-100 rounded-lg text-sm font-semibold transition-all">
+                    <i class="fas fa-download mr-1"></i> PDF
                 </a>
             </div>
-        </div>
+        </header>
 
-        <!-- Empty State -->
-        <div th:if="${horarioMatriz == null}" class="bg-blue-50 border-2 border-blue-200 text-blue-800 px-8 py-12 rounded-xl text-center">
-            <i class="fas fa-calendar-times text-5xl mb-4 text-blue-400"></i>
-            <p class="text-xl font-bold">Sin horarios asignados</p>
-            <p class="text-sm mt-2 text-blue-700">Aún no hay horarios disponibles para tu aula</p>
-        </div>
+        <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+            <div class="max-w-6xl mx-auto">
+                
+                <div class="mb-6">
+                    <p class="text-gray-500 font-medium" th:text="${horarioMatriz != null ? horarioMatriz.aulaNombre + ' - ' + horarioMatriz.aulaGrado : 'Selecciona una sección'}">
+                        1ero Secundaria B
+                    </p>
+                </div>
 
-        <!-- Matriz Table -->
-        <div th:if="${horarioMatriz != null}" class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm border-collapse">
-                    <thead class="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 text-white">
-                        <tr>
-                            <th class="border border-gray-200 px-6 py-4 text-center font-bold w-24">Hora</th>
-                            <th class="border border-gray-200 px-6 py-4 text-center font-bold">Lunes</th>
-                            <th class="border border-gray-200 px-6 py-4 text-center font-bold">Martes</th>
-                            <th class="border border-gray-200 px-6 py-4 text-center font-bold">Miercoles</th>
-                            <th class="border border-gray-200 px-6 py-4 text-center font-bold">Jueves</th>
-                            <th class="border border-gray-200 px-6 py-4 text-center font-bold">Viernes</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="hora : ${horarioMatriz.horas}">
-                            <!-- Celda de hora -->
-                            <td class="border border-gray-200 px-6 py-5 text-center font-bold bg-gradient-to-b from-gray-100 to-gray-50 text-indigo-700 w-24">
-                                <span th:text="${#temporals.format(hora, 'HH:mm')}"></span>
-                            </td>
-                            
-                            <!-- Lunes -->
-                            <td class="border border-gray-200 px-6 py-5 text-center min-h-28">
-                                <div th:if="${horarioMatriz.obtenerHorario(hora, 'Lunes') != null}" 
-                                     class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-3 border-l-4 border-blue-500 shadow-sm">
-                                    <div class="font-bold text-blue-900 text-sm" th:text="${horarioMatriz.obtenerHorario(hora, 'Lunes').cursoNombre}"></div>
-                                    <div class="text-xs text-blue-700 mt-1.5 flex items-center justify-center gap-1">
-                                        <i class="fas fa-chalkboard-user"></i>
-                                        <span th:text="${horarioMatriz.obtenerHorario(hora, 'Lunes').docenteNombre}"></span>
-                                    </div>
-                                </div>
-                            </td>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse text-sm">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-4 text-center font-bold text-gray-600">Hora</th>
+                                    <th class="px-6 py-4 text-center font-bold text-gray-600">Lunes</th>
+                                    <th class="px-6 py-4 text-center font-bold text-gray-600">Martes</th>
+                                    <th class="px-6 py-4 text-center font-bold text-gray-600">Miércoles</th>
+                                    <th class="px-6 py-4 text-center font-bold text-gray-600">Jueves</th>
+                                    <th class="px-6 py-4 text-center font-bold text-gray-600">Viernes</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr th:each="hora : ${horarioMatriz.horas}" class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4 text-center font-bold text-gray-700 bg-gray-50" th:text="${#temporals.format(hora, 'HH:mm')}"></td>
+                                    
+                                    <td class="px-3 py-2" th:each="dia : ${ {'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes'} }">
+                                        <div th:if="${horarioMatriz.obtenerHorario(hora, dia) != null}" 
+                                             class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm hover:border-[#e60000]/30 transition-all">
+                                            <div class="font-bold text-gray-800 text-xs truncate" th:text="${horarioMatriz.obtenerHorario(hora, dia).cursoNombre}"></div>
+                                            <div class="text-[10px] text-gray-500 mt-1 truncate" th:text="${horarioMatriz.obtenerHorario(hora, dia).docenteNombre}"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-                            <!-- Martes -->
-                            <td class="border border-gray-200 px-6 py-5 text-center min-h-28">
-                                <div th:if="${horarioMatriz.obtenerHorario(hora, 'Martes') != null}" 
-                                     class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-3 border-l-4 border-emerald-500 shadow-sm">
-                                    <div class="font-bold text-emerald-900 text-sm" th:text="${horarioMatriz.obtenerHorario(hora, 'Martes').cursoNombre}"></div>
-                                    <div class="text-xs text-emerald-700 mt-1.5 flex items-center justify-center gap-1">
-                                        <i class="fas fa-chalkboard-user"></i>
-                                        <span th:text="${horarioMatriz.obtenerHorario(hora, 'Martes').docenteNombre}"></span>
-                                    </div>
-                                </div>
-                            </td>
+                <div th:if="${horarioMatriz == null}" class="p-12 text-center text-gray-400 bg-white rounded-2xl border border-gray-100">
+                    <i class="fas fa-calendar-times text-4xl mb-4"></i>
+                    <p>No se encontraron horarios disponibles para esta sección.</p>
+                </div>
 
-                            <!-- Miercoles -->
-                            <td class="border border-gray-200 px-6 py-5 text-center min-h-28">
-                                <div th:if="${horarioMatriz.obtenerHorario(hora, 'Miercoles') != null}" 
-                                     class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-3 border-l-4 border-amber-500 shadow-sm">
-                                    <div class="font-bold text-amber-900 text-sm" th:text="${horarioMatriz.obtenerHorario(hora, 'Miercoles').cursoNombre}"></div>
-                                    <div class="text-xs text-amber-700 mt-1.5 flex items-center justify-center gap-1">
-                                        <i class="fas fa-chalkboard-user"></i>
-                                        <span th:text="${horarioMatriz.obtenerHorario(hora, 'Miercoles').docenteNombre}"></span>
-                                    </div>
-                                </div>
-                            </td>
-
-                            <!-- Jueves -->
-                            <td class="border border-gray-200 px-6 py-5 text-center min-h-28">
-                                <div th:if="${horarioMatriz.obtenerHorario(hora, 'Jueves') != null}" 
-                                     class="bg-gradient-to-br from-rose-50 to-rose-100 rounded-xl p-3 border-l-4 border-rose-500 shadow-sm">
-                                    <div class="font-bold text-rose-900 text-sm" th:text="${horarioMatriz.obtenerHorario(hora, 'Jueves').cursoNombre}"></div>
-                                    <div class="text-xs text-rose-700 mt-1.5 flex items-center justify-center gap-1">
-                                        <i class="fas fa-chalkboard-user"></i>
-                                        <span th:text="${horarioMatriz.obtenerHorario(hora, 'Jueves').docenteNombre}"></span>
-                                    </div>
-                                </div>
-                            </td>
-
-                            <!-- Viernes -->
-                            <td class="border border-gray-200 px-6 py-5 text-center min-h-28">
-                                <div th:if="${horarioMatriz.obtenerHorario(hora, 'Viernes') != null}" 
-                                     class="bg-gradient-to-br from-violet-50 to-violet-100 rounded-xl p-3 border-l-4 border-violet-500 shadow-sm">
-                                    <div class="font-bold text-violet-900 text-sm" th:text="${horarioMatriz.obtenerHorario(hora, 'Viernes').cursoNombre}"></div>
-                                    <div class="text-xs text-violet-700 mt-1.5 flex items-center justify-center gap-1">
-                                        <i class="fas fa-chalkboard-user"></i>
-                                        <span th:text="${horarioMatriz.obtenerHorario(hora, 'Viernes').docenteNombre}"></span>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
         </div>
-
-        <!-- Back Button -->
-        <div class="mt-8">
-            <a href="/estudiante/panel" class="inline-flex items-center px-5 py-3 border-2 border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 rounded-lg transition font-semibold">
-                <i class="fas fa-arrow-left mr-2"></i>Volver al Panel
-            </a>
-        </div>
-
-        <!-- Print Styles -->
-        <style media="print">
-            @media print {
-                .no-print { display: none !important; }
-                body { background: white !important; }
-                main { max-width: 100% !important; padding: 0 !important; }
-                table { border-collapse: collapse; width: 100%; }
-                td, th { border: 1px solid #333; padding: 10px; }
-                thead { background-color: #1f2937 !important; color: white !important; }
-                tbody tr:nth-child(even) { background-color: #f3f4f6 !important; }
-                .rounded-xl { border-radius: 8px; }
-                .border-l-4 { border-left: 4px solid currentColor; }
-            }
-        </style>
     </main>
 
-    <div th:replace="fragments/scripts :: scripts"></div>
+    <div th:replace="~{/fragments/scripts :: scripts}"></div>
 </body>
 </html>

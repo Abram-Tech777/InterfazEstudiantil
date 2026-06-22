@@ -1,18 +1,7 @@
-/* style.css */
+/* src/css/styles.css */
 :root {
     --bg-darkest: #010308;
     --neon-cyan:  #00f0ff;
-}
-
-/* El fondo debe ser global y absoluto */
-html, body {
-    background-color: var(--bg-darkest) !important;
-    color: #ffffff;
-}
-
-/* Aplicamos el fondo a TODAS las secciones para que no queden "huecos" */
-section {
-    background-color: var(--bg-darkest) !important;
 }
 
 /* Glassmorphism mejorado */
@@ -28,7 +17,7 @@ section {
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Ajuste del botón para que no dependa de CSS externo */
+/* Ajuste del botón */
 .btn-magic {
     border: 1px solid #00f0ff;
     color: #00f0ff;
@@ -41,7 +30,7 @@ section {
     box-shadow: 0 0 20px #00f0ff;
 }
 
-/* Ocultar barra de scroll en el slider pero mantener su funcionalidad */
+/* Ocultar barra de scroll */
 .hide-scrollbar::-webkit-scrollbar {
     display: none;
 }
@@ -65,38 +54,454 @@ section {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Asegurar que el form se vea bien en móviles */
+/* Form inputs */	
 input:focus {
     box-shadow: 0 0 0 3px rgba(230, 0, 0, 0.1);
 }
 
-/* Contenedor centralizado */
+/* =========================================
+   NUEVOS ESTILOS PARA LAS LETRAS IMAGEN
+========================================= */
+
 .letters-container {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 5px;
-    margin-bottom: 20px;
+    align-items: flex-end; /* Alinea por la base para que I y E resalten hacia arriba */
+    gap: 6px;
 }
 
-/* Estilo base para cada letra */
 .letter {
+    height: 60px; /* Tamaño para las minúsculas */
     transition: transform 0.3s ease;
     cursor: pointer;
     display: inline-block;
 }
 
-/* Zoom al pasar el ratón */
+.letter-large {
+    height: 85px !important; /* Tamaño más grande para la I y E */
+}
+
+/* Zoom al pasar el ratón ("piola") */
 .letter:hover {
     transform: scale(1.3) rotate(0deg) !important;
     z-index: 10;
 }
 
-/* Inclinaciones ligeras aleatorias y tamaños diferenciados */
-.letter-large { font-size: 4rem; font-weight: bold; } /* Para I y E */
-.letter-small { font-size: 3rem; } /* Para el resto */
-
+/* Inclinaciones ligeras */
 .rot-1 { transform: rotate(-5deg); }
 .rot-2 { transform: rotate(3deg); }
 .rot-3 { transform: rotate(-2deg); }
 .rot-4 { transform: rotate(4deg); }
+
+/* Ajuste para pantallas más pequeñas (Móviles) */
+@media (max-width: 768px) {
+    .letter { height: 40px; }
+    .letter-large { height: 55px !important; }
+    .letters-container { gap: 3px; }
+}
+
+/* --- OPCIÓN NUCLEAR: Fuera conflictos --- */
+/* =========================================
+   ANIMACIÓN TOSCA (Solución final)
+========================================= */
+.anim-tosca {
+    /* Pasamos de 0.3s a 2.5s para que el movimiento sea lento */
+    animation: tosca-slow 1.0s steps(8) infinite !important;
+    display: inline-block !important;
+    transition: none !important;
+    will-change: transform;
+}
+
+@keyframes tosca-slow {
+    0% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-6px) rotate(-2deg); }
+    66% { transform: translateY(2px) rotate(2deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+/* Aumentamos los delays para que cada letra se mueva cuando le dé la gana */
+.delay-1 { animation-delay: 0.0s; }
+.delay-2 { animation-delay: 0.8s; }
+.delay-3 { animation-delay: 1.5s; }
+.delay-4 { animation-delay: 2.1s; }
+
+/* Fondo del logo: Rojo transparente */
+.logo-bg-red {
+    /* Rojo más transparente: la oscuridad la crean las sombras */
+    background-color: rgba(180, 15, 15, 0.38) !important;
+
+    /* Cristal esmerilado */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    /* Sombras que construyen la oscuridad */
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.85),       /* sombra exterior profunda */
+        0 4px 12px rgba(0, 0, 0, 0.65),        /* sombra cercana */
+        inset 0 0 45px rgba(0, 0, 0, 0.60),    /* oscurece el interior desde todos los bordes */
+        inset 0 -6px 20px rgba(0, 0, 0, 0.45), /* sombra interna inferior */
+        0 0 28px rgba(110, 0, 0, 0.55);        /* halo rojo oscuro exterior */
+}
+
+/* --- ANIMACIÓN DE TIPEO --- */
+.typewriter-text {
+    display: inline-block;
+    overflow: hidden; 
+    border-right: 3px solid #e60000; /* El cursor */
+    white-space: nowrap;
+    animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: #e60000 }
+}
+
+/* --- ESTILO PARA TARJETAS DE INFO --- */
+.feature-card {
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+.feature-card:hover {
+    transform: scale(1.03);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* =========================================
+   NUEVO LOGIN GLASSMORPHISM (Parte Roja)
+========================================= */
+.wrapper {
+    width: 100%;
+    max-width: 420px; /* Evita que se estire demasiado en pantallas grandes */
+    background-color: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    color: #fff;
+    border-radius: 10px;
+    padding: 30px 40px;
+}
+
+.wrapper h1 {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.wrapper .input-box {
+    width: 100%;
+    height: 50px;
+    position: relative;
+    margin: 30px 0;
+}
+
+.input-box input {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 40px;
+    font-size: 16px;
+    color: #fff;
+    padding: 20px 45px 20px 20px;
+}
+
+.input-box input::placeholder {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Quitamos la sombra roja por defecto del Tailwind en este input específico */
+.input-box input:focus {
+    box-shadow: none; 
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.input-box i {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+}
+
+.wrapper .remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin: -15px 0 15px;
+}
+
+.remember-forgot label input {
+    accent-color: #fff;
+    margin-right: 5px;
+}
+
+.remember-forgot a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.remember-forgot a:hover {
+    text-decoration: underline;
+}
+
+.wrapper .btn {
+    width: 100%;
+    height: 45px;
+    background: #fff;
+    border: none;
+    outline: none;
+    border-radius: 40px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-size: 16px;
+    color: #e60000; /* Texto rojo para combinar con el fondo de la pantalla */
+    font-weight: 700;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.wrapper .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+}
+
+.wrapper .register-link {
+    text-align: center;
+    font-size: 14px;
+    margin: 20px 0 15px;
+}
+
+.wrapper .register-link p a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.wrapper .register-link p a:hover {
+    text-decoration: underline;
+}
+
+.wrapper {
+    /* Mantenemos tu blur, pero le damos una sombra dura y otra suave */
+    box-shadow: 
+        15px 15px 0px rgba(0, 0, 0, 0.35),   /* El bloque 3D sólido */
+        0 0 25px rgba(0, 0, 0, 0.4),         /* Difuminado alrededor */
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Efecto piola al pasar el mouse por toda la carta */
+.wrapper:hover {
+    transform: translate(-5px, -5px);
+    box-shadow: 
+        20px 20px 0px rgba(0, 0, 0, 0.3),
+        0 0 30px rgba(0, 0, 0, 0.5),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+/* --- ESTILOS DE LOS ÚTILES --- */
+.util-escolar {
+    position: absolute;
+    z-index: 1; /* Esto los manda DETRÁS del wrapper */
+    font-size: 55px; /* Tamaño de los emojis */
+    filter: drop-shadow(3px 4px 5px rgba(0, 0, 0, 0.5)); /* Sombra para el util */
+    will-change: transform;
+}
+
+/* --- ANIMACIONES DE ASOMARSE (Cero armonía y salen mucho más) --- */
+@keyframes peek-top-far {
+    0%, 80%, 100% { transform: translate(0, 0) rotate(0deg); }
+    20%, 60% { transform: translate(-15px, -110px) rotate(-20deg); } /* Sale mucho más hacia arriba */
+}
+@keyframes peek-bottom-far {
+    0%, 75%, 100% { transform: translate(0, 0) rotate(0deg); }
+    30%, 55% { transform: translate(25px, 110px) rotate(25deg); } /* Sale mucho más hacia abajo */
+}
+@keyframes peek-left-far {
+    0%, 85%, 100% { transform: translate(0, 0) rotate(0deg); }
+    15%, 45% { transform: translate(-110px, -20px) rotate(-35deg); } /* Sale mucho más a la izquierda */
+}
+@keyframes peek-right-far {
+    0%, 70%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25%, 50% { transform: translate(110px, 30px) rotate(30deg); } /* Sale mucho más a la derecha */
+}
+
+/* El libro (se queda como estaba, asomándose piola y sutil) */
+@keyframes peek-right-mild {
+    0%, 70%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25%, 50% { transform: translate(80px, 15px) rotate(25deg); } 
+}
+
+/* --- POSICIONES Y TIEMPOS ALEATORIOS --- */
+/* Lápiz (Arriba Izquierda) */
+.pos-1 { top: 15%; left: 15%; animation: peek-top-far 5s infinite ease-in-out; animation-delay: 0.2s; }
+/* Escuadra (Arriba Derecha) */
+.pos-2 { top: 10%; right: 15%; animation: peek-top-far 6.5s infinite ease-in-out; animation-delay: 3s; }
+/* Cuaderno/Libro (Derecha abajo) - EL LIBRO INTACTO */
+.pos-3 { bottom: 20%; right: 5%; animation: peek-right-mild 4.8s infinite ease-in-out; animation-delay: 1.5s; }
+/* Tijera (Abajo Izquierda) */
+.pos-4 { bottom: 10%; left: 15%; animation: peek-bottom-far 7s infinite ease-in-out; animation-delay: 0.8s; }
+/* Regla (Izquierda Centro) */
+.pos-5 { top: 40%; left: 10%; animation: peek-left-far 5.2s infinite ease-in-out; animation-delay: 4.2s; }
+
+/* --- LOS NUEVOS --- */
+/* Manzana (Arriba Centro) */
+.pos-6 { top: 5%; left: 40%; animation: peek-top-far 7.5s infinite ease-in-out; animation-delay: 1.2s; }
+/* Crayón (Izquierda Abajo) */
+.pos-7 { bottom: 25%; left: 10%; animation: peek-left-far 6.2s infinite ease-in-out; animation-delay: 2.5s; }
+/* Mochila (Derecha Arriba) */
+.pos-8 { top: 25%; right: 10%; animation: peek-right-far 5.8s infinite ease-in-out; animation-delay: 0.5s; }
+/* Pincel (Abajo Centro-Derecha) */
+.pos-9 { bottom: 5%; right: 30%; animation: peek-bottom-far 6.8s infinite ease-in-out; animation-delay: 3.5s; }
+
+/* Estilo para los items del menú lateral */
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    color: #4b5563;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.menu-item:hover {
+    background-color: #fef2f2;
+    color: #e60000;
+    transform: translateX(5px);
+}
+
+/* Scrollbar elegante para el dashboard */
+.overflow-y-auto::-webkit-scrollbar {
+    width: 6px;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 10px;
+}
+
+/* =========================================
+   ESTILOS PARA EL DASHBOARD ESTUDIANTE
+========================================= */
+
+/* Estilo para los enlaces inactivos del menú lateral */
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    color: #ffffff; /* Texto blanco */
+    font-weight: 500;
+    transition: all 0.3s ease;
+    opacity: 0.8;
+}
+
+.menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Efecto cristal al pasar el mouse */
+    color: #ffffff;
+    opacity: 1;
+    transform: translateX(5px);
+}
+
+/* 2. Mejora de las sombras en las tarjetas (dash-card) */
+.dash-card {
+    background-color: #ffffff;
+    border-radius: 1.25rem;
+    /* Sombra más marcada para que resalten */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f0f0f0; 
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dash-card:hover {
+    /* Sombra más profunda al pasar el mouse */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: translateY(-5px);
+}
+
+/* Scrollbar personalizado para el main content (Elegante) */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Fuerza el scroll suave */
+#anunciosScroll {
+    scroll-behavior: smooth;
+    /* Esto ayuda a que el scroll no se corte bruscamente */
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Animación base para cuando NO hay scroll */
+.dash-card {
+    transition: transform 0.3s ease;
+}
+
+/* Efecto hover desactivado cuando hay scroll */
+.is-scrollable .dash-card:hover {
+    transform: none !important;
+    cursor: default;
+}
+
+/* Efecto hover activado solo cuando NO hay scroll */
+:not(.is-scrollable) > .dash-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Estado Normal: Tarjetas con sombra y animación */
+.dash-card {
+    transition: all 0.3s ease;
+    /* Mantenemos tu sombra original aquí */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
+}
+
+/* Solo si NO es scrollable, aplicamos el efecto hover */
+:not(.is-scrollable) > .dash-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+}
+
+/* CUANDO HAY SCROLL (es decir, cuando es .is-scrollable) */
+.is-scrollable .dash-card {
+    transform: none !important;      /* Desactiva animación de elevación */
+    box-shadow: none !important;     /* Desactiva sombra */
+    /* El borde NO se toca, así que tu color se queda */
+}
+
+/* Opcional: Si quieres que el cursor no parezca un elemento clickeable */
+.is-scrollable .dash-card {
+    cursor: default !important;
+}
+
+.nav-arrow.disabled {
+    opacity: 0.3 !important;
+    pointer-events: none;
+    cursor: default !important;
+}

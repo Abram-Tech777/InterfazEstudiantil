@@ -1,12 +1,12 @@
 package com.colegio.controller;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Map;
+import java.util.HashMap;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpHeaders;
@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.colegio.dto.HorarioDTO;
 import com.colegio.dto.HorarioMatrizDTO;
@@ -29,6 +28,8 @@ import com.colegio.repository.AsistenciaRepository;
 import com.colegio.repository.EvaluacionNotaRepository;
 import com.colegio.service.HorarioPDFService;
 import com.colegio.service.impl.HorarioService;
+import com.colegio.repository.*;
+import com.colegio.entity.Comunicado;
 
 @Controller
 public class EstudianteController {
@@ -40,19 +41,83 @@ public class EstudianteController {
     private final AsistenciaRepository asistenciaRepository;
     private final EvaluacionNotaRepository evaluacionNotaRepository;
     private final HorarioPDFService horarioPDFService;
+    private final ComunicadoRepository comunicadoRepository;
+    private final ConductaRepository conductaRepository;
 
     public EstudianteController(AlumnoRepository alumnoRepository, 
                                 HorarioService horarioService,
                                 AsistenciaRepository asistenciaRepository,
                                 EvaluacionNotaRepository evaluacionNotaRepository,
-                                HorarioPDFService horarioPDFService) {
+                                HorarioPDFService horarioPDFService,
+                                ComunicadoRepository comunicadoRepository,
+                                ConductaRepository conductaRepository) {
         this.alumnoRepository = alumnoRepository;
         this.horarioService = horarioService;
         this.asistenciaRepository = asistenciaRepository;
         this.evaluacionNotaRepository = evaluacionNotaRepository;
         this.horarioPDFService = horarioPDFService;
+        this.comunicadoRepository = comunicadoRepository;
+        this.conductaRepository = conductaRepository;
     }
 
+    @GetMapping("/estudiante/panel")
+    public String mostrarPanel(HttpSession session, Model model) {
+        Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
+        if (u == null || !"ESTUDIANTE".equalsIgnoreCase(u.getRol())) return "redirect:/login";
+        
+        Optional<Alumno> opt = alumnoRepository.findByUsuario_IdUsuario(u.getIdUsuario());
+        if (opt.isPresent()) {
+            Alumno alumno = opt.get();
+            model.addAttribute("alumno", alumno);
+            
+            // Anuncios
+            model.addAttribute("anuncios", comunicadoRepository.listarTodosOrdenados());
+            
+            // Asistencia
+            List<Asistencia> asistencias = asistenciaRepository.findByAlumno_IdAlumnoOrderByFechaDesc(alumno.getIdAlumno());
+            model.addAttribute("totalAsistidos", asistencias.stream().filter(a -> "PRESENTE".equals(a.getEstado())).count());
+            model.addAttribute("totalClases", asistencias.size());
+            
+            model.addAttribute("conductas", conductaRepository.findByAlumno_IdAlumno(alumno.getIdAlumno()));
+        }
+        
+        return "estudiante/panel"; 
+    }
+
+    @GetMapping("/estudiante/anuncios")
+    public String mostrarAnuncios(HttpSession session, Model model) {
+        Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
+        if (u == null || !"ESTUDIANTE".equalsIgnoreCase(u.getRol())) return "redirect:/login";
+        
+        Optional<Alumno> opt = alumnoRepository.findByUsuario_IdUsuario(u.getIdUsuario());
+        if (opt.isPresent()) {
+            Alumno alumno = opt.get();
+            model.addAttribute("alumno", alumno);
+            
+            // 1. Buscamos los comunicados para el aula y grado del alumno
+            List<Comunicado> comunicados = comunicadoRepository.listarParaAulaOGrado(
+                alumno.getAula().getIdAula(), 
+                alumno.getAula().getGrado()
+            );
+            model.addAttribute("comunicados", comunicados);
+            
+            // 2. Creamos el mapa de autores para que el nombre del docente salga en la vista
+            // (Esto es necesario porque tu HTML usa autorMap[c.autor.idUsuario])
+            Map<Integer, String> autorMap = new HashMap<>();
+            for (Comunicado c : comunicados) {
+                if (c.getAutor() != null) {
+                    autorMap.put(c.getAutor().getIdUsuario(), c.getAutor().getNombreCompleto());
+                }
+            }
+            model.addAttribute("autorMap", autorMap);
+        }
+        
+        return "comunicados/bandeja";
+    }
+
+    // ==========================================
+    // VISTA DE HORARIO
+    // ==========================================
     @GetMapping("/estudiante/horario")
     public String verHorario(HttpSession session, Model model) {
         Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
@@ -66,7 +131,7 @@ public class EstudianteController {
         }
         
         Alumno alumno = opt.get();
-        logger.info("Alumno encontrado: {} (ID: {})", alumno.getNombreCompleto(), alumno.getIdAlumno());
+        model.addAttribute("alumno", alumno); 
         
         if (alumno.getAula() == null) {
             logger.warn("Alumno sin aula asignada");
@@ -74,29 +139,10 @@ public class EstudianteController {
             return "estudiante/horario";
         }
         
-        logger.info("Aula asignada: {} (ID: {})", alumno.getAula().getNombre(), alumno.getAula().getIdAula());
-        
-        // Obtener horarios activos para hoy
         LocalDate hoy = LocalDate.now();
-        logger.info("========== HORARIO DEL ESTUDIANTE ==========");
-        logger.info("Alumno: {} (ID: {}), Aula ID: {}", alumno.getNombreCompleto(), alumno.getIdAlumno(), alumno.getAula().getIdAula());
-        logger.info("Buscando horarios para fecha: {}", hoy);
         List<Horario> horarios = horarioService.findHorariosActivos(alumno.getAula().getIdAula(), hoy);
         
-        logger.info("Horarios encontrados: {}", horarios.size());
-        if (horarios.isEmpty()) {
-            logger.warn("⚠️ NO SE ENCONTRARON HORARIOS PARA ESTA AULA");
-        }
-        for (Horario h : horarios) {
-            logger.info("  ✓ {} {} {} -> {} (Activo: {}, FechaInicio: {}, FechaFin: {})", 
-                h.getDiaSemana(), h.getHoraInicio(), h.getHoraFin(), 
-                h.getCurso().getNombreCurso(), h.getActivo(), h.getFechaInicio(), h.getFechaFin());
-        }
-        
-        // Construir matriz
         HorarioMatrizDTO matriz = construirMatrizHorario(horarios, alumno.getAula().getNombre(), alumno.getAula().getNombre());
-        logger.info("Matriz construida con {} horas únicas", matriz.getHoras().size());
-        logger.info("========== FIN HORARIO DEL ESTUDIANTE ==========");
         model.addAttribute("horarioMatriz", matriz);
         return "estudiante/horario";
     }
@@ -145,7 +191,6 @@ public class EstudianteController {
                     h.getDiaSemana()
             );
             matriz.agregarHorario(h.getHoraInicio(), h.getDiaSemana(), dto);
-            logger.info("  Agregado a matriz: [{}] [{}] {} - {}", h.getHoraInicio(), h.getDiaSemana(), h.getCurso().getNombreCurso(), h.getDocente().getNombre());
         }
         
         return matriz;
@@ -163,11 +208,15 @@ public class EstudianteController {
         }
         
         Alumno alumno = opt.get();
+        model.addAttribute("alumno", alumno); 
         List<EvaluacionNota> notas = evaluacionNotaRepository.findByAlumno_IdAlumnoOrderByFechaRegistroDesc(alumno.getIdAlumno());
         model.addAttribute("notas", notas);
         return "estudiante/notas";
     }
 
+    // ==========================================
+    // VISTA DE ASISTENCIA / BITÁCORA
+    // ==========================================
     @GetMapping("/estudiante/asistencia")
     public String verAsistencia(HttpSession session, Model model) {
         Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
@@ -183,9 +232,9 @@ public class EstudianteController {
         }
         
         Alumno alumno = opt.get();
+        model.addAttribute("alumno", alumno); 
         List<Asistencia> asistencias = asistenciaRepository.findByAlumno_IdAlumnoOrderByFechaDesc(alumno.getIdAlumno());
         
-        // Contar estados
         long presentes = asistencias.stream().filter(a -> "PRESENTE".equals(a.getEstado())).count();
         long retardos = asistencias.stream().filter(a -> "RETARDO".equals(a.getEstado())).count();
         long ausencias = asistencias.stream().filter(a -> "AUSENCIA".equals(a.getEstado())).count();
@@ -197,4 +246,3 @@ public class EstudianteController {
         return "estudiante/asistencia";
     }
 }
-

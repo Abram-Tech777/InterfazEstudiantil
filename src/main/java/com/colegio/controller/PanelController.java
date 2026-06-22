@@ -28,14 +28,4 @@ public class PanelController {
         }
         return "docente/panel";
     }
-
-    @GetMapping("/estudiante/panel")
-    public String estudiantePanel(HttpSession session, RedirectAttributes redirectAttrs) {
-        Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
-        if (u == null || !"ESTUDIANTE".equalsIgnoreCase(u.getRol())) {
-            redirectAttrs.addFlashAttribute("mensajeError", "No tienes permiso para acceder a esta página.");
-            return "redirect:/login";
-        }
-        return "estudiante/panel";
-    }
 }

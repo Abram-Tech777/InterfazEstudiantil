@@ -24,6 +24,9 @@ public class EvaluacionNota {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_docente", nullable = false)
     private Docente docente;
+    
+    @Column(name = "tipo_evaluacion")
+    private String tipoEvaluacion;
 
     @Column(name = "bimestre", nullable = false)
     private Integer bimestre;
@@ -69,6 +72,10 @@ public class EvaluacionNota {
     public void setCurso(Curso curso) {
         this.curso = curso;
     }
+    
+    public String getTipoEvaluacion() {
+        return tipoEvaluacion;
+    }
 
     public Docente getDocente() {
         return docente;
@@ -111,6 +118,10 @@ public class EvaluacionNota {
     @Transient
     public Integer getPeso() {
         return 100; // Peso por defecto
+    }
+    
+    public void setTipoEvaluacion(String tipoEvaluacion) {
+        this.tipoEvaluacion = tipoEvaluacion;
     }
 
     @Transient
