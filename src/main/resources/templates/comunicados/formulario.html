@@ -1,121 +1,125 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/fragments/head :: head('Registrar Comunicado')"></head>
-<body class="bg-gray-50 m-0 p-0 min-h-screen flex flex-col">
+<body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
 
-    <div th:replace="/fragments/menu :: menu"></div>
+    <div th:replace="~{/fragments/sidebar :: sidebar}"></div>
 
-    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Registrar Comunicado</h1>
-            <p class="text-gray-600 mt-1">Publica anuncios y notificaciones importantes</p>
-        </div>
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+        <header class="h-20 bg-[#e60000] shadow-md px-8 flex items-center justify-between z-10 text-white">
+            <h1 class="text-2xl font-bold">Registrar Comunicado</h1>
+        </header>
 
-        <!-- Error Message -->
-        <div th:if="${mensajeError}" class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-start">
-            <i class="fas fa-exclamation-circle mr-3 mt-1 text-red-600"></i>
-            <span th:text="${mensajeError}"></span>
-        </div>
+        <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+            <div class="max-w-4xl mx-auto">
+                <p class="text-gray-600 mb-6">Publica anuncios y notificaciones importantes</p>
 
-        <!-- Form Card -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <form id="formComunicado" th:action="@{/gestioncomunicados/guardar}" th:object="${comunicado}" method="post" enctype="multipart/form-data" class="p-8">
-                <input type="hidden" th:field="*{idComunicado}" />
-
-                <!-- Destination Type -->
-                <div class="mb-8">
-                    <label class="block text-sm font-bold text-gray-900 mb-4">Enviar a</label>
-                    <div class="space-y-3">
-                        <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition" th:class="${'flex items-center p-4 border rounded-lg cursor-pointer transition hover:bg-blue-50' + ' ' + ('aula' == 'AULA' ? 'bg-blue-50 border-blue-300' : 'border-gray-200')}">
-                            <input class="w-4 h-4 text-blue-600 cursor-pointer" type="radio" name="destinoTipo" id="destAula" value="AULA" checked>
-                            <span class="ml-3 font-medium text-gray-900">Aula específica</span>
-                            <i class="fas fa-door-open ml-2 text-blue-600"></i>
-                        </label>
-                        <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                            <input class="w-4 h-4 text-blue-600 cursor-pointer" type="radio" name="destinoTipo" id="destGrado" value="GRADO">
-                            <span class="ml-3 font-medium text-gray-900">Grado completo</span>
-                            <i class="fas fa-graduation-cap ml-2 text-orange-600"></i>
-                        </label>
-                        <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                            <input class="w-4 h-4 text-blue-600 cursor-pointer" type="radio" name="destinoTipo" id="destGlobal" value="GLOBAL">
-                            <span class="ml-3 font-medium text-gray-900">Todos los alumnos</span>
-                            <i class="fas fa-globe ml-2 text-green-600"></i>
-                        </label>
-                    </div>
+                <!-- Error Message -->
+                <div th:if="${mensajeError}" class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-start">
+                    <i class="fas fa-exclamation-circle mr-3 mt-1 text-red-600"></i>
+                    <span th:text="${mensajeError}"></span>
                 </div>
 
-                <!-- Aula Selection -->
-                <div id="selectAulaBlock" class="mb-8">
-                    <label class="block text-sm font-bold text-gray-900 mb-2">Seleccionar Aula</label>
-                    <select th:field="*{aula.idAula}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
-                        <option value="0">-- Seleccione Aula --</option>
-                        <option th:each="a : ${aulas}" th:value="${a.idAula}" th:text="${a.grado + ' - Sección ' + a.seccion}"></option>
-                    </select>
+                <!-- Form Card -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <form id="formComunicado" th:action="@{/gestioncomunicados/guardar}" th:object="${comunicado}" method="post" enctype="multipart/form-data" class="p-8">
+                        <input type="hidden" th:field="*{idComunicado}" />
+
+                        <!-- Destination Type -->
+                        <div class="mb-8">
+                            <label class="block text-sm font-bold text-gray-900 mb-4">Enviar a</label>
+                            <div class="space-y-3">
+                                <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                                    <input class="w-4 h-4 text-blue-600 cursor-pointer" type="radio" name="destinoTipo" id="destAula" value="AULA" checked>
+                                    <span class="ml-3 font-medium text-gray-900">Aula específica</span>
+                                    <i class="fas fa-door-open ml-2 text-blue-600"></i>
+                                </label>
+                                <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                                    <input class="w-4 h-4 text-blue-600 cursor-pointer" type="radio" name="destinoTipo" id="destGrado" value="GRADO">
+                                    <span class="ml-3 font-medium text-gray-900">Grado completo</span>
+                                    <i class="fas fa-graduation-cap ml-2 text-orange-600"></i>
+                                </label>
+                                <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                                    <input class="w-4 h-4 text-blue-600 cursor-pointer" type="radio" name="destinoTipo" id="destGlobal" value="GLOBAL">
+                                    <span class="ml-3 font-medium text-gray-900">Todos los alumnos</span>
+                                    <i class="fas fa-globe ml-2 text-green-600"></i>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Aula Selection -->
+                        <div id="selectAulaBlock" class="mb-8">
+                            <label class="block text-sm font-bold text-gray-900 mb-2">Seleccionar Aula</label>
+                            <select th:field="*{aula.idAula}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
+                                <option value="0">-- Seleccione Aula --</option>
+                                <option th:each="a : ${aulas}" th:value="${a.idAula}" th:text="${a.grado + ' - Sección ' + a.seccion}"></option>
+                            </select>
+                        </div>
+
+                        <!-- Grado Selection -->
+                        <div id="selectGradoBlock" class="mb-8" style="display: none;">
+                            <label class="block text-sm font-bold text-gray-900 mb-2">Seleccionar Grado</label>
+                            <select th:field="*{grado}" id="gradoSeleccionado" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
+                                <option value="">-- Seleccione Grado --</option>
+                                <option th:each="g : ${grados}" th:value="${g}" th:text="${g}"></option>
+                            </select>
+                        </div>
+
+                        <!-- Title -->
+                        <div class="mb-8">
+                            <label class="block text-sm font-bold text-gray-900 mb-2">Título</label>
+                            <input type="text" th:field="*{titulo}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" placeholder="Ej: Cambio de horario - Suspensión de clases" required />
+                        </div>
+
+                        <!-- Content -->
+                        <div class="mb-8">
+                            <label class="block text-sm font-bold text-gray-900 mb-2">Contenido</label>
+                            <textarea th:field="*{contenido}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" rows="8" placeholder="Escribe aquí el anuncio o comunicado detallado..." required></textarea>
+                            <p class="text-xs text-gray-500 mt-2">
+                                <i class="fas fa-info-circle mr-1"></i>Se recomienda ser claro y conciso en el mensaje
+                            </p>
+                        </div>
+
+                        <!-- File Upload -->
+                        <div class="mb-8 p-6 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 transition">
+                            <label class="block text-sm font-bold text-gray-900 mb-3 cursor-pointer flex items-center">
+                                <i class="fas fa-paperclip mr-2 text-blue-600"></i>Adjuntar Archivo (Opcional)
+                            </label>
+                            <input type="file" id="archivo" name="archivo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif" />
+                            <div id="fileInfo" class="mt-3 text-sm text-gray-600 hidden">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                                <span id="fileName"></span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-3">
+                                <i class="fas fa-info-circle mr-1"></i>Formatos permitidos: PDF, Word (.doc, .docx), Imágenes (.jpg, .png, .gif)
+                            </p>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="flex gap-3 pt-6 border-t border-gray-200">
+                            <a th:href="@{/gestioncomunicados/lista}" class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg transition font-medium flex items-center justify-center">
+                                <i class="fas fa-times mr-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition font-medium flex items-center justify-center">
+                                <i class="fas fa-paper-plane mr-2"></i>Publicar Comunicado
+                            </button>
+                        </div>
+                    </form>
                 </div>
 
-                <!-- Grado Selection -->
-                <div id="selectGradoBlock" class="mb-8" style="display: none;">
-                    <label class="block text-sm font-bold text-gray-900 mb-2">Seleccionar Grado</label>
-                    <select th:field="*{grado}" id="gradoSeleccionado" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
-                        <option value="">-- Seleccione Grado --</option>
-                        <option th:each="g : ${grados}" th:value="${g}" th:text="${g}"></option>
-                    </select>
+                <!-- Info Box -->
+                <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+                    <h3 class="font-bold text-blue-900 mb-2">
+                        <i class="fas fa-lightbulb mr-2"></i>Consejos para tu comunicado
+                    </h3>
+                    <ul class="text-sm text-blue-800 space-y-1 ml-6">
+                        <li>✓ Usa un título claro y descriptivo</li>
+                        <li>✓ Incluye fechas y horarios importantes</li>
+                        <li>✓ Sé específico sobre a quién va dirigido</li>
+                        <li>✓ Revisa la información antes de publicar</li>
+                    </ul>
                 </div>
-
-                <!-- Title -->
-                <div class="mb-8">
-                    <label class="block text-sm font-bold text-gray-900 mb-2">Título</label>
-                    <input type="text" th:field="*{titulo}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" placeholder="Ej: Cambio de horario - Suspensión de clases" required />
-                </div>
-
-                <!-- Content -->
-                <div class="mb-8">
-                    <label class="block text-sm font-bold text-gray-900 mb-2">Contenido</label>
-                    <textarea th:field="*{contenido}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" rows="8" placeholder="Escribe aquí el anuncio o comunicado detallado..." required></textarea>
-                    <p class="text-xs text-gray-500 mt-2">
-                        <i class="fas fa-info-circle mr-1"></i>Se recomienda ser claro y conciso en el mensaje
-                    </p>
-                </div>
-
-                <!-- File Upload -->
-                <div class="mb-8 p-6 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 transition">
-                    <label class="block text-sm font-bold text-gray-900 mb-3 cursor-pointer flex items-center">
-                        <i class="fas fa-paperclip mr-2 text-blue-600"></i>Adjuntar Archivo (Opcional)
-                    </label>
-                    <input type="file" id="archivo" name="archivo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif" />
-                    <div id="fileInfo" class="mt-3 text-sm text-gray-600 hidden">
-                        <i class="fas fa-check-circle text-green-600 mr-2"></i>
-                        <span id="fileName"></span>
-                    </div>
-                    <p class="text-xs text-gray-500 mt-3">
-                        <i class="fas fa-info-circle mr-1"></i>Formatos permitidos: PDF, Word (.doc, .docx), Imágenes (.jpg, .png, .gif)
-                    </p>
-                </div>
-
-                <!-- Buttons -->
-                <div class="flex gap-3 pt-6 border-t border-gray-200">
-                    <a th:href="@{/gestioncomunicados/lista}" class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg transition font-medium flex items-center justify-center">
-                        <i class="fas fa-times mr-2"></i>Cancelar
-                    </a>
-                    <button type="submit" class="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition font-medium flex items-center justify-center">
-                        <i class="fas fa-paper-plane mr-2"></i>Publicar Comunicado
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Info Box -->
-        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <h3 class="font-bold text-blue-900 mb-2">
-                <i class="fas fa-lightbulb mr-2"></i>Consejos para tu comunicado
-            </h3>
-            <ul class="text-sm text-blue-800 space-y-1 ml-6">
-                <li>✓ Usa un título claro y descriptivo</li>
-                <li>✓ Incluye fechas y horarios importantes</li>
-                <li>✓ Sé específico sobre a quién va dirigido</li>
-                <li>✓ Revisa la información antes de publicar</li>
-            </ul>
+            </div>
         </div>
     </main>
 
@@ -137,7 +141,6 @@
             radios.forEach(r => r.addEventListener('change', update));
             update();
             
-            // Manejar cambio de archivo
             fileInput.addEventListener('change', function () {
                 if (this.files && this.files[0]) {
                     fileName.textContent = this.files[0].name + ' (' + (this.files[0].size / 1024).toFixed(2) + ' KB)';
@@ -149,6 +152,6 @@
         });
     </script>
 
-    <div th:replace="/fragments/scripts :: scripts"></div>
+    <div th:replace="~{/fragments/scripts :: scripts}"></div>
 </body>
 </html>

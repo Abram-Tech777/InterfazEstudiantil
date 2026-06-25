@@ -1,65 +1,67 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/fragments/head :: head('Comunicados')"></head>
-<body class="bg-gray-50 m-0 p-0 min-h-screen flex flex-col">
+<body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
 
-    <div th:replace="/fragments/menu :: menu"></div>
+    <div th:replace="~{/fragments/sidebar :: sidebar}"></div>
 
-    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-8">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900">Comunicados</h1>
-                <p class="text-gray-600 mt-1">Anuncios y notificaciones importantes</p>
-            </div>
-            <a th:href="@{/gestioncomunicados/nuevo}" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition flex items-center">
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+        <header class="h-20 bg-[#e60000] shadow-md px-8 flex items-center justify-between z-10 text-white">
+            <h1 class="text-2xl font-bold">Comunicados</h1>
+            <a th:href="@{/gestioncomunicados/nuevo}" class="px-4 py-2 bg-white text-[#e60000] hover:bg-gray-100 rounded-lg text-sm font-semibold transition-all flex items-center">
                 <i class="fas fa-plus mr-2"></i>Nuevo Comunicado
             </a>
-        </div>
+        </header>
 
-        <!-- Messages -->
-        <div th:if="${mensajeExito}" class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-start">
-            <i class="fas fa-check-circle mr-3 mt-1 text-green-600"></i>
-            <span th:text="${mensajeExito}"></span>
-        </div>
+        <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+            <div class="max-w-6xl mx-auto">
+                <p class="text-gray-600 mb-6">Anuncios y notificaciones importantes</p>
 
-        <div th:if="${mensajeError}" class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-start">
-            <i class="fas fa-exclamation-circle mr-3 mt-1 text-red-600"></i>
-            <span th:text="${mensajeError}"></span>
-        </div>
-
-        <!-- Comunicados List -->
-        <div th:if="${#lists.isEmpty(comunicados)}" class="bg-blue-50 border border-blue-200 text-blue-800 px-6 py-8 rounded-lg text-center">
-            <i class="fas fa-bell-slash text-3xl mb-4"></i>
-            <p class="text-lg font-medium">Sin comunicados</p>
-            <p class="text-sm mt-2">No hay comunicados disponibles en este momento</p>
-        </div>
-
-        <div th:if="${!#lists.isEmpty(comunicados)}" class="space-y-4">
-            <div th:each="c : ${comunicados}" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition card-hover">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="flex-1">
-                        <h3 class="text-lg font-bold text-gray-900" th:text="${c.titulo}"></h3>
-                        <p class="text-sm text-gray-600 mt-1" th:text="${c.contenido}"></p>
-                    </div>
-                    <div class="text-right">
-                        <span class="inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
-                            <i class="fas fa-calendar-alt mr-1"></i><span th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy hh:mm a').format(c.fechaEmision)}"></span>
-                        </span>
-                    </div>
+                <!-- Messages -->
+                <div th:if="${mensajeExito}" class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-start">
+                    <i class="fas fa-check-circle mr-3 mt-1 text-green-600"></i>
+                    <span th:text="${mensajeExito}"></span>
                 </div>
-                
-                <div class="pt-4 border-t border-gray-200">
-                    <p class="text-sm text-gray-600">
-                        <i class="fas fa-user-circle mr-2 text-gray-400"></i>
-                        <strong>Autor:</strong>
-                        <span th:text="${autorMap[c.autor.idUsuario] != null ? autorMap[c.autor.idUsuario] : (c.autor != null ? c.autor.nombreCompleto : 'Desconocido')}"></span>
-                    </p>
+
+                <div th:if="${mensajeError}" class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-start">
+                    <i class="fas fa-exclamation-circle mr-3 mt-1 text-red-600"></i>
+                    <span th:text="${mensajeError}"></span>
+                </div>
+
+                <!-- Comunicados List -->
+                <div th:if="${#lists.isEmpty(comunicados)}" class="bg-blue-50 border border-blue-200 text-blue-800 px-6 py-8 rounded-lg text-center">
+                    <i class="fas fa-bell-slash text-3xl mb-4"></i>
+                    <p class="text-lg font-medium">Sin comunicados</p>
+                    <p class="text-sm mt-2">No hay comunicados disponibles en este momento</p>
+                </div>
+
+                <div th:if="${!#lists.isEmpty(comunicados)}" class="space-y-4">
+                    <div th:each="c : ${comunicados}" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition card-hover">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-900" th:text="${c.titulo}"></h3>
+                                <p class="text-sm text-gray-600 mt-1" th:text="${c.contenido}"></p>
+                            </div>
+                            <div class="text-right">
+                                <span class="inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+                                    <i class="fas fa-calendar-alt mr-1"></i><span th:text="${T(java.time.format.DateTimeFormatter).ofPattern('dd/MM/yyyy hh:mm a').format(c.fechaEmision)}"></span>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-4 border-t border-gray-200">
+                            <p class="text-sm text-gray-600">
+                                <i class="fas fa-user-circle mr-2 text-gray-400"></i>
+                                <strong>Autor:</strong>
+                                <span th:text="${autorMap[c.autor.idUsuario] != null ? autorMap[c.autor.idUsuario] : (c.autor != null ? c.autor.nombreCompleto : 'Desconocido')}"></span>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <div th:replace="/fragments/scripts :: scripts"></div>
+    <div th:replace="~{/fragments/scripts :: scripts}"></div>
 </body>
 </html>

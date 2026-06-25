@@ -1,98 +1,95 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/fragments/head :: head('Gestión de Evaluaciones y Notas')"></head>
-<body class="bg-gray-50 m-0 p-0 min-h-screen flex flex-col">
+<body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
 
-    <div th:replace="fragments/menu :: menu"></div>
+    <div th:replace="~{/fragments/sidebar :: sidebar}"></div>
 
-    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Evaluaciones y Notas</h1>
-            <p class="text-gray-600 mt-1">Califica a tus estudiantes por bimestre</p>
-        </div>
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+        <header class="h-20 bg-[#e60000] shadow-md px-8 flex items-center justify-between z-10 text-white">
+            <h1 class="text-2xl font-bold">Evaluaciones y Notas</h1>
+        </header>
 
-        <!-- Messages -->
-        <div th:if="${session.mensajeExito}" class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-start">
-            <i class="fas fa-check-circle mr-3 mt-1 text-green-600"></i>
-            <span th:text="${session.mensajeExito}"></span>
-        </div>
+        <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+            <div class="max-w-6xl mx-auto">
+                <p class="text-gray-600 mb-6">Califica a tus estudiantes por bimestre</p>
 
-        <div th:if="${session.mensajeError}" class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-start">
-            <i class="fas fa-exclamation-circle mr-3 mt-1 text-red-600"></i>
-            <span th:text="${session.mensajeError}"></span>
-        </div>
+                <!-- Messages -->
+                <div th:if="${session.mensajeExito}" class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-start">
+                    <i class="fas fa-check-circle mr-3 mt-1 text-green-600"></i>
+                    <span th:text="${session.mensajeExito}"></span>
+                </div>
 
-        <!-- Empty State -->
-        <div th:if="${#lists.isEmpty(horarios)}" class="bg-blue-50 border border-blue-200 text-blue-800 px-6 py-8 rounded-lg text-center">
-            <i class="fas fa-info-circle text-3xl mb-4"></i>
-            <p class="text-lg font-medium">No tienes horarios asignados</p>
-            <p class="text-sm mt-2">Contacta con administración para asignar tus horarios</p>
-        </div>
+                <div th:if="${session.mensajeError}" class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-start">
+                    <i class="fas fa-exclamation-circle mr-3 mt-1 text-red-600"></i>
+                    <span th:text="${session.mensajeError}"></span>
+                </div>
 
-        <!-- Table -->
-        <div th:if="${!#lists.isEmpty(horarios)}" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm text-gray-700">
-                    <thead class="bg-gray-800 text-white sticky top-0">
-                        <tr>
-                            <th class="px-6 py-4 text-left font-semibold">#</th>
-                            <th class="px-6 py-4 text-left font-semibold">Día</th>
-                            <th class="px-6 py-4 text-left font-semibold">Hora Inicio</th>
-                            <th class="px-6 py-4 text-left font-semibold">Hora Fin</th>
-                            <th class="px-6 py-4 text-left font-semibold">Aula</th>
-                            <th class="px-6 py-4 text-left font-semibold">Curso</th>
-                            <th class="px-6 py-4 text-center font-semibold">Bimestres</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="h, iter : ${horarios}" class="border-t hover:bg-gray-50 transition">
-                            <td class="px-6 py-4 font-bold text-gray-900" th:text="${iter.count}"></td>
-                            <td class="px-6 py-4">
-                                <span class="badge-status bg-purple-100 text-purple-700" th:text="${h.diaSemana}"></span>
-                            </td>
-                            <td class="px-6 py-4" th:text="${h.horaInicio != null ? h.horaInicio.format(T(java.time.format.DateTimeFormatter).ofPattern('HH:mm')) : 'N/A'}"></td>
-                            <td class="px-6 py-4" th:text="${h.horaFin != null ? h.horaFin.format(T(java.time.format.DateTimeFormatter).ofPattern('HH:mm')) : 'N/A'}"></td>
-                            <td class="px-6 py-4 font-medium text-gray-800" th:text="${h.aula != null ? (h.aula.grado + ' - ' + h.aula.seccion) : 'N/A'}"></td>
-                            <td class="px-6 py-4" th:text="${h.curso != null ? h.curso.nombreCurso : 'N/A'}"></td>
-                            <td class="px-6 py-4">
-                                <div class="flex justify-center gap-2 flex-wrap">
-                                    <a th:href="@{/docente/evaluaciones/abrir/{id}(id=${h.idHorario}, bimestre=1)}" 
-                                       class="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded font-medium text-xs transition"
-                                       title="Bimestre 1">
-                                        <i class="fas fa-edit mr-1"></i>B1
-                                    </a>
-                                    <a th:href="@{/docente/evaluaciones/abrir/{id}(id=${h.idHorario}, bimestre=2)}" 
-                                       class="inline-flex items-center px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 rounded font-medium text-xs transition"
-                                       title="Bimestre 2">
-                                        <i class="fas fa-edit mr-1"></i>B2
-                                    </a>
-                                    <a th:href="@{/docente/evaluaciones/abrir/{id}(id=${h.idHorario}, bimestre=3)}" 
-                                       class="inline-flex items-center px-3 py-1.5 bg-yellow-100 text-yellow-700 hover:bg-yellow-200 rounded font-medium text-xs transition"
-                                       title="Bimestre 3">
-                                        <i class="fas fa-edit mr-1"></i>B3
-                                    </a>
-                                    <a th:href="@{/docente/evaluaciones/abrir/{id}(id=${h.idHorario}, bimestre=4)}" 
-                                       class="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 rounded font-medium text-xs transition"
-                                       title="Bimestre 4">
-                                        <i class="fas fa-edit mr-1"></i>B4
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <!-- Empty State -->
+                <div th:if="${#lists.isEmpty(horarios)}" class="bg-blue-50 border border-blue-200 text-blue-800 px-6 py-8 rounded-lg text-center">
+                    <i class="fas fa-info-circle text-3xl mb-4"></i>
+                    <p class="text-lg font-medium">No tienes horarios asignados</p>
+                    <p class="text-sm mt-2">Contacta con administración para asignar tus horarios</p>
+                </div>
+
+                <!-- Table -->
+                <div th:if="${!#lists.isEmpty(horarios)}" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-gray-700">
+                            <thead class="bg-gray-800 text-white sticky top-0">
+                                <tr>
+                                    <th class="px-6 py-4 text-left font-semibold">#</th>
+                                    <th class="px-6 py-4 text-left font-semibold">Día</th>
+                                    <th class="px-6 py-4 text-left font-semibold">Hora Inicio</th>
+                                    <th class="px-6 py-4 text-left font-semibold">Hora Fin</th>
+                                    <th class="px-6 py-4 text-left font-semibold">Aula</th>
+                                    <th class="px-6 py-4 text-left font-semibold">Curso</th>
+                                    <th class="px-6 py-4 text-center font-semibold">Bimestres</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="h, iter : ${horarios}" class="border-t hover:bg-gray-50 transition">
+                                    <td class="px-6 py-4 font-bold text-gray-900" th:text="${iter.count}"></td>
+                                    <td class="px-6 py-4">
+                                        <span class="badge-status bg-purple-100 text-purple-700" th:text="${h.diaSemana}"></span>
+                                    </td>
+                                    <td class="px-6 py-4" th:text="${h.horaInicio != null ? h.horaInicio.format(T(java.time.format.DateTimeFormatter).ofPattern('HH:mm')) : 'N/A'}"></td>
+                                    <td class="px-6 py-4" th:text="${h.horaFin != null ? h.horaFin.format(T(java.time.format.DateTimeFormatter).ofPattern('HH:mm')) : 'N/A'}"></td>
+                                    <td class="px-6 py-4 font-medium text-gray-800" th:text="${h.aula != null ? (h.aula.grado + ' - ' + h.aula.seccion) : 'N/A'}"></td>
+                                    <td class="px-6 py-4" th:text="${h.curso != null ? h.curso.nombreCurso : 'N/A'}"></td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex justify-center gap-2 flex-wrap">
+                                            <a th:href="@{/docente/evaluaciones/abrir/{id}(id=${h.idHorario}, bimestre=1)}" 
+                                               class="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded font-medium text-xs transition"
+                                               title="Bimestre 1">
+                                                <i class="fas fa-edit mr-1"></i>B1
+                                            </a>
+                                            <a th:href="@{/docente/evaluaciones/abrir/{id}(id=${h.idHorario}, bimestre=2)}" 
+                                               class="inline-flex items-center px-3 py-1.5 bg-green-100 text-green-700 hover:bg-green-200 rounded font-medium text-xs transition"
+                                               title="Bimestre 2">
+                                                <i class="fas fa-edit mr-1"></i>B2
+                                            </a>
+                                            <a th:href="@{/docente/evaluaciones/abrir/{id}(id=${h.idHorario}, bimestre=3)}" 
+                                               class="inline-flex items-center px-3 py-1.5 bg-yellow-100 text-yellow-700 hover:bg-yellow-200 rounded font-medium text-xs transition"
+                                               title="Bimestre 3">
+                                                <i class="fas fa-edit mr-1"></i>B3
+                                            </a>
+                                            <a th:href="@{/docente/evaluaciones/abrir/{id}(id=${h.idHorario}, bimestre=4)}" 
+                                               class="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 rounded font-medium text-xs transition"
+                                               title="Bimestre 4">
+                                                <i class="fas fa-edit mr-1"></i>B4
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <!-- Back Button -->
-        <div class="mt-8">
-            <a href="/docente/panel" class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg transition font-medium">
-                <i class="fas fa-arrow-left mr-2"></i>Volver al Panel
-            </a>
         </div>
     </main>
 
-    <div th:replace="fragments/scripts :: scripts"></div>
+    <div th:replace="~{/fragments/scripts :: scripts}"></div>
 </body>
 </html>

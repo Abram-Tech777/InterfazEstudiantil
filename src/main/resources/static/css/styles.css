@@ -159,7 +159,7 @@ input:focus {
 
 @keyframes blink-caret {
     from, to { border-color: transparent }
-    50% { border-color: #e60000 }
+    50% { border-color:#b30000 }
 }
 
 /* --- ESTILO PARA TARJETAS DE INFO --- */
@@ -176,15 +176,17 @@ input:focus {
 ========================================= */
 .wrapper {
     width: 100%;
-    max-width: 420px; /* Evita que se estire demasiado en pantallas grandes */
-    background-color: transparent;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    max-width: 420px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    /* Sin backdrop-filter: era el causante del cuadrado blanco fantasma */
+    box-shadow:
+        15px 15px 0px rgba(0, 0, 0, 0.3),
+        0 0 25px rgba(0, 0, 0, 0.35);
     color: #fff;
-    border-radius: 10px;
+    border-radius: 14px;
     padding: 30px 40px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .wrapper h1 {
@@ -263,7 +265,7 @@ input:focus {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     cursor: pointer;
     font-size: 16px;
-    color: #e60000; /* Texto rojo para combinar con el fondo de la pantalla */
+    color:#b30000; /* Texto rojo para combinar con el fondo de la pantalla */
     font-weight: 700;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -289,78 +291,135 @@ input:focus {
     text-decoration: underline;
 }
 
-.wrapper {
-    /* Mantenemos tu blur, pero le damos una sombra dura y otra suave */
-    box-shadow: 
-        15px 15px 0px rgba(0, 0, 0, 0.35),   /* El bloque 3D sólido */
-        0 0 25px rgba(0, 0, 0, 0.4),         /* Difuminado alrededor */
-        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* Efecto piola al pasar el mouse por toda la carta */
+/* Animación 3D al pasar el mouse por el cuadro de login */
 .wrapper:hover {
     transform: translate(-5px, -5px);
-    box-shadow: 
-        20px 20px 0px rgba(0, 0, 0, 0.3),
-        0 0 30px rgba(0, 0, 0, 0.5),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+    box-shadow:
+        20px 20px 0px rgba(0, 0, 0, 0.25),
+        0 0 30px rgba(0, 0, 0, 0.45),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.15);
 }
 
-/* --- ESTILOS DE LOS ÚTILES --- */
-.util-escolar {
+/* =========================================
+   TÍTULO PRINCIPAL - PORTAL ACADÉMICO
+   ========================================= */
+
+/* Contenedor del título */
+.portal-title {
+    font-family: 'Bebas Neue', 'Impact', sans-serif;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    line-height: 1;
+    letter-spacing: 0.04em;
+    margin: 0;
+    /* Sombra doble para garantizar legibilidad sobre cualquier fondo */
+    filter: drop-shadow(0 4px 16px rgba(0,0,0,0.7));
+}
+
+/* El span con la animación del texto */
+.portal-title-text {
+    /* Gradiente blanco → plateado → blanco con destellos */
+    background: linear-gradient(
+        105deg,
+        #ffffff   0%,
+        #e8e8e8  20%,
+        #ffffff  35%,
+        #ffe0e0  50%,
+        #ffffff  65%,
+        #e0e0e0  80%,
+        #ffffff 100%
+    );
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer-white 3.5s linear infinite;
+    display: inline-block;
+    /* Sombra de texto para legibilidad extra */
+    text-shadow: none; /* no aplica con clip, usamos filter en padre */
+}
+
+/* Animación: barrido de luz de izquierda a derecha */
+@keyframes shimmer-white {
+    0%   { background-position: 200% center; }
+    100% { background-position: -200% center; }
+}
+
+/* Subtítulo "Fe y Alegría 32" */
+.portal-subtitle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+
+/* Líneas decorativas a ambos lados del subtítulo */
+.subtitle-line {
+    display: inline-block;
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #e60000, #ff4444);
+    border-radius: 2px;
+}
+
+/* Blobs de brillo flotantes (Dashboard Premium) */
+.glowing-blob {
     position: absolute;
-    z-index: 1; /* Esto los manda DETRÁS del wrapper */
-    font-size: 55px; /* Tamaño de los emojis */
-    filter: drop-shadow(3px 4px 5px rgba(0, 0, 0, 0.5)); /* Sombra para el util */
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 1;
+    opacity: 0.35;
+    pointer-events: none;
     will-change: transform;
 }
 
-/* --- ANIMACIONES DE ASOMARSE (Cero armonía y salen mucho más) --- */
-@keyframes peek-top-far {
-    0%, 80%, 100% { transform: translate(0, 0) rotate(0deg); }
-    20%, 60% { transform: translate(-15px, -110px) rotate(-20deg); } /* Sale mucho más hacia arriba */
-}
-@keyframes peek-bottom-far {
-    0%, 75%, 100% { transform: translate(0, 0) rotate(0deg); }
-    30%, 55% { transform: translate(25px, 110px) rotate(25deg); } /* Sale mucho más hacia abajo */
-}
-@keyframes peek-left-far {
-    0%, 85%, 100% { transform: translate(0, 0) rotate(0deg); }
-    15%, 45% { transform: translate(-110px, -20px) rotate(-35deg); } /* Sale mucho más a la izquierda */
-}
-@keyframes peek-right-far {
-    0%, 70%, 100% { transform: translate(0, 0) rotate(0deg); }
-    25%, 50% { transform: translate(110px, 30px) rotate(30deg); } /* Sale mucho más a la derecha */
+@keyframes float-blob-1 {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.15); }
+    66% { transform: translate(-25px, 25px) scale(0.9); }
+    100% { transform: translate(0px, 0px) scale(1); }
 }
 
-/* El libro (se queda como estaba, asomándose piola y sutil) */
-@keyframes peek-right-mild {
-    0%, 70%, 100% { transform: translate(0, 0) rotate(0deg); }
-    25%, 50% { transform: translate(80px, 15px) rotate(25deg); } 
+@keyframes float-blob-2 {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(-40px, 30px) scale(0.9); }
+    66% { transform: translate(35px, -30px) scale(1.1); }
+    100% { transform: translate(0px, 0px) scale(1); }
 }
 
-/* --- POSICIONES Y TIEMPOS ALEATORIOS --- */
-/* Lápiz (Arriba Izquierda) */
-.pos-1 { top: 15%; left: 15%; animation: peek-top-far 5s infinite ease-in-out; animation-delay: 0.2s; }
-/* Escuadra (Arriba Derecha) */
-.pos-2 { top: 10%; right: 15%; animation: peek-top-far 6.5s infinite ease-in-out; animation-delay: 3s; }
-/* Cuaderno/Libro (Derecha abajo) - EL LIBRO INTACTO */
-.pos-3 { bottom: 20%; right: 5%; animation: peek-right-mild 4.8s infinite ease-in-out; animation-delay: 1.5s; }
-/* Tijera (Abajo Izquierda) */
-.pos-4 { bottom: 10%; left: 15%; animation: peek-bottom-far 7s infinite ease-in-out; animation-delay: 0.8s; }
-/* Regla (Izquierda Centro) */
-.pos-5 { top: 40%; left: 10%; animation: peek-left-far 5.2s infinite ease-in-out; animation-delay: 4.2s; }
+.blob-1 {
+    width: 250px;
+    height: 250px;
+    background-color: #ffb3b3;
+    top: -50px;
+    left: -50px;
+    animation: float-blob-1 10s infinite ease-in-out;
+}
 
-/* --- LOS NUEVOS --- */
-/* Manzana (Arriba Centro) */
-.pos-6 { top: 5%; left: 40%; animation: peek-top-far 7.5s infinite ease-in-out; animation-delay: 1.2s; }
-/* Crayón (Izquierda Abajo) */
-.pos-7 { bottom: 25%; left: 10%; animation: peek-left-far 6.2s infinite ease-in-out; animation-delay: 2.5s; }
-/* Mochila (Derecha Arriba) */
-.pos-8 { top: 25%; right: 10%; animation: peek-right-far 5.8s infinite ease-in-out; animation-delay: 0.5s; }
-/* Pincel (Abajo Centro-Derecha) */
-.pos-9 { bottom: 5%; right: 30%; animation: peek-bottom-far 6.8s infinite ease-in-out; animation-delay: 3.5s; }
+.blob-2 {
+    width: 300px;
+    height: 300px;
+    background-color: #800000;
+    bottom: -80px;
+    right: -80px;
+    animation: float-blob-2 12s infinite ease-in-out;
+}
+
+.blob-3 {
+    width: 180px;
+    height: 180px;
+    background-color: #ffffff;
+    top: 30%;
+    right: 20%;
+    animation: float-blob-1 14s infinite ease-in-out;
+    opacity: 0.12;
+}
 
 /* Estilo para los items del menú lateral */
 .menu-item {
@@ -376,7 +435,7 @@ input:focus {
 
 .menu-item:hover {
     background-color: #fef2f2;
-    color: #e60000;
+    color: #b30000;
     transform: translateX(5px);
 }
 
@@ -504,4 +563,84 @@ input:focus {
     opacity: 0.3 !important;
     pointer-events: none;
     cursor: default !important;
+}
+
+/* =========================================
+   ORBS FLOTANTES ANIMADOS - PANEL LOGIN
+   ========================================= */
+
+/* Orb base: círculo glassmorphism con icono */
+.login-orb {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: rgba(255, 255, 255, 0.9);
+    pointer-events: none;
+    z-index: 2;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Posición y tamaño de cada orb */
+.orb-1 {
+    width: 70px;
+    height: 70px;
+    font-size: 1.5rem;
+    top: 12%;
+    left: 10%;
+    animation: orb-float-1 7s ease-in-out infinite;
+}
+
+.orb-2 {
+    width: 55px;
+    height: 55px;
+    font-size: 1.2rem;
+    top: 20%;
+    right: 12%;
+    animation: orb-float-2 9s ease-in-out infinite;
+}
+
+.orb-3 {
+    width: 45px;
+    height: 45px;
+    font-size: 1rem;
+    bottom: 25%;
+    left: 8%;
+    animation: orb-float-3 6s ease-in-out infinite;
+}
+
+.orb-4 {
+    width: 60px;
+    height: 60px;
+    font-size: 1.3rem;
+    bottom: 15%;
+    right: 10%;
+    animation: orb-float-1 10s ease-in-out infinite reverse;
+}
+
+/* Keyframes de flotado independientes para variedad */
+@keyframes orb-float-1 {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    25%  { transform: translate(10px, -18px) rotate(5deg); }
+    50%  { transform: translate(-8px, -30px) rotate(-3deg); }
+    75%  { transform: translate(15px, -12px) rotate(7deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes orb-float-2 {
+    0%   { transform: translate(0, 0) scale(1); }
+    33%  { transform: translate(-12px, 20px) scale(1.08); }
+    66%  { transform: translate(8px, -15px) scale(0.95); }
+    100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes orb-float-3 {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    50%  { transform: translate(20px, -25px) rotate(-10deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
 }

@@ -25,29 +25,15 @@
 
             <div class="flex-1 flex flex-col items-center justify-center pb-16 px-6 sm:px-8 w-full">
                 
-                <div class="flex flex-row flex-wrap justify-center items-end gap-x-6 sm:gap-x-8 mb-6 drop-shadow-2xl w-full">
-                    
-					<div class="flex flex-row justify-center items-end gap-1 w-full">
-					    <img th:src="@{/img/letra(I).png}" class="h-16 sm:h-20 anim-tosca delay-1">
-					    <img th:src="@{/img/letra_(n).png}" class="h-10 sm:h-14 anim-tosca delay-2">
-					    <img th:src="@{/img/letra_(t).png}" class="h-10 sm:h-14 anim-tosca delay-3">
-					    <img th:src="@{/img/letra_(r).png}" class="h-10 sm:h-14 anim-tosca delay-4">
-					    <img th:src="@{/img/letra_(a).png}" class="h-10 sm:h-14 anim-tosca delay-1">
-					    <img th:src="@{/img/letra_(n).png}" class="h-10 sm:h-14 anim-tosca delay-2">
-					    <img th:src="@{/img/letra_(e).png}" class="h-10 sm:h-14 anim-tosca delay-3">
-					    <img th:src="@{/img/letra_(t).png}" class="h-10 sm:h-14 anim-tosca delay-4">
-					</div>
-
-					<div class="flex flex-row justify-center items-end gap-1 w-full mt-2">
-					    <img th:src="@{/img/letra(E).png}" class="h-16 sm:h-20 anim-tosca delay-2">
-					    <img th:src="@{/img/letra_(s).png}" class="h-12 sm:h-16 anim-tosca delay-3">
-					    <img th:src="@{/img/letra_(C).png}" class="h-12 sm:h-16 anim-tosca delay-4">
-					    <img th:src="@{/img/letra_(o).png}" class="h-12 sm:h-16 anim-tosca delay-1">
-					    <img th:src="@{/img/letra_(l).png}" class="h-12 sm:h-16 anim-tosca delay-2">
-					    <img th:src="@{/img/letra_(a).png}" class="h-12 sm:h-16 anim-tosca delay-3">
-					    <img th:src="@{/img/letra_(r).png}" class="h-12 sm:h-16 anim-tosca delay-4">
-					</div>
-                    
+                <div class="w-full text-center mb-8">
+                    <h1 class="portal-title mb-3">
+                        <span class="portal-title-text">Portal Académico</span>
+                    </h1>
+                    <p class="portal-subtitle">
+                        <span class="subtitle-line"></span>
+                        Fe y Alegría 32
+                        <span class="subtitle-line"></span>
+                    </p>
                 </div>
 
                 <div class="w-full max-w-lg bg-black/40 backdrop-blur-md p-8 sm:p-10 rounded-3xl border border-white/10 shadow-2xl flex flex-col items-center text-center">
@@ -104,20 +90,20 @@
         </div>
     </div>
 
-	<div class="w-full md:w-1/2 flex items-center justify-center bg-[#e60000] p-8 overflow-hidden">
-	        
-	        <div class="relative w-full max-w-[420px] flex items-center justify-center">
+	<div class="w-full md:w-1/2 flex items-center justify-center bg-[#e60000] p-8 overflow-hidden relative min-h-screen">
 
-				<div class="util-escolar pos-1">✏️</div>
-				            <div class="util-escolar pos-2">📐</div>
-				            <div class="util-escolar pos-3">📓</div> <div class="util-escolar pos-4">✂️</div>
-				            <div class="util-escolar pos-5">📏</div>
-				            <div class="util-escolar pos-6">🍎</div>
-				            <div class="util-escolar pos-7">🖍️</div>
-				            <div class="util-escolar pos-8">🎒</div>
-				            <div class="util-escolar pos-9">🖌️</div>
+                <!-- Blobs de luz animados de fondo (diseño premium) -->
+                <div class="glowing-blob blob-1"></div>
+                <div class="glowing-blob blob-2"></div>
+                <div class="glowing-blob blob-3"></div>
 
-	            <div class="wrapper w-full relative z-10">
+                <!-- Partículas decorativas flotantes (círculos con icono) -->
+                <div class="login-orb orb-1"><i class="fas fa-graduation-cap"></i></div>
+                <div class="login-orb orb-2"><i class="fas fa-book-open"></i></div>
+                <div class="login-orb orb-3"><i class="fas fa-star"></i></div>
+                <div class="login-orb orb-4"><i class="fas fa-chart-line"></i></div>
+
+	            <div class="wrapper relative z-10">
 	                <form th:action="@{/login}" method="post">
 	                    <h1>Iniciar Sesión</h1>
 	                    
@@ -137,10 +123,8 @@
 	                   
 	                </form>
 	            </div>
-	            
-	        </div>
 
-	    </div>
+	</div>
     
     <div th:replace="~{/fragments/scripts :: scripts}"></div>
 </body>
