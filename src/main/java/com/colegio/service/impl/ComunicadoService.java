@@ -12,13 +12,13 @@ import com.colegio.entity.Comunicado;
 
 public interface ComunicadoService {
     Comunicado crearComunicado(Comunicado comunicado);
+    Comunicado actualizarComunicado(Comunicado comunicado);
     List<Comunicado> listarPorAula(int idAula);
     List<Comunicado> listarParaAlumno(Alumno alumno);
     List<Comunicado> listarTodos();
     void eliminarComunicado(Integer idComunicado);
-    
-    // Métodos para manejo de archivos
+    Comunicado obtenerComunicadoPorId(Integer id);
+
     String guardarArchivo(MultipartFile archivo) throws Exception;
     ResponseEntity<Resource> descargarArchivo(Integer idComunicado) throws Exception;
-    Comunicado obtenerComunicadoPorId(Integer id);
 }

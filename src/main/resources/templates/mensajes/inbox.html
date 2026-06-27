@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{/fragments/head :: head('Bandeja de Mensajes')}"></head>
+<body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
+
+<div th:replace="~{/fragments/sidebar :: sidebar}"></div>
+
+<main class="flex-1 flex flex-col h-full relative overflow-hidden">
+
+    <header class="h-20 bg-[#a03030] shadow-md px-8 flex items-center justify-between z-10 text-white">
+        <h1 class="text-2xl font-bold">Bandeja de Mensajes</h1>
+        <a th:href="@{/mensajes/nuevo}" class="px-4 py-2 bg-white text-[#a03030] rounded-lg text-sm font-bold hover:bg-red-50 transition">
+            <i class="fas fa-pen mr-1"></i>Nuevo Mensaje
+        </a>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+        <div class="w-[95%] mx-auto">
+
+            <input type="hidden" id="currentUserId" th:value="${currentUserId}" />
+
+            <div th:if="${#lists.isEmpty(inbox)}" class="bg-blue-50 border border-blue-200 text-blue-800 px-6 py-12 rounded-2xl text-center shadow-sm">
+                <i class="fas fa-inbox text-4xl mb-4 text-blue-400"></i>
+                <p class="text-xl font-bold">Bandeja vacía</p>
+                <p class="text-sm text-blue-600 mt-2">No tienes mensajes recibidos por el momento.</p>
+            </div>
+
+            <div th:each="m : ${inbox}" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300 mb-4">
+                <div class="px-6 py-5 flex justify-between items-start">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                            <strong class="text-gray-800" th:text="${m.remitente.nombreCompleto}"></strong>
+                            <span th:if="${!m.leido}" class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block shrink-0"></span>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-1 truncate">
+                            <span th:text="${m.asunto}"></span>
+                            <span class="text-xs text-gray-400 ml-2" th:text="${#temporals.format(m.fechaEnvio, 'dd/MM/yyyy hh:mm a')}"></span>
+                        </p>
+                    </div>
+                    <button class="abrir-msj px-4 py-2 bg-[#a03030] text-white rounded-xl text-sm font-bold hover:bg-[#7d1f1f] transition shrink-0 ml-4" th:attr="data-id=${m.idMensaje}">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div class="hidden contenido-msj border-t border-gray-100" th:attrappend="id='msj-' + ${m.idMensaje}"></div>
+            </div>
+
+        </div>
+    </div>
+
+</main>
+
+<div th:replace="~{/fragments/scripts :: scripts}"></div>
+<script>
+function renderArchivo(archivo, mensajeId) {
+    var ext = archivo.archivoNombre.split('.').pop().toLowerCase();
+    var isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext);
+    var isPdf = ext === 'pdf';
+    var icon = isImage ? 'fa-image text-blue-500' : isPdf ? 'fa-file-pdf text-red-500' : 'fa-file text-yellow-500';
+    var previewUrl = isImage ? '/mensajes/abrirArchivo/' + archivo.idArchivo : (isPdf ? '/mensajes/abrirArchivo/' + archivo.idArchivo : null);
+    var downloadUrl = '/mensajes/descargarArchivo/' + archivo.idArchivo;
+    var html = '<div class="archivo-item bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-sm transition">';
+    html += '<div class="p-3 flex items-center gap-3">';
+    html += '<div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center"><i class="fas ' + icon + '"></i></div>';
+    html += '<span class="text-sm font-semibold text-gray-700 truncate flex-1">' + archivo.archivoNombre + '</span>';
+    html += '<div class="flex gap-1 shrink-0">';
+    if (previewUrl) {
+        html += '<button class="preview-btn px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition" data-url="' + previewUrl + '" data-ext="' + ext + '"><i class="fas fa-eye"></i></button>';
+    }
+    html += '<a href="' + downloadUrl + '" class="px-2 py-1 text-xs bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"><i class="fas fa-download"></i></a>';
+    html += '</div></div>';
+    html += '<div class="archivo-preview-cont hidden"></div>';
+    html += '</div>';
+    return html;
+}
+
+document.querySelectorAll('.abrir-msj').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        const cont = document.getElementById('msj-' + id);
+        if (!cont) return;
+        if (!cont.classList.contains('hidden')) {
+            cont.classList.add('hidden');
+            cont.innerHTML = '';
+            this.innerHTML = '<i class="fas fa-chevron-down"></i>';
+            return;
+        }
+        fetch('/mensajes/ver/' + id)
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(t => { throw new Error(t || 'Error al obtener el mensaje'); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                var currentUserId = parseInt(document.getElementById('currentUserId').value);
+                var otherUserId = data.remitente && data.remitente.idUsuario === currentUserId
+                    ? (data.destinatario ? data.destinatario.idUsuario : '')
+                    : (data.remitente ? data.remitente.idUsuario : '');
+
+                let html = '<div class="px-6 py-5 bg-gray-50">' +
+                    '<div class="flex items-center gap-2 text-sm text-gray-600 mb-3">' +
+                    '<i class="fas fa-user-circle text-gray-400"></i>' +
+                    '<strong>De:</strong> ' + (data.remitente != null ? (data.remitente.nombreCompleto || '') : '') +
+                    '</div>' +
+                    '<p class="font-bold text-gray-800 text-lg mb-3">' + (data.asunto || '') + '</p>' +
+                    '<div class="bg-white rounded-xl p-4 border border-gray-200">' +
+                    '<p class="whitespace-pre-wrap text-gray-700 leading-relaxed">' + (data.contenido || '') + '</p>' +
+                    '</div>' +
+                    '<div class="mt-4 flex gap-3">';
+
+                if (data.destinatario && data.destinatario.idUsuario === currentUserId) {
+                    html += '<a href="/mensajes/nuevo?to=' + otherUserId + '" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-700 transition shadow-sm">' +
+                        '<i class="fas fa-reply mr-2"></i>Responder</a>';
+                }
+                if (otherUserId) {
+                    html += '<a href="/mensajes/chat/' + otherUserId + '" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition shadow-sm">' +
+                        '<i class="fas fa-comments mr-2"></i>Chat</a>';
+                }
+                html += '</div>';
+
+                if (data.archivos && data.archivos.length > 0) {
+                    html += '<div class="mt-4 pt-4 border-t border-gray-200">' +
+                        '<p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Archivos adjuntos (' + data.archivos.length + ')</p>' +
+                        '<div class="grid gap-3" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">';
+                    data.archivos.forEach(function(archivo) {
+                        html += renderArchivo(archivo, data.idMensaje);
+                    });
+                    html += '</div></div>';
+                }
+
+                html += '</div>';
+                cont.innerHTML = html;
+                cont.classList.remove('hidden');
+                this.innerHTML = '<i class="fas fa-chevron-up"></i>';
+
+                cont.querySelectorAll('.preview-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        var parent = this.closest('.archivo-item');
+                        var previewCont = parent.querySelector('.archivo-preview-cont');
+                        if (!previewCont.classList.contains('hidden')) {
+                            previewCont.classList.add('hidden');
+                            previewCont.innerHTML = '';
+                            return;
+                        }
+                        var url = this.getAttribute('data-url');
+                        var ext = this.getAttribute('data-ext');
+                        if (ext === 'pdf') {
+                            previewCont.innerHTML = '<embed src="' + url + '" type="application/pdf" class="w-full h-64 rounded-xl border" />';
+                        } else {
+                            previewCont.innerHTML = '<img src="' + url + '" class="w-full max-h-64 object-contain rounded-xl border" />';
+                        }
+                        previewCont.classList.remove('hidden');
+                    });
+                });
+            }).catch(err => alert('No se pudo obtener el mensaje: ' + (err.message || err)));
+    });
+});
+</script>
+</body>
+</html>

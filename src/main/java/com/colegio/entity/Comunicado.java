@@ -1,6 +1,7 @@
 package com.colegio.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import jakarta.persistence.*;
 
 @Entity
@@ -46,6 +47,9 @@ public class Comunicado {
     @Column(name = "archivo_tipo", nullable = true, length = 100)
     private String archivoTipo;
 
+    @OneToMany(mappedBy = "comunicado", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<ComunicadoArchivo> archivos;
+
     public Comunicado() {}
 
     // Getters / Setters
@@ -81,4 +85,7 @@ public class Comunicado {
 
     public String getArchivoTipo() { return archivoTipo; }
     public void setArchivoTipo(String archivoTipo) { this.archivoTipo = archivoTipo; }
+
+    public List<ComunicadoArchivo> getArchivos() { return archivos; }
+    public void setArchivos(List<ComunicadoArchivo> archivos) { this.archivos = archivos; }
 }

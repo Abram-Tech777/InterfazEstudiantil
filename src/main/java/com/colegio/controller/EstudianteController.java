@@ -85,23 +85,29 @@ public class EstudianteController {
         if (opt.isPresent()) {
             Alumno alumno = opt.get();
             model.addAttribute("alumno", alumno);
-            
-            // 1. Buscamos los comunicados para el aula y grado del alumno
-            List<Comunicado> comunicados = comunicadoRepository.listarParaAulaOGrado(
-                alumno.getAula().getIdAula(), 
-                alumno.getAula().getGrado()
-            );
-            model.addAttribute("comunicados", comunicados);
-            
-            // 2. Creamos el mapa de autores para que el nombre del docente salga en la vista
-            // (Esto es necesario porque tu HTML usa autorMap[c.autor.idUsuario])
-            Map<Integer, String> autorMap = new HashMap<>();
-            for (Comunicado c : comunicados) {
-                if (c.getAutor() != null) {
-                    autorMap.put(c.getAutor().getIdUsuario(), c.getAutor().getNombreCompleto());
+            // Asegurarnos de que el alumno tiene aula asignada antes de llamar al repositorio
+            if (alumno.getAula() == null) {
+                // Si no hay aula asignada, devolvemos listas vacías para evitar NPE y mostrar la vista
+                model.addAttribute("comunicados", List.of());
+                model.addAttribute("autorMap", Map.of());
+            } else {
+                // 1. Buscamos los comunicados para el aula y grado del alumno
+                List<Comunicado> comunicados = comunicadoRepository.listarParaAulaOGrado(
+                    alumno.getAula().getIdAula(), 
+                    alumno.getAula().getGrado()
+                );
+                model.addAttribute("comunicados", comunicados);
+
+                // 2. Creamos el mapa de autores para que el nombre del docente salga en la vista
+                // (Esto es necesario porque la vista usa autorMap[c.autor.idUsuario])
+                Map<Integer, String> autorMap = new HashMap<>();
+                for (Comunicado c : comunicados) {
+                    if (c.getAutor() != null) {
+                        autorMap.put(c.getAutor().getIdUsuario(), c.getAutor().getNombreCompleto());
+                    }
                 }
+                model.addAttribute("autorMap", autorMap);
             }
-            model.addAttribute("autorMap", autorMap);
         }
         
         return "comunicados/bandeja";

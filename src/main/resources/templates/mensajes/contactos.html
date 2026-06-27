@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{/fragments/head :: head('Contactos')}"></head>
+<body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
+
+<div th:replace="~{/fragments/sidebar :: sidebar}"></div>
+
+<main class="flex-1 flex flex-col h-full relative overflow-hidden">
+
+    <header class="h-20 bg-[#a03030] shadow-md px-8 flex items-center justify-between z-10 text-white">
+        <h1 class="text-2xl font-bold"><i class="fas fa-comments mr-2"></i>Chat</h1>
+        <a th:href="@{/mensajes/inbox}" class="px-4 py-2 bg-white text-[#a03030] rounded-lg text-sm font-bold hover:bg-red-50 transition">
+            <i class="fas fa-arrow-left mr-1"></i>Volver
+        </a>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+        <div class="w-[95%] mx-auto max-w-2xl">
+
+            <div th:if="${#lists.isEmpty(contactos)}" class="bg-blue-50 border border-blue-200 text-blue-800 px-6 py-12 rounded-2xl text-center shadow-sm">
+                <i class="fas fa-users text-4xl mb-4 text-blue-400"></i>
+                <p class="text-xl font-bold">Sin contactos</p>
+                <p class="text-sm text-blue-600 mt-2">Aún no has tenido conversaciones con nadie.</p>
+            </div>
+
+            <div class="space-y-3">
+                <div th:each="c : ${contactos}"
+                     class="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-[#a03030]/30 transition-all duration-200 overflow-hidden">
+                    <a th:href="@{/mensajes/chat/{id}(id=${c.idUsuario})}" class="flex items-center gap-4 px-6 py-5">
+                        <div class="w-12 h-12 rounded-full bg-[#a03030]/10 flex items-center justify-center shrink-0">
+                            <i class="fas fa-user-circle text-2xl text-[#a03030]"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-800" th:text="${c.nombreCompleto}"></p>
+                            <p class="text-xs text-gray-500 capitalize" th:text="${c.rol}"></p>
+                        </div>
+                        <i class="fas fa-chevron-right ml-auto text-gray-300"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</main>
+
+<div th:replace="~{/fragments/scripts :: scripts}"></div>
+</body>
+</html>

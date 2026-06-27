@@ -47,6 +47,35 @@ public class ComunicadoServiceImpl implements ComunicadoService {
     }
 
     @Override
+    public Comunicado actualizarComunicado(Comunicado comunicado) {
+        Comunicado existente = comunicadoRepository.findById(comunicado.getIdComunicado())
+                .orElseThrow(() -> new IllegalArgumentException("Comunicado no encontrado."));
+
+        if (comunicado.getTitulo() == null || comunicado.getTitulo().isBlank()) {
+            throw new IllegalArgumentException("El título no puede estar vacío.");
+        }
+        if (comunicado.getContenido() == null || comunicado.getContenido().isBlank()) {
+            throw new IllegalArgumentException("El contenido no puede estar vacío.");
+        }
+
+        existente.setTitulo(comunicado.getTitulo());
+        existente.setContenido(comunicado.getContenido());
+        existente.setAula(comunicado.getAula());
+        existente.setGrado(comunicado.getGrado());
+
+        if (comunicado.getArchivos() != null) {
+            if (existente.getArchivos() != null) {
+                existente.getArchivos().clear();
+                existente.getArchivos().addAll(comunicado.getArchivos());
+            } else {
+                existente.setArchivos(comunicado.getArchivos());
+            }
+        }
+
+        return comunicadoRepository.save(existente);
+    }
+
+    @Override
     public List<Comunicado> listarPorAula(int idAula) {
         return comunicadoRepository.listarPorAula(idAula);
     }
@@ -75,11 +104,14 @@ public class ComunicadoServiceImpl implements ComunicadoService {
             throw new IllegalArgumentException("El archivo está vacío.");
         }
 
-        // Validar extensiones permitidas
+        // Validar extensiones permitidas y tamaño (solo .jpg, .gif, .doc, .docx; max 20MB)
         String nombreArchivo = archivo.getOriginalFilename();
-        String extension = nombreArchivo.substring(nombreArchivo.lastIndexOf(".")).toLowerCase();
-        
-        String[] extensionesPermitidas = {".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png", ".gif"};
+        if (nombreArchivo == null || !nombreArchivo.contains(".")) {
+            throw new IllegalArgumentException("Nombre de archivo inválido.");
+        }
+        String extension = nombreArchivo.substring(nombreArchivo.lastIndexOf('.')).toLowerCase();
+
+        String[] extensionesPermitidas = {".jpg", ".gif", ".doc", ".docx"};
         boolean extensionValida = false;
         for (String ext : extensionesPermitidas) {
             if (extension.equals(ext)) {
@@ -87,9 +119,14 @@ public class ComunicadoServiceImpl implements ComunicadoService {
                 break;
             }
         }
-        
+
         if (!extensionValida) {
-            throw new IllegalArgumentException("Tipo de archivo no permitido. Solo se aceptan: PDF, Word, imágenes.");
+            throw new IllegalArgumentException("Tipo de archivo no permitido. Solo se aceptan: .jpg, .gif, .doc, .docx");
+        }
+
+        long maxBytes = 20L * 1024L * 1024L; // 20 MB
+        if (archivo.getSize() > maxBytes) {
+            throw new IllegalArgumentException("Archivo demasiado grande. Tamaño máximo permitido: 20 MB.");
         }
 
         // Crear directorio si no existe

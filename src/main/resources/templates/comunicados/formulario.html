@@ -1,54 +1,52 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/fragments/head :: head('Registrar Comunicado')"></head>
+<head th:replace="/fragments/head :: head( ${comunicado.idComunicado > 0} ? 'Editar Comunicado' : 'Registrar Comunicado')"></head>
 <body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
 
     <div th:replace="~{/fragments/sidebar :: sidebar}"></div>
 
     <main class="flex-1 flex flex-col h-full relative overflow-hidden">
         <header class="h-20 bg-[#e60000] shadow-md px-8 flex items-center justify-between z-10 text-white">
-            <h1 class="text-2xl font-bold">Registrar Comunicado</h1>
+            <h1 class="text-2xl font-bold" th:text="${comunicado.idComunicado > 0} ? 'Editar Comunicado' : 'Registrar Comunicado'"></h1>
         </header>
 
         <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
             <div class="max-w-4xl mx-auto">
-                <p class="text-gray-600 mb-6">Publica anuncios y notificaciones importantes</p>
+                <p class="text-gray-600 mb-6" th:text="${comunicado.idComunicado > 0} ? 'Modifica los datos del comunicado' : 'Publica anuncios y notificaciones importantes'"></p>
 
-                <!-- Error Message -->
                 <div th:if="${mensajeError}" class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-start">
                     <i class="fas fa-exclamation-circle mr-3 mt-1 text-red-600"></i>
                     <span th:text="${mensajeError}"></span>
                 </div>
 
-                <!-- Form Card -->
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                    <form id="formComunicado" th:action="@{/gestioncomunicados/guardar}" th:object="${comunicado}" method="post" enctype="multipart/form-data" class="p-8">
+                    <form id="formComunicado"
+                          th:action="${comunicado.idComunicado > 0} ? @{/gestioncomunicados/actualizar} : @{/gestioncomunicados/guardar}"
+                          th:object="${comunicado}" method="post" enctype="multipart/form-data" class="p-8">
                         <input type="hidden" th:field="*{idComunicado}" />
 
-                        <!-- Destination Type -->
                         <div class="mb-8">
                             <label class="block text-sm font-bold text-gray-900 mb-4">Enviar a</label>
                             <div class="space-y-3">
                                 <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                                    <input class="w-4 h-4 text-blue-600 cursor-pointer" type="radio" name="destinoTipo" id="destAula" value="AULA" checked>
+                                    <input class="w-4 h-4 text-blue-600 cursor-pointer" type="radio" name="destinoTipo" id="destAula" value="AULA" th:checked="${destinoTipo == null or destinoTipo == 'AULA'}">
                                     <span class="ml-3 font-medium text-gray-900">Aula específica</span>
                                     <i class="fas fa-door-open ml-2 text-blue-600"></i>
                                 </label>
                                 <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                                    <input class="w-4 h-4 text-blue-600 cursor-pointer" type="radio" name="destinoTipo" id="destGrado" value="GRADO">
+                                    <input class="w-4 h-4 text-blue-600 cursor-pointer" type="radio" name="destinoTipo" id="destGrado" value="GRADO" th:checked="${destinoTipo == 'GRADO'}">
                                     <span class="ml-3 font-medium text-gray-900">Grado completo</span>
                                     <i class="fas fa-graduation-cap ml-2 text-orange-600"></i>
                                 </label>
                                 <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
-                                    <input class="w-4 h-4 text-blue-600 cursor-pointer" type="radio" name="destinoTipo" id="destGlobal" value="GLOBAL">
+                                    <input class="w-4 h-4 text-blue-600 cursor-pointer" type="radio" name="destinoTipo" id="destGlobal" value="GLOBAL" th:checked="${destinoTipo == 'GLOBAL'}">
                                     <span class="ml-3 font-medium text-gray-900">Todos los alumnos</span>
                                     <i class="fas fa-globe ml-2 text-green-600"></i>
                                 </label>
                             </div>
                         </div>
 
-                        <!-- Aula Selection -->
-                        <div id="selectAulaBlock" class="mb-8">
+                        <div id="selectAulaBlock" class="mb-8" th:style="${destinoTipo == 'GRADO'} ? 'display:none' : ''">
                             <label class="block text-sm font-bold text-gray-900 mb-2">Seleccionar Aula</label>
                             <select th:field="*{aula.idAula}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
                                 <option value="0">-- Seleccione Aula --</option>
@@ -56,8 +54,7 @@
                             </select>
                         </div>
 
-                        <!-- Grado Selection -->
-                        <div id="selectGradoBlock" class="mb-8" style="display: none;">
+                        <div id="selectGradoBlock" class="mb-8" style="display:none;">
                             <label class="block text-sm font-bold text-gray-900 mb-2">Seleccionar Grado</label>
                             <select th:field="*{grado}" id="gradoSeleccionado" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
                                 <option value="">-- Seleccione Grado --</option>
@@ -65,13 +62,11 @@
                             </select>
                         </div>
 
-                        <!-- Title -->
                         <div class="mb-8">
                             <label class="block text-sm font-bold text-gray-900 mb-2">Título</label>
                             <input type="text" th:field="*{titulo}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" placeholder="Ej: Cambio de horario - Suspensión de clases" required />
                         </div>
 
-                        <!-- Content -->
                         <div class="mb-8">
                             <label class="block text-sm font-bold text-gray-900 mb-2">Contenido</label>
                             <textarea th:field="*{contenido}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" rows="8" placeholder="Escribe aquí el anuncio o comunicado detallado..." required></textarea>
@@ -80,34 +75,50 @@
                             </p>
                         </div>
 
-                        <!-- File Upload -->
                         <div class="mb-8 p-6 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 transition">
                             <label class="block text-sm font-bold text-gray-900 mb-3 cursor-pointer flex items-center">
-                                <i class="fas fa-paperclip mr-2 text-blue-600"></i>Adjuntar Archivo (Opcional)
+                                <i class="fas fa-paperclip mr-2 text-blue-600"></i>Adjuntar Archivos (Opcional)
                             </label>
-                            <input type="file" id="archivo" name="archivo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif" />
-                            <div id="fileInfo" class="mt-3 text-sm text-gray-600 hidden">
-                                <i class="fas fa-check-circle text-green-600 mr-2"></i>
-                                <span id="fileName"></span>
+                            <input type="file" id="fileAdjuntos" name="fileAdjuntos" multiple class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" accept=".jpg,.jpeg,.png,.gif,.bmp,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" />
+
+                            <div id="filePreviewList" class="flex flex-wrap gap-2 mt-3 hidden"></div>
+
+                            <div id="fileErrorCard" class="hidden mt-3 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm flex items-center gap-3">
+                                <i class="fas fa-exclamation-circle text-lg shrink-0"></i>
+                                <span id="fileErrorMsg">Tamaño máximo alcanzado. Elimine algunos archivos.</span>
                             </div>
+
+                            <div th:if="${comunicado.idComunicado > 0 and comunicado.archivos != null and !comunicado.archivos.isEmpty()}" id="existingFiles" class="mt-3">
+                                <p class="text-xs font-semibold text-gray-700 mb-2"><i class="fas fa-paperclip mr-1"></i>Archivos actuales (clic X para eliminar):</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <div th:each="archivo : ${comunicado.archivos}" th:attr="data-archivoid=${archivo.idArchivo}" class="existing-file-item flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs">
+                                        <i th:class="${#strings.endsWith(#strings.toLowerCase(archivo.archivoNombre), '.pdf')} ? 'fas fa-file-pdf text-red-500' : (${#strings.startsWith(archivo.archivoTipo, 'image/')} ? 'fas fa-image text-blue-500' : 'fas fa-file text-yellow-500')"></i>
+                                        <span class="truncate max-w-[150px]" th:text="${archivo.archivoNombre}"></span>
+                                        <button type="button" class="delete-existing-file w-4 h-4 rounded-full bg-red-100 text-red-500 hover:bg-red-200 transition flex items-center justify-center ml-1">
+                                            <i class="fas fa-times text-[10px]"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="eliminarArchivosIds" id="eliminarArchivosIds" value="" />
+                            </div>
+
                             <p class="text-xs text-gray-500 mt-3">
-                                <i class="fas fa-info-circle mr-1"></i>Formatos permitidos: PDF, Word (.doc, .docx), Imágenes (.jpg, .png, .gif)
+                                <i class="fas fa-info-circle mr-1"></i>Formatos: Imágenes, PDF, Word, Excel, PowerPoint. Tamaño máximo total: 20 MB.
                             </p>
                         </div>
 
-                        <!-- Buttons -->
                         <div class="flex gap-3 pt-6 border-t border-gray-200">
                             <a th:href="@{/gestioncomunicados/lista}" class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg transition font-medium flex items-center justify-center">
                                 <i class="fas fa-times mr-2"></i>Cancelar
                             </a>
                             <button type="submit" class="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition font-medium flex items-center justify-center">
-                                <i class="fas fa-paper-plane mr-2"></i>Publicar Comunicado
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                <span th:text="${comunicado.idComunicado > 0} ? 'Actualizar Comunicado' : 'Publicar Comunicado'"></span>
                             </button>
                         </div>
                     </form>
                 </div>
 
-                <!-- Info Box -->
                 <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
                     <h3 class="font-bold text-blue-900 mb-2">
                         <i class="fas fa-lightbulb mr-2"></i>Consejos para tu comunicado
@@ -125,29 +136,130 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const radios = document.querySelectorAll('input[name="destinoTipo"]');
-            const aulaBlock = document.getElementById('selectAulaBlock');
-            const gradoBlock = document.getElementById('selectGradoBlock');
-            const fileInput = document.getElementById('archivo');
-            const fileInfo = document.getElementById('fileInfo');
-            const fileName = document.getElementById('fileName');
-            
+            var radios = document.querySelectorAll('input[name="destinoTipo"]');
+            var aulaBlock = document.getElementById('selectAulaBlock');
+            var gradoBlock = document.getElementById('selectGradoBlock');
+
             function update() {
-                const v = document.querySelector('input[name="destinoTipo"]:checked').value;
+                var v = document.querySelector('input[name="destinoTipo"]:checked').value;
                 aulaBlock.style.display = (v === 'AULA') ? '' : 'none';
                 gradoBlock.style.display = (v === 'GRADO') ? '' : 'none';
             }
-            
-            radios.forEach(r => r.addEventListener('change', update));
-            update();
-            
-            fileInput.addEventListener('change', function () {
-                if (this.files && this.files[0]) {
-                    fileName.textContent = this.files[0].name + ' (' + (this.files[0].size / 1024).toFixed(2) + ' KB)';
-                    fileInfo.classList.remove('hidden');
-                } else {
-                    fileInfo.classList.add('hidden');
+            radios.forEach(function(r) { r.addEventListener('change', update); });
+
+            // ========== MULTI-FILE UPLOAD ==========
+            var fileInput = document.getElementById('fileAdjuntos');
+            var filePreviewList = document.getElementById('filePreviewList');
+            var selectedFiles = [];
+            var MAX_FILE_SIZE = 20 * 1024 * 1024;
+
+            fileInput.addEventListener('change', function() {
+                for (var i = 0; i < this.files.length; i++) {
+                    var file = this.files[i];
+                    var exists = selectedFiles.some(function(f) { return f.name === file.name && f.size === file.size && f.lastModified === file.lastModified; });
+                    if (!exists) selectedFiles.push(file);
                 }
+                this.value = '';
+                renderFilePreviews();
+                checkFileSize();
+            });
+
+            function removeFile(index) {
+                selectedFiles.splice(index, 1);
+                renderFilePreviews();
+                checkFileSize();
+            }
+
+            function renderFilePreviews() {
+                filePreviewList.innerHTML = '';
+                if (selectedFiles.length === 0) {
+                    filePreviewList.classList.add('hidden');
+                    return;
+                }
+                filePreviewList.classList.remove('hidden');
+                selectedFiles.forEach(function(file, idx) {
+                    var ext = (file.name.split('.').pop() || '').toLowerCase();
+                    var isImage = ['jpg','jpeg','png','gif','bmp','webp'].indexOf(ext) !== -1;
+                    var isPdf = ext === 'pdf';
+                    var isWord = ['doc','docx'].indexOf(ext) !== -1;
+                    var isExcel = ['xls','xlsx'].indexOf(ext) !== -1;
+                    var icon = isImage ? 'fa-image text-blue-500' : isPdf ? 'fa-file-pdf text-red-500' : isWord ? 'fa-file-word text-blue-600' : isExcel ? 'fa-file-excel text-green-600' : 'fa-file text-yellow-500';
+                    var size = (file.size / 1024).toFixed(1) + ' KB';
+
+                    var div = document.createElement('div');
+                    div.className = 'flex flex-col gap-1';
+
+                    var row = document.createElement('div');
+                    row.className = 'flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs';
+                    row.innerHTML = '<i class="fas ' + icon + '"></i><span class="truncate max-w-[150px]">' + file.name + '</span><span class="text-gray-400">' + size + '</span><button type="button" onclick="removeFile(' + idx + ')" class="ml-1 w-4 h-4 rounded-full bg-red-100 text-red-500 flex items-center justify-center hover:bg-red-200 transition"><i class="fas fa-times text-[10px]"></i></button>';
+
+                    div.appendChild(row);
+
+                    if (isImage) {
+                        var imgCont = document.createElement('div');
+                        imgCont.className = 'rounded-lg overflow-hidden border border-gray-200';
+                        var img = document.createElement('img');
+                        img.className = 'w-full max-h-96 object-contain';
+                        var reader = new FileReader();
+                        reader.onload = function(e) { img.src = e.target.result; };
+                        reader.readAsDataURL(file);
+                        imgCont.appendChild(img);
+                        div.appendChild(imgCont);
+                    } else if (isPdf) {
+                        var pdfCont = document.createElement('div');
+                        pdfCont.className = 'rounded-lg overflow-hidden border border-gray-200';
+                        var embed = document.createElement('embed');
+                        embed.className = 'w-full h-[500px]';
+                        var reader = new FileReader();
+                        reader.onload = function(e) { embed.src = e.target.result; };
+                        reader.readAsDataURL(file);
+                        pdfCont.appendChild(embed);
+                        div.appendChild(pdfCont);
+                    }
+
+                    filePreviewList.appendChild(div);
+                });
+            }
+
+            function checkFileSize() {
+                var card = document.getElementById('fileErrorCard');
+                var total = 0;
+                selectedFiles.forEach(function(f) { total += f.size; });
+                card.classList.toggle('hidden', total <= MAX_FILE_SIZE);
+            }
+
+            window.removeFile = removeFile;
+
+            // ========== PER-FILE DELETE IN EDIT MODE ==========
+            var deletedFileIds = [];
+
+            document.querySelectorAll('.delete-existing-file').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var item = this.closest('.existing-file-item');
+                    var id = parseInt(item.getAttribute('data-archivoid'));
+                    if (!deletedFileIds.includes(id)) {
+                        deletedFileIds.push(id);
+                    }
+                    item.classList.add('opacity-30', 'line-through');
+                    this.disabled = true;
+                    document.getElementById('eliminarArchivosIds').value = deletedFileIds.join(',');
+                });
+            });
+
+            // Append selectedFiles to FormData on submit
+            var form = document.getElementById('formComunicado');
+            form.addEventListener('submit', function(e) {
+                var total = 0;
+                selectedFiles.forEach(function(f) { total += f.size; });
+                if (total > MAX_FILE_SIZE) {
+                    e.preventDefault();
+                    document.getElementById('fileErrorCard').classList.remove('hidden');
+                    return;
+                }
+
+                var dt = new DataTransfer();
+                selectedFiles.forEach(function(f) { dt.items.add(f); });
+                fileInput.files = dt.files;
             });
         });
     </script>

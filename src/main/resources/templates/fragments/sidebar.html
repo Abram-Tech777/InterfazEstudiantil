@@ -25,6 +25,13 @@
             padding-right: 0.5rem !important;
             justify-content: center !important;
         }
+
+        /* Estado de carga durante navegación AJAX */
+        main.loading {
+            opacity: 0.5;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
     </style>
 
     <aside id="mainSidebar" class="w-72 bg-[#7d1f1f] shadow-[4px_0_24px_rgba(0,0,0,0.25)] flex flex-col h-full z-20 relative sidebar-transition">
@@ -103,6 +110,13 @@
                     <i class="fas fa-calendar-alt w-5 text-center text-lg shrink-0"></i>
                     <span class="hide-on-collapse">Horarios</span>
                 </a>
+                <a th:href="@{/mensajes/contactos}"
+                   th:classappend="${#strings.startsWith(currentUri, '/mensajes/contactos') or #strings.startsWith(currentUri, '/mensajes/chat')} ? 'bg-[#5c1515] text-white font-semibold shadow-md' : 'text-rose-100 hover:bg-[#9b3030]/40 hover:text-white font-medium'"
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all center-on-collapse"
+                   title="Chat">
+                    <i class="fas fa-comments w-5 text-center text-lg shrink-0"></i>
+                    <span class="hide-on-collapse">Chat</span>
+                </a>
             </th:block>
 
             <!-- ========== DOCENTE ========== -->
@@ -149,6 +163,21 @@
                     <i class="fas fa-star w-5 text-center text-lg shrink-0"></i>
                     <span class="hide-on-collapse">Evaluaciones / Notas</span>
                 </a>
+                <a th:href="@{/mensajes/inbox}"
+                   th:classappend="${#strings.startsWith(currentUri, '/mensajes') and !#strings.startsWith(currentUri, '/mensajes/chat') and !#strings.startsWith(currentUri, '/mensajes/contactos')} ? 'bg-[#5c1515] text-white font-semibold shadow-md' : 'text-rose-100 hover:bg-[#9b3030]/40 hover:text-white font-medium'"
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all center-on-collapse"
+                   title="Mensajes">
+                    <i class="fas fa-envelope w-5 text-center text-lg shrink-0"></i>
+                    <span class="hide-on-collapse flex-1">Mensajes</span>
+                    <span class="mensaje-badge hide-on-collapse bg-yellow-400 text-[#5c1515] text-xs font-bold rounded-full px-2 py-0.5">0</span>
+                </a>
+                <a th:href="@{/mensajes/contactos}"
+                   th:classappend="${#strings.startsWith(currentUri, '/mensajes/contactos') or #strings.startsWith(currentUri, '/mensajes/chat')} ? 'bg-[#5c1515] text-white font-semibold shadow-md' : 'text-rose-100 hover:bg-[#9b3030]/40 hover:text-white font-medium'"
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all center-on-collapse"
+                   title="Chat">
+                    <i class="fas fa-comments w-5 text-center text-lg shrink-0"></i>
+                    <span class="hide-on-collapse">Chat</span>
+                </a>
             </th:block>
 
             <!-- ========== ADMINISTRADOR ========== -->
@@ -188,6 +217,21 @@
                     <i class="fas fa-calendar-alt w-5 text-center text-lg shrink-0"></i>
                     <span class="hide-on-collapse">Horarios</span>
                 </a>
+                <a th:href="@{/mensajes/inbox}"
+                   th:classappend="${#strings.startsWith(currentUri, '/mensajes') and !#strings.startsWith(currentUri, '/mensajes/chat') and !#strings.startsWith(currentUri, '/mensajes/contactos')} ? 'bg-[#5c1515] text-white font-semibold shadow-md' : 'text-rose-100 hover:bg-[#9b3030]/40 hover:text-white font-medium'"
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all center-on-collapse"
+                   title="Mensajes">
+                    <i class="fas fa-envelope w-5 text-center text-lg shrink-0"></i>
+                    <span class="hide-on-collapse flex-1">Mensajes</span>
+                    <span class="mensaje-badge hide-on-collapse bg-yellow-400 text-[#5c1515] text-xs font-bold rounded-full px-2 py-0.5">0</span>
+                </a>
+                <a th:href="@{/mensajes/contactos}"
+                   th:classappend="${#strings.startsWith(currentUri, '/mensajes/contactos') or #strings.startsWith(currentUri, '/mensajes/chat')} ? 'bg-[#5c1515] text-white font-semibold shadow-md' : 'text-rose-100 hover:bg-[#9b3030]/40 hover:text-white font-medium'"
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all center-on-collapse"
+                   title="Chat">
+                    <i class="fas fa-comments w-5 text-center text-lg shrink-0"></i>
+                    <span class="hide-on-collapse">Chat</span>
+                </a>
             </th:block>
         </nav>
 
@@ -206,30 +250,192 @@
             const sidebar = document.getElementById("mainSidebar");
             const toggleBtn = document.getElementById("sidebarToggle");
             const toggleIcon = document.getElementById("toggleIcon");
-            
-            // Cargar el estado guardado en el navegador del usuario
+            const nav = document.querySelector("nav");
+
+            // ========== SCROLL PRESERVATION ==========
+            var savedScroll = sessionStorage.getItem("sidebar-scroll");
+            if (nav && savedScroll) nav.scrollTop = parseInt(savedScroll);
+
+            window.addEventListener("beforeunload", function() {
+                if (nav) sessionStorage.setItem("sidebar-scroll", nav.scrollTop);
+            });
+
+            // ========== COLLAPSE STATE ==========
             const isCollapsed = localStorage.getItem("sidebar-collapsed") === "true";
             if (isCollapsed) {
                 sidebar.classList.remove("w-72");
                 sidebar.classList.add("w-20", "sidebar-collapsed");
                 toggleIcon.className = "fas fa-chevron-right text-[10px]";
             }
-            
+
             toggleBtn.addEventListener("click", function() {
                 if (sidebar.classList.contains("w-72")) {
-                    // Colapsar barra lateral
                     sidebar.classList.remove("w-72");
                     sidebar.classList.add("w-20", "sidebar-collapsed");
                     toggleIcon.className = "fas fa-chevron-right text-[10px]";
                     localStorage.setItem("sidebar-collapsed", "true");
                 } else {
-                    // Expandir barra lateral
                     sidebar.classList.remove("w-20", "sidebar-collapsed");
                     sidebar.classList.add("w-72");
                     toggleIcon.className = "fas fa-chevron-left text-[10px]";
                     localStorage.setItem("sidebar-collapsed", "false");
                 }
             });
+
+            // ========== BADGE NO-LEIDOS ==========
+            function actualizarBadgeMensajes() {
+                fetch('/mensajes/no-leidos')
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        var badges = document.querySelectorAll('.mensaje-badge');
+                        badges.forEach(function(b) {
+                            b.textContent = data.count;
+                            b.style.display = data.count > 0 ? 'inline' : 'none';
+                        });
+                    })
+                    .catch(function() {});
+            }
+            actualizarBadgeMensajes();
+            setInterval(actualizarBadgeMensajes, 30000);
+
+            // ========== AJAX NAVIGATION ==========
+            var isLoading = false;
+
+            function matchLink(linkPath, currentPath) {
+                if (linkPath === currentPath) return true;
+
+                if (linkPath === '/mensajes/inbox') {
+                    return currentPath.startsWith('/mensajes') &&
+                           currentPath.indexOf('/mensajes/contactos') !== 0 &&
+                           currentPath.indexOf('/mensajes/chat') !== 0;
+                }
+
+                if (linkPath === '/mensajes/contactos') {
+                    return currentPath.startsWith('/mensajes/contactos') ||
+                           currentPath.startsWith('/mensajes/chat');
+                }
+
+                if (linkPath === '/gestioncomunicados/lista') {
+                    return currentPath === '/gestioncomunicados/lista';
+                }
+                if (linkPath === '/gestioncomunicados/nuevo') {
+                    return currentPath === '/gestioncomunicados/nuevo';
+                }
+
+                return currentPath.startsWith(linkPath);
+            }
+
+            function updateSidebarActive(url) {
+                var path = new URL(url).pathname;
+                if (path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
+
+                var links = document.querySelectorAll('nav a');
+                var activeClasses = ['bg-[#5c1515]', 'text-white', 'font-semibold', 'shadow-md'];
+                var inactiveClasses = ['text-rose-100', 'hover:bg-[#9b3030]/40', 'hover:text-white', 'font-medium'];
+
+                links.forEach(function(a) {
+                    activeClasses.forEach(function(c) { a.classList.remove(c); });
+                    inactiveClasses.forEach(function(c) { a.classList.remove(c); });
+
+                    inactiveClasses.forEach(function(c) { a.classList.add(c); });
+
+                    var linkPath = new URL(a.href).pathname;
+                    if (linkPath.length > 1 && linkPath.endsWith('/')) linkPath = linkPath.slice(0, -1);
+
+                    if (matchLink(linkPath, path)) {
+                        activeClasses.forEach(function(c) { a.classList.add(c); });
+                        inactiveClasses.forEach(function(c) { a.classList.remove(c); });
+                    }
+                });
+            }
+
+            function swapPageScripts(doc) {
+                var oldScripts = document.querySelectorAll('body > script:not([src])');
+                oldScripts.forEach(function(s) { s.parentNode.removeChild(s); });
+
+                var newScripts = doc.querySelectorAll('body > script:not([src])');
+                newScripts.forEach(function(s) {
+                    var script = document.createElement('script');
+                    for (var i = 0; i < s.attributes.length; i++) {
+                        script.setAttribute(s.attributes[i].name, s.attributes[i].value);
+                    }
+                    if (s.src) {
+                        script.src = s.src;
+                    } else {
+                        script.textContent = s.textContent;
+                    }
+                    document.body.appendChild(script);
+                });
+            }
+
+            function navigateTo(url) {
+                if (isLoading) return;
+                if (url === window.location.href) return;
+
+                isLoading = true;
+                var mainEl = document.querySelector('main');
+                if (mainEl) mainEl.classList.add('loading');
+
+                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(function(r) {
+                        if (!r.ok) throw new Error('Request failed');
+                        return r.text();
+                    })
+                    .then(function(html) {
+                        var parser = new DOMParser();
+                        var doc = parser.parseFromString(html, 'text/html');
+                        var newMain = doc.querySelector('main');
+                        if (!newMain || !newMain.classList.contains('flex-1')) {
+                            window.location.href = url;
+                            return;
+                        }
+
+                        var oldMain = document.querySelector('main');
+                        oldMain.outerHTML = newMain.outerHTML;
+
+                        document.title = doc.title;
+
+                        swapPageScripts(doc);
+
+                        updateSidebarActive(url);
+
+                        history.pushState({ url: url }, '', url);
+
+                        var newMainEl = document.querySelector('main');
+                        if (newMainEl) {
+                            var scrollContainer = newMainEl.querySelector('.overflow-y-auto');
+                            if (scrollContainer) scrollContainer.scrollTop = 0;
+                        }
+                    })
+                    .catch(function() {
+                        window.location.href = url;
+                    })
+                    .finally(function() {
+                        isLoading = false;
+                        var m = document.querySelector('main');
+                        if (m) m.classList.remove('loading');
+                    });
+            }
+
+            document.addEventListener('click', function(e) {
+                var link = e.target.closest('nav a');
+                if (!link) return;
+                if (link.getAttribute('href') === '#') return;
+                if (e.metaKey || e.ctrlKey || e.button === 1) return;
+
+                e.preventDefault();
+                navigateTo(link.href);
+            });
+
+            window.addEventListener('popstate', function(e) {
+                if (e.state && e.state.url) {
+                    navigateTo(e.state.url);
+                }
+            });
+
+            if (!history.state) {
+                history.replaceState({ url: window.location.href }, '');
+            }
         });
     </script>
 </div>
