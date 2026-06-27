@@ -1,123 +1,377 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/fragments/head :: head('Registrar Notas')"></head>
+<head th:replace="~{/fragments/head :: head('Registrar Notas')}"></head>
 <body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
 
     <div th:replace="~{/fragments/sidebar :: sidebar}"></div>
 
     <main class="flex-1 flex flex-col h-full relative overflow-hidden">
-        <header class="h-20 bg-[#a03030] shadow-md px-8 flex items-center justify-between z-10 text-white">
-            <h1 class="text-2xl font-bold">Registrar Notas</h1>
-            <span class="badge-status bg-white text-[#e60000] px-3 py-1 rounded-full text-sm font-semibold">
-                Bimestre <span th:text="${bimestre}"></span>
-            </span>
+        <header class="h-20 bg-gradient-to-r from-[#a03030] to-[#7d1f1f] shadow-md px-8 flex items-center justify-between z-10 text-white">
+            <div class="flex items-center gap-4">
+                <h1 class="text-2xl font-bold">Registrar Notas</h1>
+                <span class="badge-status bg-white text-[#a03030] px-3 py-1 rounded-full text-sm font-semibold">
+                    <i class="fas fa-layer-group mr-1"></i> Bimestre <span th:text="${bimestre}"></span>
+                </span>
+            </div>
+            <div class="flex items-center gap-3" th:if="${horario != null}">
+                <span class="text-sm text-rose-200">
+                    <i class="fas fa-clock mr-1"></i>
+                    <span th:text="${horario.horaInicio}"></span> - <span th:text="${horario.horaFin}"></span>
+                </span>
+            </div>
         </header>
 
         <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
-            <div class="max-w-6xl mx-auto">
+            <div class="max-w-6xl mx-auto space-y-6">
+
                 <!-- Class Info -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
-                            <p class="text-xs text-gray-600 uppercase font-semibold">Día</p>
-                            <p class="text-lg font-bold text-gray-900" th:text="${horario.diaSemana}"></p>
+                            <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Día</p>
+                            <p class="text-lg font-bold text-gray-900 flex items-center gap-2 mt-1">
+                                <i class="fas fa-calendar-day text-[#a03030]"></i>
+                                <span th:text="${horario.diaSemana}"></span>
+                            </p>
                         </div>
                         <div>
-                            <p class="text-xs text-gray-600 uppercase font-semibold">Hora</p>
-                            <p class="text-lg font-bold text-gray-900">
+                            <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Hora</p>
+                            <p class="text-lg font-bold text-gray-900 flex items-center gap-2 mt-1">
+                                <i class="fas fa-clock text-[#a03030]"></i>
                                 <span th:text="${horario.horaInicio}"></span> - <span th:text="${horario.horaFin}"></span>
                             </p>
                         </div>
                         <div>
-                            <p class="text-xs text-gray-600 uppercase font-semibold">Aula</p>
-                            <p class="text-lg font-bold text-gray-900" th:text="${horario.aula != null ? (horario.aula.grado + ' - ' + horario.aula.seccion) : 'N/A'}"></p>
+                            <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Aula</p>
+                            <p class="text-lg font-bold text-gray-900 flex items-center gap-2 mt-1">
+                                <i class="fas fa-door-open text-[#a03030]"></i>
+                                <span th:text="${horario.aula != null ? (horario.aula.grado + ' - ' + horario.aula.seccion) : 'N/A'}"></span>
+                            </p>
                         </div>
                         <div>
-                            <p class="text-xs text-gray-600 uppercase font-semibold">Curso</p>
-                            <p class="text-lg font-bold text-gray-900" th:text="${horario.curso != null ? horario.curso.nombreCurso : 'N/A'}"></p>
+                            <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Curso</p>
+                            <p class="text-lg font-bold text-gray-900 flex items-center gap-2 mt-1">
+                                <i class="fas fa-book text-[#a03030]"></i>
+                                <span th:text="${horario.curso != null ? horario.curso.nombreCurso : 'N/A'}"></span>
+                            </p>
                         </div>
                     </div>
                 </div>
 
+                <!-- Scale Selector + Messages -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                    <div class="flex flex-col md:flex-row md:items-center gap-4">
+                        <div class="flex items-center gap-3">
+                            <label class="text-sm font-semibold text-gray-700 whitespace-nowrap">
+                                <i class="fas fa-sliders-h text-[#a03030] mr-2"></i>Escala de calificación:
+                            </label>
+                            <select id="escalaSelector" 
+                                    class="px-4 py-2.5 border border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none transition text-sm font-medium text-gray-700 min-w-[180px]">
+                                <option value="DECIMAL" th:selected="${escala == 'DECIMAL'}">Decimal (0 - 20)</option>
+                                <option value="LETRA" th:selected="${escala == 'LETRA'}">Letra (AD - A - B - C)</option>
+                                <option value="LOGRO" th:selected="${escala == 'LOGRO'}">Logro (Destacado - Inicio)</option>
+                            </select>
+                        </div>
+                        <div class="flex-1"></div>
+                        <div id="saveStatus" class="hidden"></div>
+                    </div>
+                </div>
+
                 <!-- Messages -->
-                <div th:if="${session.mensajeExito}" class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-start">
-                    <i class="fas fa-check-circle mr-3 mt-1 text-green-600"></i>
-                    <span th:text="${session.mensajeExito}"></span>
+                <div th:if="${session.mensajeExito}" class="bg-green-50 border border-green-200 text-green-800 px-5 py-3 rounded-xl flex items-center gap-3">
+                    <i class="fas fa-check-circle text-green-500"></i>
+                    <span class="font-medium" th:text="${session.mensajeExito}"></span>
+                </div>
+                <div th:if="${session.mensajeError}" class="bg-red-50 border border-red-200 text-red-800 px-5 py-3 rounded-xl flex items-center gap-3">
+                    <i class="fas fa-exclamation-circle text-red-500"></i>
+                    <span class="font-medium" th:text="${session.mensajeError}"></span>
                 </div>
 
-                <div th:if="${session.mensajeError}" class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-start">
-                    <i class="fas fa-exclamation-circle mr-3 mt-1 text-red-600"></i>
-                    <span th:text="${session.mensajeError}"></span>
-                </div>
-
-                <!-- Form -->
-                <form th:action="@{/docente/evaluaciones/guardar}" method="post" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                    <input type="hidden" name="idHorario" th:value="${horario.idHorario}" />
-                    <input type="hidden" name="bimestre" th:value="${bimestre}" />
-
-                    <!-- Table -->
+                <!-- Students Table -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-gray-700">
-                            <thead class="bg-gray-800 text-white sticky top-0">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-800 text-white">
                                 <tr>
-                                    <th class="px-6 py-4 text-left font-semibold">#</th>
-                                    <th class="px-6 py-4 text-left font-semibold">Alumno</th>
-                                    <th class="px-6 py-4 text-center font-semibold">Nota (0-20)</th>
-                                    <th class="px-6 py-4 text-left font-semibold">Estado</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-xs uppercase tracking-wider">#</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-xs uppercase tracking-wider">Estudiante</th>
+                                    <th class="px-6 py-4 text-center font-semibold text-xs uppercase tracking-wider">
+                                        <span id="colHeaderNota">Nota (0-20)</span>
+                                    </th>
+                                    <th class="px-6 py-4 text-left font-semibold text-xs uppercase tracking-wider">Equivalencia</th>
+                                    <th class="px-6 py-4 text-left font-semibold text-xs uppercase tracking-wider">Estado Actual</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr th:each="a, iter : ${alumnos}" class="border-t hover:bg-gray-50 transition">
-                                    <td class="px-6 py-4 font-bold text-gray-900" th:text="${iter.count}"></td>
-                                    <td class="px-6 py-4 font-medium text-gray-800" th:text="${a.nombreCompleto}"></td>
+                            <tbody id="alumnosTableBody">
+                                <tr th:each="a, iter : ${alumnos}" class="border-t border-gray-100 hover:bg-gray-50/50 transition">
+                                    <td class="px-6 py-4 font-bold text-gray-400 text-xs" th:text="${iter.count}"></td>
                                     <td class="px-6 py-4">
-                                        <input type="number" 
-                                               th:name="${'nota_' + a.idAlumno}" 
-                                               class="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition"
-                                               placeholder="0-20"
-                                               step="0.01"
-                                               min="0"
-                                               max="20"
-                                               th:value="${notasMap.containsKey(a.idAlumno) ? notasMap.get(a.idAlumno).nota : ''}" />
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#a03030] to-[#7d1f1f] flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                                                <span th:text="${#strings.substring(a.nombreCompleto, 0, 1)}"></span>
+                                            </div>
+                                            <span class="font-semibold text-gray-800" th:text="${a.nombreCompleto}"></span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <!-- DECIMAL input -->
+                                        <div th:if="${escala == 'DECIMAL'}" class="flex justify-center">
+                                            <input type="number" step="0.01" min="0" max="20"
+                                                   th:name="${'nota_' + a.idAlumno}"
+                                                   th:id="${'nota_' + a.idAlumno}"
+                                                   class="nota-input w-24 px-3 py-2.5 text-center border border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none transition text-sm font-bold"
+                                                   placeholder="0-20"
+                                                   th:value="${notasMap.containsKey(a.idAlumno) ? notasMap.get(a.idAlumno).nota : ''}"
+                                                   data-alumno-id="${a.idAlumno}"
+                                                   data-alumno-nombre="${a.nombreCompleto}" />
+                                        </div>
+                                        <!-- LETRA select -->
+                                        <div th:if="${escala == 'LETRA'}" class="flex justify-center">
+                                            <select th:name="${'nota_' + a.idAlumno}"
+                                                    th:id="${'nota_' + a.idAlumno}"
+                                                    class="nota-input w-28 px-3 py-2.5 text-center border border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none transition text-sm font-bold"
+                                                    data-alumno-id="${a.idAlumno}"
+                                                    data-alumno-nombre="${a.nombreCompleto}">
+                                                <option value="">--</option>
+                                                <option value="AD" th:selected="${notasMap.containsKey(a.idAlumno) and notasMap.get(a.idAlumno).notaLiteral == 'AD'}">AD - Destacado</option>
+                                                <option value="A" th:selected="${notasMap.containsKey(a.idAlumno) and notasMap.get(a.idAlumno).notaLiteral == 'A'}">A - Esperado</option>
+                                                <option value="B" th:selected="${notasMap.containsKey(a.idAlumno) and notasMap.get(a.idAlumno).notaLiteral == 'B'}">B - Proceso</option>
+                                                <option value="C" th:selected="${notasMap.containsKey(a.idAlumno) and notasMap.get(a.idAlumno).notaLiteral == 'C'}">C - Inicio</option>
+                                            </select>
+                                        </div>
+                                        <!-- LOGRO select -->
+                                        <div th:if="${escala == 'LOGRO'}" class="flex justify-center">
+                                            <select th:name="${'nota_' + a.idAlumno}"
+                                                    th:id="${'nota_' + a.idAlumno}"
+                                                    class="nota-input w-44 px-3 py-2.5 text-center border border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none transition text-sm font-bold"
+                                                    data-alumno-id="${a.idAlumno}"
+                                                    data-alumno-nombre="${a.nombreCompleto}">
+                                                <option value="">--</option>
+                                                <option value="Destacado" th:selected="${notasMap.containsKey(a.idAlumno) and notasMap.get(a.idAlumno).notaLogro == 'Destacado'}">Destacado (18-20)</option>
+                                                <option value="Logro Esperado" th:selected="${notasMap.containsKey(a.idAlumno) and notasMap.get(a.idAlumno).notaLogro == 'Logro Esperado'}">Logro Esperado (14-17)</option>
+                                                <option value="Proceso" th:selected="${notasMap.containsKey(a.idAlumno) and notasMap.get(a.idAlumno).notaLogro == 'Proceso'}">Proceso (11-13)</option>
+                                                <option value="Inicio" th:selected="${notasMap.containsKey(a.idAlumno) and notasMap.get(a.idAlumno).notaLogro == 'Inicio'}">Inicio (0-10)</option>
+                                            </select>
+                                        </div>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span th:if="${notasMap.containsKey(a.idAlumno)}" class="badge-status bg-blue-100 text-blue-700">
-                                            <i class="fas fa-info-circle mr-1"></i>Existente
-                                            <span th:with="dias=${T(java.time.temporal.ChronoUnit).DAYS.between(notasMap.get(a.idAlumno).fechaRegistro, T(java.time.LocalDate).now())}">
-                                                (hace <span th:text="${dias}"></span>d)
+                                        <div th:if="${notasMap.containsKey(a.idAlumno)}" class="flex items-center gap-2">
+                                            <span class="text-xs text-gray-400 bg-gray-50 rounded-lg px-2 py-1">
+                                                <span th:text="${notasMap.get(a.idAlumno).notaLiteral != null ? (notasMap.get(a.idAlumno).notaLiteral + ' / ' + notasMap.get(a.idAlumno).notaLogro) : notasMap.get(a.idAlumno).nota}"></span>
                                             </span>
-                                        </span>
-                                        <span th:unless="${notasMap.containsKey(a.idAlumno)}" class="badge-status bg-gray-200 text-gray-700">
-                                            <i class="fas fa-minus-circle mr-1"></i>Sin calificar
-                                        </span>
+                                        </div>
+                                        <span th:unless="${notasMap.containsKey(a.idAlumno)}" class="text-xs text-gray-300 italic">Sin registrar</span>
+                                    </td>
+                                    <td class="px-6 py-4" th:with="estadoColor=${notasMap.containsKey(a.idAlumno) ? notasMap.get(a.idAlumno).estadoColor : 'none'}">
+                                        <th:block th:switch="${estadoColor}">
+                                            <span th:case="'green'" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-green-50 text-green-700">
+                                                <i class="fas fa-circle text-[6px]"></i>
+                                                <span th:text="${notasMap.get(a.idAlumno).estadoTexto}"></span>
+                                            </span>
+                                            <span th:case="'yellow'" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-yellow-50 text-yellow-700">
+                                                <i class="fas fa-circle text-[6px]"></i>
+                                                <span th:text="${notasMap.get(a.idAlumno).estadoTexto}"></span>
+                                            </span>
+                                            <span th:case="'red'" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-red-50 text-red-700">
+                                                <i class="fas fa-circle text-[6px]"></i>
+                                                <span th:text="${notasMap.get(a.idAlumno).estadoTexto}"></span>
+                                            </span>
+                                            <span th:case="*" class="text-xs text-gray-300 italic">Sin calificar</span>
+                                        </th:block>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <!-- Info Box -->
-                    <div class="bg-yellow-50 border-t border-yellow-200 px-6 py-4">
-                        <p class="text-sm text-yellow-800">
-                            <i class="fas fa-lightbulb text-yellow-600 mr-2"></i>
-                            <strong>Importante:</strong> Las notas pueden editarse dentro de 3 días después del registro. Después de ese período no se pueden modificar.
-                        </p>
+                    <!-- Info + Buttons -->
+                    <div class="bg-gray-50 px-6 py-4 border-t border-gray-100">
+                        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                            <div class="flex items-center gap-4">
+                                <p class="text-xs text-gray-500 flex items-center gap-1.5">
+                                    <i class="fas fa-info-circle text-gray-400"></i>
+                                    Las notas se guardan automáticamente. Edición permitida dentro de 3 días.
+                                </p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button id="btnGuardar" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2.5 px-6 rounded-xl transition flex items-center gap-2 shadow-sm">
+                                    <i class="fas fa-save"></i> Guardar Cambios
+                                </button>
+                                <a th:href="@{/docente/evaluaciones}" 
+                                   class="border border-gray-200 text-gray-600 hover:bg-gray-100 font-medium py-2.5 px-5 rounded-xl transition flex items-center gap-2">
+                                    <i class="fas fa-arrow-left"></i> Volver
+                                </a>
+                            </div>
+                        </div>
                     </div>
-
-                    <!-- Buttons -->
-                    <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex gap-3">
-                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition flex items-center">
-                            <i class="fas fa-save mr-2"></i>Guardar Notas
-                        </button>
-                        <a th:href="@{/docente/evaluaciones}" class="border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-2 px-6 rounded-lg transition flex items-center">
-                            <i class="fas fa-arrow-left mr-2"></i>Volver
-                        </a>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </main>
 
     <div th:replace="~{/fragments/scripts :: scripts}"></div>
+
+    <script>
+        (function() {
+            var escalaSelector = document.getElementById('escalaSelector');
+            var btnGuardar = document.getElementById('btnGuardar');
+            var saveStatus = document.getElementById('saveStatus');
+            var inputs = document.querySelectorAll('.nota-input');
+
+            // Scale switch
+            if (escalaSelector) {
+                escalaSelector.addEventListener('change', function() {
+                    var url = new URL(window.location.href);
+                    url.searchParams.set('escala', this.value);
+                    window.location.href = url.toString();
+                });
+            }
+
+            // Auto-convert & live preview
+            inputs.forEach(function(input) {
+                input.addEventListener('change', function() {
+                    updateRowEquivalence(this);
+                });
+                input.addEventListener('blur', function() {
+                    updateRowEquivalence(this);
+                });
+            });
+
+            function updateRowEquivalence(input) {
+                var row = input.closest('tr');
+                if (!row) return;
+                var equivCell = row.querySelector('td:nth-child(4) div, td:nth-child(4) span');
+                var statusCell = row.querySelector('td:nth-child(5) span');
+                var val = input.value.trim();
+                
+                if (!val) {
+                    if (equivCell) {
+                        equivCell.innerHTML = '<span class="text-xs text-gray-300 italic">Sin registrar</span>';
+                    }
+                    if (statusCell) {
+                        statusCell.outerHTML = '<span class="text-xs text-gray-300 italic">Sin calificar</span>';
+                    }
+                    return;
+                }
+
+                var escala = escalaSelector ? escalaSelector.value : 'DECIMAL';
+                var numVal = parseFloat(val);
+
+                if (escala === 'DECIMAL' && !isNaN(numVal)) {
+                    var letra = numVal >= 18 ? 'AD' : numVal >= 14 ? 'A' : numVal >= 11 ? 'B' : 'C';
+                    var logro = numVal >= 18 ? 'Destacado' : numVal >= 14 ? 'Logro Esperado' : numVal >= 11 ? 'Proceso' : 'Inicio';
+                    var color = numVal >= 14 ? 'green' : numVal >= 11 ? 'yellow' : 'red';
+                    var texto = numVal >= 14 ? 'Aprobado' : numVal >= 11 ? 'En proceso' : 'En inicio';
+                    if (equivCell) equivCell.innerHTML = '<span class="text-xs text-gray-400 bg-gray-50 rounded-lg px-2 py-1">' + letra + ' / ' + logro + '</span>';
+                    if (statusCell) {
+                        var newSpan = document.createElement('span');
+                        newSpan.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold ' + 
+                            (color === 'green' ? 'bg-green-50 text-green-700' : color === 'yellow' ? 'bg-yellow-50 text-yellow-700' : 'bg-red-50 text-red-700');
+                        newSpan.innerHTML = '<i class="fas fa-circle text-[6px]"></i> ' + texto;
+                        statusCell.parentNode.replaceChild(newSpan, statusCell);
+                    }
+                } else if (escala === 'LETRA') {
+                    var logro = val === 'AD' ? 'Destacado' : val === 'A' ? 'Logro Esperado' : val === 'B' ? 'Proceso' : 'Inicio';
+                    if (equivCell) equivCell.innerHTML = '<span class="text-xs text-gray-400 bg-gray-50 rounded-lg px-2 py-1">' + logro + '</span>';
+                } else if (escala === 'LOGRO') {
+                    var letraEq = val === 'Destacado' ? 'AD' : val === 'Logro Esperado' ? 'A' : val === 'Proceso' ? 'B' : 'C';
+                    if (equivCell) equivCell.innerHTML = '<span class="text-xs text-gray-400 bg-gray-50 rounded-lg px-2 py-1">' + letraEq + '</span>';
+                }
+            }
+
+            // AJAX Save
+            if (btnGuardar) {
+                btnGuardar.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var escala = escalaSelector ? escalaSelector.value : 'DECIMAL';
+                    var params = new URLSearchParams();
+                    params.set('idHorario', [[${horario.idHorario}]]);
+                    params.set('bimestre', [[${bimestre}]]);
+                    params.set('escala', escala);
+
+                    var hasData = false;
+                    inputs.forEach(function(input) {
+                        if (input.value.trim()) {
+                            params.set(input.name || ('nota_' + input.getAttribute('data-alumno-id')), input.value.trim());
+                            hasData = true;
+                        }
+                    });
+
+                    if (!hasData) {
+                        showStatus('warning', 'No hay notas para guardar. Ingresa al menos una calificación.');
+                        return;
+                    }
+
+                    btnGuardar.disabled = true;
+                    btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+                    fetch('/docente/evaluaciones/guardar/ajax', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: params.toString()
+                    })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.success) {
+                            showStatus('success', '<i class="fas fa-check-circle mr-1"></i> ' + data.message);
+                            // Reload data
+                            reloadData();
+                        } else {
+                            showStatus('error', '<i class="fas fa-exclamation-circle mr-1"></i> ' + data.message);
+                        }
+                    })
+                    .catch(function(err) {
+                        showStatus('error', '<i class="fas fa-exclamation-circle mr-1"></i> Error de conexión');
+                    })
+                    .finally(function() {
+                        btnGuardar.disabled = false;
+                        btnGuardar.innerHTML = '<i class="fas fa-save"></i> Guardar Cambios';
+                    });
+                });
+            }
+
+            function showStatus(type, message) {
+                if (!saveStatus) return;
+                saveStatus.className = 'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium ';
+                if (type === 'success') {
+                    saveStatus.classList.add('bg-green-50', 'text-green-700', 'border', 'border-green-200');
+                } else if (type === 'error') {
+                    saveStatus.classList.add('bg-red-50', 'text-red-700', 'border', 'border-red-200');
+                } else {
+                    saveStatus.classList.add('bg-yellow-50', 'text-yellow-700', 'border', 'border-yellow-200');
+                }
+                saveStatus.innerHTML = message;
+                saveStatus.classList.remove('hidden');
+                setTimeout(function() { saveStatus.classList.add('hidden'); }, 5000);
+            }
+
+            function reloadData() {
+                var escala = escalaSelector ? escalaSelector.value : 'DECIMAL';
+                fetch('/docente/evaluaciones/datos?idHorario=' + [[${horario.idHorario}]] + '&bimestre=' + [[${bimestre}]], {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    data.forEach(function(dto) {
+                        var input = document.getElementById('nota_' + dto.idAlumno);
+                        if (input) {
+                            if (escala === 'DECIMAL' && dto.nota != null) input.value = dto.nota;
+                            else if (escala === 'LETRA' && dto.notaLiteral) input.value = dto.notaLiteral;
+                            else if (escala === 'LOGRO' && dto.notaLogro) input.value = dto.notaLogro;
+                            else input.value = '';
+                            updateRowEquivalence(input);
+                        }
+                    });
+                })
+                .catch(function() {});
+            }
+
+            // Init: update equivalences on load
+            inputs.forEach(function(input) { updateRowEquivalence(input); });
+        })();
+    </script>
 </body>
 </html>

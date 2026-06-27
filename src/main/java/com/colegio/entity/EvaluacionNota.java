@@ -1,5 +1,9 @@
 package com.colegio.entity;
 
+import com.colegio.entity.enums.EscalaCalificacion;
+import com.colegio.entity.enums.NotaLetra;
+import com.colegio.entity.enums.NotaLogro;
+import com.colegio.util.ConversionNotas;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -34,6 +38,15 @@ public class EvaluacionNota {
     @Column(name = "nota", nullable = false, precision = 4, scale = 2)
     private BigDecimal nota;
 
+    @Column(name = "nota_letra", length = 2)
+    private String notaLiteral;
+
+    @Column(name = "nota_logro", length = 30)
+    private String notaLogro;
+
+    @Column(name = "escala", length = 10, nullable = false)
+    private String escala = "DECIMAL";
+
     @Column(name = "fecha_registro", nullable = false)
     private LocalDate fechaRegistro;
 
@@ -46,70 +59,51 @@ public class EvaluacionNota {
         this.bimestre = bimestre;
         this.nota = nota;
         this.fechaRegistro = fechaRegistro;
+        this.escala = "DECIMAL";
+        this.notaLiteral = ConversionNotas.notaLiteral(nota);
+        this.notaLogro = ConversionNotas.notaLogro(nota);
     }
 
-    // Getters y Setters
-    public Integer getIdNota() {
-        return idNota;
-    }
+    public Integer getIdNota() { return idNota; }
+    public void setIdNota(Integer idNota) { this.idNota = idNota; }
 
-    public void setIdNota(Integer idNota) {
-        this.idNota = idNota;
-    }
+    public Alumno getAlumno() { return alumno; }
+    public void setAlumno(Alumno alumno) { this.alumno = alumno; }
 
-    public Alumno getAlumno() {
-        return alumno;
-    }
-
-    public void setAlumno(Alumno alumno) {
-        this.alumno = alumno;
-    }
-
-    public Curso getCurso() {
-        return curso;
-    }
-
-    public void setCurso(Curso curso) {
-        this.curso = curso;
-    }
+    public Curso getCurso() { return curso; }
+    public void setCurso(Curso curso) { this.curso = curso; }
     
-    public String getTipoEvaluacion() {
-        return tipoEvaluacion;
-    }
+    public String getTipoEvaluacion() { return tipoEvaluacion; }
+    public void setTipoEvaluacion(String tipoEvaluacion) { this.tipoEvaluacion = tipoEvaluacion; }
 
-    public Docente getDocente() {
-        return docente;
-    }
+    public Docente getDocente() { return docente; }
+    public void setDocente(Docente docente) { this.docente = docente; }
 
-    public void setDocente(Docente docente) {
-        this.docente = docente;
-    }
+    public Integer getBimestre() { return bimestre; }
+    public void setBimestre(Integer bimestre) { this.bimestre = bimestre; }
 
-    public Integer getBimestre() {
-        return bimestre;
-    }
-
-    public void setBimestre(Integer bimestre) {
-        this.bimestre = bimestre;
-    }
-
-    public BigDecimal getNota() {
-        return nota;
-    }
+    public BigDecimal getNota() { return nota; }
 
     public void setNota(BigDecimal nota) {
         this.nota = nota;
+        if (nota != null) {
+            this.notaLiteral = ConversionNotas.notaLiteral(nota);
+            this.notaLogro = ConversionNotas.notaLogro(nota);
+        }
     }
 
-    public LocalDate getFechaRegistro() {
-        return fechaRegistro;
-    }
+    public String getNotaLiteral() { return notaLiteral; }
+    public void setNotaLiteral(String notaLiteral) { this.notaLiteral = notaLiteral; }
 
-    public void setFechaRegistro(LocalDate fechaRegistro) {
-        this.fechaRegistro = fechaRegistro;
-    }
+    public String getNotaLogro() { return notaLogro; }
+    public void setNotaLogro(String notaLogro) { this.notaLogro = notaLogro; }
 
-    // Transient helpers para compatibilidad con plantillas
+    public String getEscala() { return escala; }
+    public void setEscala(String escala) { this.escala = escala; }
+
+    public LocalDate getFechaRegistro() { return fechaRegistro; }
+    public void setFechaRegistro(LocalDate fechaRegistro) { this.fechaRegistro = fechaRegistro; }
+
     @Transient
     public String getTipo() {
         return "Bimestre " + (bimestre != null ? bimestre : "?");
@@ -117,15 +111,27 @@ public class EvaluacionNota {
 
     @Transient
     public Integer getPeso() {
-        return 100; // Peso por defecto
-    }
-    
-    public void setTipoEvaluacion(String tipoEvaluacion) {
-        this.tipoEvaluacion = tipoEvaluacion;
+        return 100;
     }
 
     @Transient
     public String getValor() {
-        return nota != null ? nota.toPlainString() : "N/A";
+        return nota != null ? nota.stripTrailingZeros().toPlainString() : "N/A";
+    }
+
+    @Transient
+    public String getEstadoColor() {
+        if (nota == null) return "gray";
+        if (nota.compareTo(new BigDecimal("14")) >= 0) return "green";
+        if (nota.compareTo(new BigDecimal("11")) >= 0) return "yellow";
+        return "red";
+    }
+
+    @Transient
+    public String getEstadoTexto() {
+        if (nota == null) return "Sin nota";
+        if (nota.compareTo(new BigDecimal("14")) >= 0) return "Aprobado";
+        if (nota.compareTo(new BigDecimal("11")) >= 0) return "En proceso";
+        return "Desaprobado";
     }
 }

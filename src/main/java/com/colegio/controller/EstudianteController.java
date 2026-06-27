@@ -1,8 +1,11 @@
 package com.colegio.controller;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Map;
@@ -12,15 +15,20 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.colegio.dto.HorarioDTO;
 import com.colegio.dto.HorarioMatrizDTO;
+import com.colegio.dto.NotaDTO;
 import com.colegio.entity.Alumno;
 import com.colegio.entity.Asistencia;
+import com.colegio.entity.Curso;
 import com.colegio.entity.EvaluacionNota;
 import com.colegio.entity.Horario;
 import com.colegio.entity.Usuario;
@@ -201,15 +209,80 @@ public class EstudianteController {
         
         Optional<Alumno> opt = alumnoRepository.findByUsuario_IdUsuario(u.getIdUsuario());
         if (opt.isEmpty()) {
+            model.addAttribute("cursos", List.of());
             model.addAttribute("notas", List.of());
             return "estudiante/notas";
         }
         
         Alumno alumno = opt.get();
-        model.addAttribute("alumno", alumno); 
+        model.addAttribute("alumno", alumno);
+        
+        List<Curso> cursos = evaluacionNotaRepository.findCursosByAlumnoId(alumno.getIdAlumno());
+        model.addAttribute("cursos", cursos);
+        
         List<EvaluacionNota> notas = evaluacionNotaRepository.findByAlumno_IdAlumnoOrderByFechaRegistroDesc(alumno.getIdAlumno());
         model.addAttribute("notas", notas);
         return "estudiante/notas";
+    }
+
+    // ==========================================
+    // AJAX - NOTAS FILTRADAS
+    // ==========================================
+    @GetMapping(value = "/estudiante/notas/filtrar", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public List<NotaDTO> filtrarNotas(@RequestParam(value = "curso", required = false) Integer idCurso,
+                                       @RequestParam(value = "bimestre", required = false) Integer bimestre,
+                                       HttpSession session) {
+        Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
+        if (u == null || !"ESTUDIANTE".equalsIgnoreCase(u.getRol())) return List.of();
+
+        Optional<Alumno> opt = alumnoRepository.findByUsuario_IdUsuario(u.getIdUsuario());
+        if (opt.isEmpty()) return List.of();
+
+        Alumno alumno = opt.get();
+        List<EvaluacionNota> notas;
+
+        if (idCurso != null && bimestre != null && bimestre > 0) {
+            notas = evaluacionNotaRepository.findByAlumno_IdAlumnoAndCurso_IdCursoAndBimestre(
+                alumno.getIdAlumno(), idCurso, bimestre);
+        } else if (idCurso != null) {
+            notas = evaluacionNotaRepository.findByAlumno_IdAlumnoAndCurso_IdCursoOrderByBimestreAsc(
+                alumno.getIdAlumno(), idCurso);
+        } else if (bimestre != null && bimestre > 0) {
+            List<Curso> cursos = evaluacionNotaRepository.findCursosByAlumnoId(alumno.getIdAlumno());
+            notas = new ArrayList<>();
+            for (Curso c : cursos) {
+                notas.addAll(evaluacionNotaRepository.findByAlumno_IdAlumnoAndCurso_IdCursoAndBimestre(
+                    alumno.getIdAlumno(), c.getIdCurso(), bimestre));
+            }
+        } else {
+            notas = evaluacionNotaRepository.findByAlumno_IdAlumnoOrderByFechaRegistroDesc(alumno.getIdAlumno());
+        }
+
+        return notas.stream().map(this::toNotaDTO).collect(Collectors.toList());
+    }
+
+    private NotaDTO toNotaDTO(EvaluacionNota en) {
+        NotaDTO dto = new NotaDTO();
+        dto.setIdNota(en.getIdNota());
+        dto.setIdAlumno(en.getAlumno().getIdAlumno());
+        dto.setAlumnoNombre(en.getAlumno().getNombreCompleto());
+        dto.setIdCurso(en.getCurso().getIdCurso());
+        dto.setCursoNombre(en.getCurso().getNombreCurso());
+        dto.setIdDocente(en.getDocente().getIdDocente());
+        dto.setDocenteNombre(en.getDocente().getNombre());
+        dto.setBimestre(en.getBimestre());
+        dto.setNota(en.getNota());
+        dto.setNotaLiteral(en.getNotaLiteral());
+        dto.setNotaLogro(en.getNotaLogro());
+        dto.setEscala(en.getEscala());
+        dto.setFechaRegistro(en.getFechaRegistro());
+        if (en.getNota() != null) {
+            if (en.getNota().compareTo(new BigDecimal("14")) >= 0) dto.setEstado("Aprobado");
+            else if (en.getNota().compareTo(new BigDecimal("11")) >= 0) dto.setEstado("En proceso");
+            else dto.setEstado("En inicio");
+        }
+        return dto;
     }
 
     // ==========================================
