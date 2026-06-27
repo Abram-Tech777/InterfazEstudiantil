@@ -9,6 +9,8 @@ public class HorarioDTO {
     private LocalTime horaInicio;
     private LocalTime horaFin;
     private String diaSemana;
+    private String color;
+    private String tipo;
 
     public HorarioDTO() {}
 
@@ -39,4 +41,10 @@ public class HorarioDTO {
 
     public String getDiaSemana() { return diaSemana; }
     public void setDiaSemana(String diaSemana) { this.diaSemana = diaSemana; }
+
+    public String getColor() { return color; }
+    public void setColor(String color) { this.color = color; }
+
+    public String getTipo() { return tipo; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
 }

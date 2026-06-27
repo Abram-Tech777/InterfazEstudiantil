@@ -102,6 +102,7 @@ public class HorarioController {
 	    model.addAttribute("cursos", cursoRepository.findAll());
 	    model.addAttribute("docentes", docenteRepository.findAll());
 	    model.addAttribute("dias", diasSemana());
+	    model.addAttribute("tipos", Arrays.asList("CLASE", "REFUERZO", "TALLER"));
 	    
 	    return "horarios/formulario";
 	}
@@ -146,7 +147,10 @@ public class HorarioController {
 	        model.addAttribute("mensajeError", e.getMessage());
 	        model.addAttribute("horario", h);
 	        model.addAttribute("aulas", aulaRepository.findAll());
+	        model.addAttribute("cursos", cursoRepository.findAll());
+	        model.addAttribute("docentes", docenteRepository.findAll());
 	        model.addAttribute("dias", diasSemana());
+	        model.addAttribute("tipos", Arrays.asList("CLASE", "REFUERZO", "TALLER"));
 	        return "horarios/formulario";
 	    }
 	    return "redirect:/gestionarhorarios";
@@ -168,10 +172,11 @@ public class HorarioController {
         model.addAttribute("cursos", cursoRepository.findAll());
         model.addAttribute("docentes", docenteRepository.findAll());
         model.addAttribute("dias", diasSemana());
+        model.addAttribute("tipos", Arrays.asList("CLASE", "REFUERZO", "TALLER"));
         return "horarios/formulario";
     }
-	
-	@GetMapping("/eliminar/{id}")
+    
+    @GetMapping("/eliminar/{id}")
     public String eliminarHorario(@PathVariable("id") int id, RedirectAttributes redirectAttrs, HttpSession session) {
         Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuarioLogueado != null && "DOCENTE".equals(usuarioLogueado.getRol())) {
@@ -187,8 +192,8 @@ public class HorarioController {
         return "redirect:/gestionarhorarios";
     }
 	
-	private List<String> diasSemana() {
-        return Arrays.asList("LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES");
+    private List<String> diasSemana() {
+        return Arrays.asList("LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO");
     }
 	
 }

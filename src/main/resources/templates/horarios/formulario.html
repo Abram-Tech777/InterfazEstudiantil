@@ -70,6 +70,15 @@
                             </select>
                         </div>
 
+                        <!-- Tipo -->
+                        <div class="mb-8">
+                            <label class="block text-sm font-bold text-gray-900 mb-2">Tipo</label>
+                            <select th:field="*{tipo}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition">
+                                <option th:each="t : ${tipos}" th:value="${t}" th:text="${t}"></option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">CLASE: regular, REFUERZO: semanal, TALLER: todo el año</p>
+                        </div>
+
                         <!-- Horas -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                             <div>

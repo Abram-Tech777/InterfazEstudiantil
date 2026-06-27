@@ -1,20 +1,17 @@
 package com.colegio.dto;
 
 import java.time.LocalTime;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * DTO que representa el horario en formato matriz (horas x dias)
- * Estructura: Map<hora_inicio, Map<dia_semana, HorarioDTO>>
- */
 public class HorarioMatrizDTO {
-    private Map<LocalTime, Map<String, HorarioDTO>> matriz;
+
+    private List<FilaHorarioDTO> filas;
     private String aulaNombre;
     private String aulaGrado;
 
     public HorarioMatrizDTO() {
-        this.matriz = new TreeMap<>();
+        this.filas = new ArrayList<>();
     }
 
     public HorarioMatrizDTO(String aulaNombre, String aulaGrado) {
@@ -23,33 +20,53 @@ public class HorarioMatrizDTO {
         this.aulaGrado = aulaGrado;
     }
 
-    /**
-     * Agregar un horario a la matriz
-     */
-    public void agregarHorario(LocalTime horaInicio, String diaSemana, HorarioDTO horario) {
-        matriz.computeIfAbsent(horaInicio, k -> new TreeMap<>())
-               .put(diaSemana, horario);
+    public void agregarFila(FilaHorarioDTO fila) {
+        filas.add(fila);
     }
 
     /**
-     * Obtener el horario para una hora y dia especificos
+     * Backward-compatible: agregar horario by start time and day
+     */
+    @Deprecated
+    public void agregarHorario(LocalTime horaInicio, String diaSemana, HorarioDTO horario) {
+        for (FilaHorarioDTO fila : filas) {
+            if (!fila.isRecreo() && fila.getHoraInicio().equals(horaInicio)) {
+                fila.asignarHorario(diaSemana, horario);
+                return;
+            }
+        }
+        FilaHorarioDTO fila = new FilaHorarioDTO(horaInicio, horario.getHoraFin(), false);
+        fila.asignarHorario(diaSemana, horario);
+        filas.add(fila);
+    }
+
+    /**
+     * Backward-compatible: returns start times of all non-recreo rows
+     */
+    public List<LocalTime> getHoras() {
+        List<LocalTime> horas = new ArrayList<>();
+        for (FilaHorarioDTO fila : filas) {
+            if (!fila.isRecreo()) {
+                horas.add(fila.getHoraInicio());
+            }
+        }
+        return horas;
+    }
+
+    /**
+     * Backward-compatible: find horario by start time and day
      */
     public HorarioDTO obtenerHorario(LocalTime horaInicio, String diaSemana) {
-        if (matriz.containsKey(horaInicio)) {
-            return matriz.get(horaInicio).get(diaSemana);
+        for (FilaHorarioDTO fila : filas) {
+            if (!fila.isRecreo() && fila.getHoraInicio().equals(horaInicio)) {
+                return fila.getHorario(diaSemana);
+            }
         }
         return null;
     }
 
-    /**
-     * Verificar si existe un horario para una hora y dia
-     */
-    public boolean existeHorario(LocalTime horaInicio, String diaSemana) {
-        return obtenerHorario(horaInicio, diaSemana) != null;
-    }
-
-    public Map<LocalTime, Map<String, HorarioDTO>> getMatriz() { return matriz; }
-    public void setMatriz(Map<LocalTime, Map<String, HorarioDTO>> matriz) { this.matriz = matriz; }
+    public List<FilaHorarioDTO> getFilas() { return filas; }
+    public void setFilas(List<FilaHorarioDTO> filas) { this.filas = filas; }
 
     public String getAulaNombre() { return aulaNombre; }
     public void setAulaNombre(String aulaNombre) { this.aulaNombre = aulaNombre; }
@@ -57,17 +74,7 @@ public class HorarioMatrizDTO {
     public String getAulaGrado() { return aulaGrado; }
     public void setAulaGrado(String aulaGrado) { this.aulaGrado = aulaGrado; }
 
-    /**
-     * Obtener lista de horas unicas en la matriz (ordenadas)
-     */
-    public java.util.List<LocalTime> getHoras() {
-        return new java.util.ArrayList<>(matriz.keySet());
-    }
-
-    /**
-     * Obtener lista de dias de la semana
-     */
-    public java.util.List<String> getDias() {
-        return java.util.List.of("Lunes", "Martes", "Miercoles", "Jueves", "Viernes");
+    public List<String> getDias() {
+        return List.of("Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado");
     }
 }

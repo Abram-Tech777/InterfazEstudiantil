@@ -33,4 +33,7 @@ public interface HorarioRepository extends JpaRepository<Horario, Integer>{
 
     @Query("SELECT h FROM Horario h WHERE h.aula.idAula = :idAula AND h.activo = true AND (h.fechaInicio IS NULL OR h.fechaInicio <= :fecha) AND (h.fechaFin IS NULL OR h.fechaFin >= :fecha) ORDER BY h.horaInicio ASC, h.diaSemana ASC")
     List<Horario> findHorariosActivos(@Param("idAula") int idAula, @Param("fecha") LocalDate fecha);
+
+    @Query("SELECT h FROM Horario h WHERE h.tipo = 'REFUERZO' AND h.activo = true AND h.fechaInicio IS NOT NULL AND h.fechaInicio < :fechaLimite")
+    List<Horario> findRefuerzoExpirados(@Param("fechaLimite") LocalDate fechaLimite);
 }

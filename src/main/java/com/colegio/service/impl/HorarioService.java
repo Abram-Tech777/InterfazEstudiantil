@@ -15,4 +15,7 @@ public interface HorarioService {
     void deleteHorario(int id);
     HorarioRepository findHorarioRepository();
     List<Horario> findHorariosActivos(int idAula, LocalDate fecha);
+    void validarDuracionClase(Horario horario);
+    void validarNoChoqueConRecreo(Horario horario);
+    void limpiarRefuerzoExpirados();
 }

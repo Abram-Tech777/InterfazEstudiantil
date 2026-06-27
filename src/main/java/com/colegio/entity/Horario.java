@@ -55,7 +55,10 @@ public class Horario {
     private LocalDate fechaFin;
 
     @Column(name = "activo")
-    private Boolean activo;
+    private Boolean activo = true;
+
+    @Column(name = "tipo", nullable = false, length = 20)
+    private String tipo = "CLASE";
 
     public Horario() {}
 
@@ -105,4 +108,7 @@ public class Horario {
 
     public Boolean getActivo() { return activo != null ? activo : true; }
     public void setActivo(Boolean activo) { this.activo = activo; }
+
+    public String getTipo() { return tipo; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
 }

@@ -1,5 +1,6 @@
 package com.colegio.service;
 
+import com.colegio.dto.FilaHorarioDTO;
 import com.colegio.dto.HorarioDTO;
 import com.colegio.dto.HorarioMatrizDTO;
 import com.lowagie.text.*;
@@ -7,7 +8,6 @@ import com.lowagie.text.pdf.PdfWriter;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -16,55 +16,58 @@ public class HorarioPDFService {
 
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
-    /**
-     * Generar PDF del horario en formato matriz
-     */
     public byte[] generarPDFHorario(HorarioMatrizDTO horarioMatriz) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        
+
         Document document = new Document(PageSize.A4.rotate());
         PdfWriter.getInstance(document, baos);
         document.open();
 
-        // Título
         Paragraph titulo = new Paragraph(horarioMatriz.getAulaNombre());
         titulo.setAlignment(Element.ALIGN_CENTER);
         titulo.getFont().setSize(18);
         titulo.getFont().setStyle(Font.BOLD);
         document.add(titulo);
 
-        // Subtítulo con grado
         Paragraph subtitulo = new Paragraph(horarioMatriz.getAulaGrado());
         subtitulo.setAlignment(Element.ALIGN_CENTER);
         subtitulo.getFont().setSize(12);
         subtitulo.setSpacingAfter(20);
         document.add(subtitulo);
 
-        // Crear tabla: 6 columnas (Hora + 5 días)
-        Table table = new Table(6);
+        int numDias = horarioMatriz.getDias().size();
+        int totalColumnas = 1 + numDias; // time + days
+
+        Table table = new Table(totalColumnas);
         table.setWidth(100);
         table.setPadding(5);
         table.setSpacing(0);
         table.setBorderColor(new java.awt.Color(0, 0, 0));
 
-        // Encabezado
-        agregarCeldaEncabezado(table, "Hora");
+        agregarCeldaEncabezado(table, "Horario");
         for (String dia : horarioMatriz.getDias()) {
             agregarCeldaEncabezado(table, dia);
         }
 
-        // Filas con horarios
-        List<LocalTime> horas = horarioMatriz.getHoras();
-        for (LocalTime hora : horas) {
-            agregarCeldaHora(table, hora);
+        for (FilaHorarioDTO fila : horarioMatriz.getFilas()) {
+            if (fila.isRecreo()) {
+                String tiempoTexto = fila.getHoraInicio().format(TIME_FORMATTER) + " - " + fila.getHoraFin().format(TIME_FORMATTER);
+                agregarCeldaHora(table, tiempoTexto);
+                for (int i = 0; i < numDias; i++) {
+                    agregarCeldaRecreo(table);
+                }
+            } else {
+                String tiempoTexto = fila.getHoraInicio().format(TIME_FORMATTER) + " - " + fila.getHoraFin().format(TIME_FORMATTER);
+                agregarCeldaHora(table, tiempoTexto);
 
-            for (String dia : horarioMatriz.getDias()) {
-                HorarioDTO horario = horarioMatriz.obtenerHorario(hora, dia);
-                if (horario != null) {
-                    String contenido = horario.getCursoNombre() + "\n" + horario.getDocenteNombre();
-                    agregarCeldaContenido(table, contenido);
-                } else {
-                    agregarCeldaVacia(table);
+                for (String dia : horarioMatriz.getDias()) {
+                    HorarioDTO horario = fila.getHorario(dia);
+                    if (horario != null) {
+                        String contenido = horario.getCursoNombre() + "\n" + horario.getDocenteNombre();
+                        agregarCeldaContenido(table, contenido);
+                    } else {
+                        agregarCeldaVacia(table);
+                    }
                 }
             }
         }
@@ -83,9 +86,8 @@ public class HorarioPDFService {
         table.addCell(cell);
     }
 
-    private void agregarCeldaHora(Table table, LocalTime hora) throws BadElementException {
-        String horaTexto = hora.format(TIME_FORMATTER);
-        Cell cell = new Cell(new Paragraph(horaTexto));
+    private void agregarCeldaHora(Table table, String texto) throws BadElementException {
+        Cell cell = new Cell(new Paragraph(texto));
         cell.setBackgroundColor(new java.awt.Color(211, 211, 211));
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
@@ -101,6 +103,16 @@ public class HorarioPDFService {
 
     private void agregarCeldaVacia(Table table) throws BadElementException {
         Cell cell = new Cell(new Paragraph(""));
+        table.addCell(cell);
+    }
+
+    private void agregarCeldaRecreo(Table table) throws BadElementException {
+        Paragraph p = new Paragraph("RECREO");
+        p.setAlignment(Element.ALIGN_CENTER);
+        Cell cell = new Cell(p);
+        cell.setBackgroundColor(new java.awt.Color(255, 243, 205));
+        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         table.addCell(cell);
     }
 }
