@@ -5,10 +5,11 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -27,6 +28,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.colegio.dto.NotaDTO;
 import com.colegio.entity.Alumno;
+import com.colegio.entity.Aula;
 import com.colegio.entity.Curso;
 import com.colegio.entity.Docente;
 import com.colegio.entity.EvaluacionNota;
@@ -34,6 +36,7 @@ import com.colegio.entity.Horario;
 import com.colegio.entity.Usuario;
 import com.colegio.entity.enums.EscalaCalificacion;
 import com.colegio.repository.AlumnoRepository;
+import com.colegio.repository.AulaRepository;
 import com.colegio.repository.CursoRepository;
 import com.colegio.repository.DocenteRepository;
 import com.colegio.repository.EvaluacionNotaRepository;
@@ -57,9 +60,14 @@ public class EvaluacionController {
     private AulaDocenteService aulaDocenteService;
     @Autowired
     private EvaluacionNotaRepository evaluacionNotaRepository;
+    @Autowired
+    private AulaRepository aulaRepository;
 
     @GetMapping
-    public String listarEvaluaciones(HttpSession session, Model model) {
+    public String listarEvaluaciones(HttpSession session, Model model,
+                                     @RequestParam(required = false) Integer idAula,
+                                     @RequestParam(required = false) Integer idCurso,
+                                     @RequestParam(defaultValue = "1") int bimestre) {
         Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
         if (u == null || !"DOCENTE".equalsIgnoreCase(u.getRol())) {
             return "redirect:/login";
@@ -73,10 +81,65 @@ public class EvaluacionController {
 
         Docente d = docenteOpt.get();
         List<Integer> aulasAsignadas = aulaDocenteService.listarAulasDelDocente(d.getIdDocente());
-        List<Horario> horarios = horarioService.findHorarioRepository()
-            .findByDocenteAndAulasAsignadas(d.getIdDocente(), aulasAsignadas);
 
-        model.addAttribute("horarios", horarios);
+        List<Horario> horarios;
+        if (aulasAsignadas != null && !aulasAsignadas.isEmpty()) {
+            horarios = horarioService.findHorarioRepository()
+                .findByDocenteAndAulasAsignadas(d.getIdDocente(), aulasAsignadas);
+        } else {
+            horarios = horarioService.findHorarioRepository().findByIdDocente(d.getIdDocente());
+        }
+
+        // Aulas disponibles para el docente
+        List<Aula> aulas;
+        if (aulasAsignadas != null && !aulasAsignadas.isEmpty()) {
+            aulas = aulaRepository.findAllById(aulasAsignadas);
+        } else {
+            aulas = horarios.stream()
+                .map(Horario::getAula)
+                .filter(a -> a != null)
+                .distinct()
+                .toList();
+        }
+
+        // Cursos disponibles en los horarios del docente
+        List<Curso> cursos = horarios.stream()
+            .map(Horario::getCurso)
+            .filter(c -> c != null)
+            .distinct()
+            .toList();
+
+        // Aplicar filtros
+        List<Horario> horariosFiltrados = horarios;
+        if (idAula != null && idAula > 0) {
+            horariosFiltrados = horariosFiltrados.stream()
+                .filter(h -> h.getAula() != null && h.getAula().getIdAula() == idAula)
+                .toList();
+        }
+        if (idCurso != null && idCurso > 0) {
+            horariosFiltrados = horariosFiltrados.stream()
+                .filter(h -> h.getCurso() != null && h.getCurso().getIdCurso() == idCurso)
+                .toList();
+        }
+
+        // Deduplicar por aula+curso
+        Set<String> seen = new HashSet<>();
+        List<Horario> unicos = new ArrayList<>();
+        for (Horario h : horariosFiltrados) {
+            if (h.getAula() == null || h.getCurso() == null) continue;
+            String key = h.getAula().getIdAula() + ":" + h.getCurso().getIdCurso();
+            if (seen.add(key)) {
+                unicos.add(h);
+            }
+        }
+
+        model.addAttribute("horarios", unicos);
+        model.addAttribute("aulas", aulas);
+        model.addAttribute("cursos", cursos);
+        model.addAttribute("bimestres", List.of(1, 2, 3, 4));
+        model.addAttribute("idAulaSel", idAula != null ? idAula : 0);
+        model.addAttribute("idCursoSel", idCurso != null ? idCurso : 0);
+        model.addAttribute("bimestreSel", bimestre);
         model.addAttribute("docente", d);
         model.addAttribute("escalas", EscalaCalificacion.values());
         return "docente/evaluaciones";

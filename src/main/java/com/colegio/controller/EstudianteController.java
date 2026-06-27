@@ -2,14 +2,17 @@ package com.colegio.controller;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Map;
-import java.util.HashMap;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +26,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.colegio.dto.FilaHorarioDTO;
 import com.colegio.dto.HorarioDTO;
 import com.colegio.dto.HorarioMatrizDTO;
 import com.colegio.dto.NotaDTO;
 import com.colegio.entity.Alumno;
 import com.colegio.entity.Asistencia;
+import com.colegio.entity.Comunicado;
 import com.colegio.entity.Curso;
 import com.colegio.entity.EvaluacionNota;
 import com.colegio.entity.Horario;
@@ -38,7 +43,7 @@ import com.colegio.repository.EvaluacionNotaRepository;
 import com.colegio.service.HorarioPDFService;
 import com.colegio.service.impl.HorarioService;
 import com.colegio.repository.*;
-import com.colegio.entity.Comunicado;
+import com.colegio.util.JornadaConfig;
 
 @Controller
 public class EstudianteController {
@@ -59,6 +64,8 @@ public class EstudianteController {
     private ComunicadoRepository comunicadoRepository;
     @Autowired
     private ConductaRepository conductaRepository;
+    @Autowired
+    private JornadaConfig jornadaConfig;
 
     @GetMapping("/estudiante/panel")
     public String mostrarPanel(HttpSession session, Model model) {
@@ -149,7 +156,17 @@ public class EstudianteController {
         List<Horario> horarios = horarioService.findHorariosActivos(alumno.getAula().getIdAula(), hoy);
         
         HorarioMatrizDTO matriz = construirMatrizHorario(horarios, alumno.getAula().getNombre(), alumno.getAula().getNombre());
+        
+        LinkedHashMap<String, String> cursosColores = new LinkedHashMap<>();
+        for (Horario h : horarios) {
+            String nombreCurso = h.getCurso() != null ? h.getCurso().getNombreCurso() : "N/A";
+            if (!cursosColores.containsKey(nombreCurso)) {
+                cursosColores.put(nombreCurso, asignarColorCurso(nombreCurso));
+            }
+        }
+        
         model.addAttribute("horarioMatriz", matriz);
+        model.addAttribute("cursosColores", cursosColores);
         return "estudiante/horario";
     }
 
@@ -184,21 +201,72 @@ public class EstudianteController {
         }
     }
 
+    private static final List<String> COLORES_CURSOS = List.of(
+        "#a03030", "#2563eb", "#059669", "#d97706", "#7c3aed",
+        "#dc2626", "#0891b2", "#ca8a04", "#9333ea", "#ea580c"
+    );
+
+    private String asignarColorCurso(String nombreCurso) {
+        if (nombreCurso == null || nombreCurso.isEmpty()) return COLORES_CURSOS.get(0);
+        return COLORES_CURSOS.get(Math.abs(nombreCurso.hashCode()) % COLORES_CURSOS.size());
+    }
+
     private HorarioMatrizDTO construirMatrizHorario(List<Horario> horarios, String aulaNombre, String aulaGrado) {
         HorarioMatrizDTO matriz = new HorarioMatrizDTO(aulaNombre, aulaGrado);
-        
+        List<String> dias = matriz.getDias();
+
+        Map<LocalTime, List<Horario>> horariosPorInicio = new LinkedHashMap<>();
         for (Horario h : horarios) {
-            HorarioDTO dto = new HorarioDTO(
-                    h.getIdHorario(),
-                    h.getCurso() != null ? h.getCurso().getNombreCurso() : "N/A",
-                    h.getDocente() != null ? h.getDocente().getNombre() : "N/A",
-                    h.getHoraInicio(),
-                    h.getHoraFin(),
-                    h.getDiaSemana()
-            );
-            matriz.agregarHorario(h.getHoraInicio(), h.getDiaSemana(), dto);
+            horariosPorInicio.computeIfAbsent(h.getHoraInicio(), k -> new ArrayList<>()).add(h);
         }
-        
+
+        List<LocalTime> startTimesOrdenados = new ArrayList<>(horariosPorInicio.keySet());
+        startTimesOrdenados.sort(Comparator.naturalOrder());
+
+        LocalTime recreoInicio = jornadaConfig.getRecreoInicio();
+        LocalTime recreoFin = recreoInicio.plusMinutes(jornadaConfig.getRecreoDuracion());
+
+        for (LocalTime inicio : startTimesOrdenados) {
+            List<Horario> horariosEnInicio = horariosPorInicio.get(inicio);
+            LocalTime fin = horariosEnInicio.get(0).getHoraFin();
+            FilaHorarioDTO fila = new FilaHorarioDTO(inicio, fin, false);
+
+            for (String dia : dias) {
+                HorarioDTO dto = null;
+                for (Horario h : horariosEnInicio) {
+                    if (h.getDiaSemana().equalsIgnoreCase(dia) || h.getDiaSemana().equals(dia)) {
+                        dto = new HorarioDTO(
+                                h.getIdHorario(),
+                                h.getCurso() != null ? h.getCurso().getNombreCurso() : "N/A",
+                                h.getDocente() != null ? h.getDocente().getNombreCompleto() : "N/A",
+                                h.getHoraInicio(),
+                                h.getHoraFin(),
+                                h.getDiaSemana()
+                        );
+                        dto.setColor(asignarColorCurso(dto.getCursoNombre()));
+                        dto.setTipo(h.getTipo() != null ? h.getTipo() : "CLASE");
+                        break;
+                    }
+                }
+                fila.asignarHorario(dia, dto);
+            }
+            matriz.agregarFila(fila);
+        }
+
+        // Insert RECREO row
+        boolean tieneDespuesDeRecreo = startTimesOrdenados.stream().anyMatch(t -> !t.isBefore(recreoFin));
+        if (tieneDespuesDeRecreo) {
+            FilaHorarioDTO recreoFila = new FilaHorarioDTO(recreoInicio, recreoFin, true);
+            List<FilaHorarioDTO> filasActuales = matriz.getFilas();
+            int insertIndex = 0;
+            for (int i = 0; i < filasActuales.size(); i++) {
+                if (!filasActuales.get(i).isRecreo() && filasActuales.get(i).getHoraInicio().isBefore(recreoInicio)) {
+                    insertIndex = i + 1;
+                }
+            }
+            filasActuales.add(insertIndex, recreoFila);
+        }
+
         return matriz;
     }
 

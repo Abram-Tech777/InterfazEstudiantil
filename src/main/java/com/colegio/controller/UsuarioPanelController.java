@@ -1,8 +1,13 @@
 package com.colegio.controller;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -34,9 +39,16 @@ public class UsuarioPanelController {
     private AulaDocenteService aulaDocenteService;
     @Autowired
     private AsistenciaRepository asistenciaRepository;
+    @Autowired
+    private AulaRepository aulaRepository;
+    @Autowired
+    private CursoRepository cursoRepository;
 
     @GetMapping("/docente/asistencia")
-    public String controlAsistenciaDocente(HttpSession session, Model model) {
+    public String controlAsistenciaDocente(HttpSession session, Model model,
+                                           @RequestParam(required = false) Integer idAula,
+                                           @RequestParam(required = false) Integer idCurso,
+                                           @RequestParam(required = false) String diaSemana) {
         Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
         if (u == null || !"DOCENTE".equalsIgnoreCase(u.getRol())) return "redirect:/login";
         var docenteOpt = docenteRepository.findByUsuario_IdUsuario(u.getIdUsuario());
@@ -45,20 +57,65 @@ public class UsuarioPanelController {
             return "docente/asistencia";
         }
         Docente d = docenteOpt.get();
-        
+
         // Obtener horarios del docente
-        // Si hay aulas asignadas, filtrar por esas aulas; si no, traer todos los horarios del docente
         List<Horario> horarios;
         List<Integer> aulasAsignadas = aulaDocenteService.listarAulasDelDocente(d.getIdDocente());
-        
+
         if (aulasAsignadas != null && !aulasAsignadas.isEmpty()) {
             horarios = horarioService.findHorarioRepository().findByDocenteAndAulasAsignadas(d.getIdDocente(), aulasAsignadas);
         } else {
-            // Si no hay aulas asignadas en aula_docente, traer todos los horarios donde aparece como docente
             horarios = horarioService.findHorarioRepository().findByIdDocente(d.getIdDocente());
         }
-        
-        model.addAttribute("horarios", horarios);
+
+        // Aulas disponibles para el docente
+        List<Aula> aulas;
+        if (aulasAsignadas != null && !aulasAsignadas.isEmpty()) {
+            aulas = aulaRepository.findAllById(aulasAsignadas);
+        } else {
+            aulas = horarios.stream()
+                .map(Horario::getAula)
+                .filter(a -> a != null)
+                .distinct()
+                .toList();
+        }
+
+        // Cursos disponibles en los horarios del docente
+        List<Curso> cursos = horarios.stream()
+            .map(Horario::getCurso)
+            .filter(c -> c != null)
+            .distinct()
+            .toList();
+
+        // Días disponibles
+        List<String> dias = Arrays.asList("LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO");
+
+        // Aplicar filtros
+        List<Horario> horariosFiltrados = horarios;
+        if (idAula != null && idAula > 0) {
+            horariosFiltrados = horariosFiltrados.stream()
+                .filter(h -> h.getAula() != null && h.getAula().getIdAula() == idAula)
+                .toList();
+        }
+        if (idCurso != null && idCurso > 0) {
+            horariosFiltrados = horariosFiltrados.stream()
+                .filter(h -> h.getCurso() != null && h.getCurso().getIdCurso() == idCurso)
+                .toList();
+        }
+        if (diaSemana != null && !diaSemana.isEmpty()) {
+            String diaFiltro = diaSemana;
+            horariosFiltrados = horariosFiltrados.stream()
+                .filter(h -> h.getDiaSemana() != null && h.getDiaSemana().equalsIgnoreCase(diaFiltro))
+                .toList();
+        }
+
+        model.addAttribute("horarios", horariosFiltrados);
+        model.addAttribute("aulas", aulas);
+        model.addAttribute("cursos", cursos);
+        model.addAttribute("dias", dias);
+        model.addAttribute("idAulaSel", idAula != null ? idAula : 0);
+        model.addAttribute("idCursoSel", idCurso != null ? idCurso : 0);
+        model.addAttribute("diaSel", diaSemana != null ? diaSemana : "");
         return "docente/asistencia";
     }
 

@@ -14,11 +14,47 @@
             <div class="max-w-6xl mx-auto">
                 <p class="text-gray-600 mb-6">Registra la asistencia de tus estudiantes</p>
 
+                <!-- Filtros -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6 no-print">
+                    <form method="get" action="/docente/asistencia" class="flex flex-wrap items-end gap-4">
+                        <div class="flex-1 min-w-[180px]">
+                            <label for="filtroAula" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                                <i class="fas fa-school mr-1"></i> Aula
+                            </label>
+                            <select id="filtroAula" name="idAula" onchange="cambiarFiltroAsistencia()"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none font-medium cursor-pointer bg-gray-50 hover:bg-white transition-colors">
+                                <option value="">Todas las aulas</option>
+                                <option th:each="a : ${aulas}" th:value="${a.idAula}" th:text="${a.grado + ' - Sección ' + a.seccion}" th:selected="${a.idAula == idAulaSel}"></option>
+                            </select>
+                        </div>
+                        <div class="flex-1 min-w-[180px]">
+                            <label for="filtroCurso" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                                <i class="fas fa-book mr-1"></i> Curso
+                            </label>
+                            <select id="filtroCurso" name="idCurso" onchange="cambiarFiltroAsistencia()"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none font-medium cursor-pointer bg-gray-50 hover:bg-white transition-colors">
+                                <option value="">Todos los cursos</option>
+                                <option th:each="c : ${cursos}" th:value="${c.idCurso}" th:text="${c.nombreCurso}" th:selected="${c.idCurso == idCursoSel}"></option>
+                            </select>
+                        </div>
+                        <div class="flex-1 min-w-[160px]">
+                            <label for="filtroDia" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                                <i class="fas fa-calendar-day mr-1"></i> Día
+                            </label>
+                            <select id="filtroDia" name="diaSemana" onchange="cambiarFiltroAsistencia()"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none font-medium cursor-pointer bg-gray-50 hover:bg-white transition-colors">
+                                <option value="">Todos los días</option>
+                                <option th:each="d : ${dias}" th:value="${d}" th:text="${d}" th:selected="${d == diaSel}"></option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+
                 <!-- Empty State -->
                 <div th:if="${#lists.isEmpty(horarios)}" class="bg-blue-50 border border-blue-200 text-blue-800 px-6 py-8 rounded-lg text-center">
                     <i class="fas fa-info-circle text-3xl mb-4"></i>
-                    <p class="text-lg font-medium">No tienes horarios asignados</p>
-                    <p class="text-sm mt-2">Contacta con administración para asignar tus horarios</p>
+                    <p class="text-lg font-medium">No se encontraron horarios</p>
+                    <p class="text-sm mt-2">Prueba ajustando los filtros o contacta con administración</p>
                 </div>
 
                 <!-- Table -->
@@ -62,5 +98,49 @@
     </main>
 
     <div th:replace="~{/fragments/scripts :: scripts}"></div>
+    <script>
+        function cambiarFiltroAsistencia() {
+            var form = document.querySelector('form[action="/docente/asistencia"]');
+            if (!form) return;
+            var selects = form.querySelectorAll('select[name]');
+            var params = new URLSearchParams();
+            selects.forEach(function(s) {
+                if (s.value) params.set(s.name, s.value);
+            });
+            var url = form.getAttribute('action') + '?' + params.toString();
+            if (url === window.location.href) return;
+
+            var mainEl = document.querySelector('main');
+            if (mainEl) mainEl.classList.add('loading');
+
+            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(function(r) {
+                    if (!r.ok) throw new Error();
+                    return r.text();
+                })
+                .then(function(html) {
+                    var parser = new DOMParser();
+                    var doc = parser.parseFromString(html, 'text/html');
+                    var newMain = doc.querySelector('main');
+                    var oldMain = document.querySelector('main');
+                    if (newMain && oldMain) {
+                        oldMain.outerHTML = newMain.outerHTML;
+                    }
+                    document.title = doc.title;
+                })
+                .catch(function() {
+                    window.location.href = url;
+                })
+                .finally(function() {
+                    var m = document.querySelector('main');
+                    if (m) m.classList.remove('loading');
+                });
+        }
+
+        document.addEventListener('submit', function(e) {
+            var form = e.target.closest('form[action="/docente/asistencia"]');
+            if (form) e.preventDefault();
+        });
+    </script>
 </body>
 </html>
