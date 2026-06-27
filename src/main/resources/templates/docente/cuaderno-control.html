@@ -1,0 +1,222 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Cuaderno de Control')"></head>
+<body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
+
+    <div th:replace="~{/fragments/sidebar :: sidebar}"></div>
+
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+        <header class="h-20 bg-[#a03030] shadow-md px-8 flex items-center justify-between z-10 text-white">
+            <h1 class="text-2xl font-bold">Cuaderno de Control</h1>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+            <div class="max-w-6xl mx-auto">
+                <p class="text-gray-600 mb-6">Gestiona las anotaciones de conducta de tus estudiantes</p>
+
+                
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6 no-print">
+                    <div class="flex flex-wrap items-end gap-4">
+                        <div class="flex-1 min-w-[180px]">
+                            <label for="filtroAula" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                                <i class="fas fa-school mr-1"></i> Aula
+                            </label>
+                            <select id="filtroAula" onchange="filtrarTabla()"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none font-medium cursor-pointer bg-gray-50 hover:bg-white transition-colors">
+                                <option value="">Todas las aulas</option>
+                                <option th:each="a : ${aulas}" th:value="${a.idAula}" th:text="${a.grado + ' - ' + a.seccion}" th:selected="${a.idAula == idAulaSel}"></option>
+                            </select>
+                        </div>
+                        <div class="flex-1 min-w-[180px]">
+                            <label for="filtroCurso" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+                                <i class="fas fa-book mr-1"></i> Curso
+                            </label>
+                            <select id="filtroCurso" onchange="filtrarTabla()"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none font-medium cursor-pointer bg-gray-50 hover:bg-white transition-colors">
+                                <option value="">Todos los cursos</option>
+                                <option th:each="c : ${cursos}" th:value="${c.idCurso}" th:text="${c.nombreCurso}" th:selected="${c.idCurso == idCursoSel}"></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tabla-container">
+                    
+                    <div th:if="${session.mensajeExito}" class="mb-6 bg-green-50 border border-green-200 text-green-800 px-5 py-3 rounded-xl flex items-center gap-3">
+                        <i class="fas fa-check-circle text-green-500"></i>
+                        <span class="font-medium" th:text="${session.mensajeExito}"></span>
+                    </div>
+
+                    
+                    <div id="loadingTable" class="hidden mb-6 text-center py-8">
+                        <i class="fas fa-spinner fa-spin text-3xl text-[#a03030]"></i>
+                        <p class="text-gray-500 mt-2">Cargando...</p>
+                    </div>
+
+                    
+                    <div th:if="${#lists.isEmpty(alumnos)}" class="bg-blue-50 border border-blue-200 text-blue-800 px-6 py-8 rounded-lg text-center">
+                        <i class="fas fa-info-circle text-3xl mb-4"></i>
+                        <p class="text-lg font-medium">No se encontraron estudiantes</p>
+                        <p class="text-sm mt-2">Prueba ajustando los filtros</p>
+                    </div>
+
+                    
+                    <div th:if="${!#lists.isEmpty(alumnos)}" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-gray-700">
+                                <thead class="bg-gray-800 text-white sticky top-0">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left font-semibold">#</th>
+                                        <th class="px-6 py-4 text-left font-semibold">Estudiante</th>
+                                        <th class="px-6 py-4 text-left font-semibold">Aula</th>
+                                        <th class="px-6 py-4 text-center font-semibold">Acci&oacute;n</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="a, iter : ${alumnos}" class="border-t hover:bg-gray-50 transition">
+                                        <td class="px-6 py-4 font-bold text-gray-900" th:text="${iter.count}"></td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#a03030] to-[#7d1f1f] flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                                                    <span th:text="${#strings.substring(a.nombreCompleto, 0, 1)}"></span>
+                                                </div>
+                                                <span class="font-semibold text-gray-800" th:text="${a.nombreCompleto}"></span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold bg-purple-50 text-purple-700" th:text="${a.aula != null ? a.aula.grado + ' - ' + a.aula.seccion : 'Sin aula'}"></span>
+                                        </td>
+                                        <td class="px-6 py-4 text-center">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <a th:href="@{/docente/cuaderno-control/alumno/{id}(id=${a.idAlumno})}" 
+                                                   class="inline-flex items-center px-4 py-2 bg-[#a03030] hover:bg-[#7d1f1f] text-white font-medium rounded-lg transition text-sm">
+                                                    <i class="fas fa-book-open mr-2"></i>Ver Cuaderno
+                                                </a>
+                                                <button th:attr="data-id=${a.idAlumno}, data-nombre=${a.nombreCompleto}"
+                                                        class="btn-nva-anotacion inline-flex items-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition text-sm">
+                                                    <i class="fas fa-plus mr-1"></i>Nueva Anotacion;n
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    
+    <div id="modalNueva" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+                <h2 class="text-lg font-bold text-gray-800">Nueva Anotaci&oacute;n</h2>
+                <button onclick="document.getElementById('modalNueva').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form method="post" action="/docente/cuaderno-control/anotacion/crear" class="p-6 space-y-4">
+                <input type="hidden" name="idAlumno" id="nuevaIdAlumno">
+                <div class="bg-gray-50 rounded-xl p-4 mb-2">
+                    <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Estudiante</p>
+                    <p id="nuevaNombreAlumno" class="text-lg font-bold text-gray-800 mt-1"></p>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Tipo</label>
+                    <div class="flex gap-3">
+                        <label class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all has-[:checked]:border-green-500 has-[:checked]:bg-green-50 border-gray-200">
+                            <input type="radio" name="tipo" value="POSITIVA" class="hidden" checked>
+                            <i class="fas fa-star text-green-500"></i>
+                            <span class="font-semibold text-sm text-gray-700">Positiva</span>
+                        </label>
+                        <label class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all has-[:checked]:border-red-500 has-[:checked]:bg-red-50 border-gray-200">
+                            <input type="radio" name="tipo" value="NEGATIVA" class="hidden">
+                            <i class="fas fa-exclamation-triangle text-red-500"></i>
+                            <span class="font-semibold text-sm text-gray-700">Negativa</span>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">T&iacute;tulo</label>
+                    <input type="text" name="titulo" required
+                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none"
+                           placeholder="Ej: Participaci&oacute;n destacada">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Descripci&oacute;n</label>
+                    <textarea name="descripcion" rows="3"
+                              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none resize-none"
+                              placeholder="Describe la anotaci&oacute;n..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Observaciones</label>
+                    <textarea name="observaciones" rows="2"
+                              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none resize-none"
+                              placeholder="Notas adicionales..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Bimestre</label>
+                    <select name="bimestre"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none">
+                        <option th:each="i : ${#numbers.sequence(1, 4)}" th:value="${i}" th:text="'Bimestre ' + ${i}"></option>
+                    </select>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="submit"
+                            class="flex-1 px-6 py-3 bg-[#a03030] hover:bg-[#7d1f1f] text-white font-bold rounded-xl transition-all text-sm">
+                        <i class="fas fa-save mr-2"></i> Guardar Anotaci&oacute;n
+                    </button>
+                    <button type="button" onclick="document.getElementById('modalNueva').classList.add('hidden')"
+                            class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-all text-sm">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div th:replace="~{/fragments/scripts :: scripts}"></div>
+    <script>
+        document.addEventListener('click', function(e) {
+            var btn = e.target.closest('.btn-nva-anotacion');
+            if (btn) {
+                document.getElementById('nuevaIdAlumno').value = btn.getAttribute('data-id');
+                document.getElementById('nuevaNombreAlumno').textContent = btn.getAttribute('data-nombre');
+                document.getElementById('modalNueva').classList.remove('hidden');
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.getElementById('modalNueva').classList.add('hidden');
+            }
+        });
+
+        function filtrarTabla() {
+            var aula = document.getElementById('filtroAula').value;
+            var curso = document.getElementById('filtroCurso').value;
+            var loading = document.getElementById('loadingTable');
+            var container = document.getElementById('tabla-container');
+
+            loading.classList.remove('hidden');
+
+            var url = '/docente/cuaderno-control?fragment=true';
+            if (aula) url += '&idAula=' + aula;
+            if (curso) url += '&idCurso=' + curso;
+
+            fetch(url)
+                .then(function(r) { return r.text(); })
+                .then(function(html) {
+                    container.outerHTML = html;
+                    loading.classList.add('hidden');
+                })
+                .catch(function() {
+                    loading.classList.add('hidden');
+                    location.reload();
+                });
+        }
+    </script>
+</body>
+</html>

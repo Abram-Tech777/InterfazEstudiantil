@@ -33,6 +33,7 @@ import com.colegio.dto.NotaDTO;
 import com.colegio.entity.Alumno;
 import com.colegio.entity.Asistencia;
 import com.colegio.entity.Comunicado;
+import com.colegio.entity.Conducta;
 import com.colegio.entity.Curso;
 import com.colegio.entity.EvaluacionNota;
 import com.colegio.entity.Horario;
@@ -41,6 +42,7 @@ import com.colegio.repository.AlumnoRepository;
 import com.colegio.repository.AsistenciaRepository;
 import com.colegio.repository.EvaluacionNotaRepository;
 import com.colegio.service.HorarioPDFService;
+import com.colegio.service.ConductaPDFService;
 import com.colegio.service.impl.HorarioService;
 import com.colegio.repository.*;
 import com.colegio.util.JornadaConfig;
@@ -61,9 +63,13 @@ public class EstudianteController {
     @Autowired
     private HorarioPDFService horarioPDFService;
     @Autowired
+    private ConductaPDFService conductaPDFService;
+    @Autowired
     private ComunicadoRepository comunicadoRepository;
     @Autowired
     private ConductaRepository conductaRepository;
+    @Autowired
+    private com.colegio.service.impl.ConductaService conductaService;
     @Autowired
     private JornadaConfig jornadaConfig;
 
@@ -76,16 +82,44 @@ public class EstudianteController {
         if (opt.isPresent()) {
             Alumno alumno = opt.get();
             model.addAttribute("alumno", alumno);
-            
-            // Anuncios
-            model.addAttribute("anuncios", comunicadoRepository.listarTodosOrdenados());
-            
-            // Asistencia
+
+            List<Comunicado> anuncios;
+            if (alumno.getAula() != null) {
+                anuncios = comunicadoRepository.listarParaAulaOGrado(alumno.getAula().getIdAula(), alumno.getAula().getGrado());
+            } else {
+                anuncios = comunicadoRepository.listarTodosOrdenados();
+            }
+            model.addAttribute("anuncios", anuncios);
+
             List<Asistencia> asistencias = asistenciaRepository.findByAlumno_IdAlumnoOrderByFechaDesc(alumno.getIdAlumno());
-            model.addAttribute("totalAsistidos", asistencias.stream().filter(a -> "PRESENTE".equals(a.getEstado())).count());
-            model.addAttribute("totalClases", asistencias.size());
-            
-            model.addAttribute("conductas", conductaRepository.findByAlumno_IdAlumno(alumno.getIdAlumno()));
+            long presentes = asistencias.stream().filter(a -> "PRESENTE".equals(a.getEstado())).count();
+            long retardos = asistencias.stream().filter(a -> "RETARDO".equals(a.getEstado())).count();
+            long ausencias = asistencias.stream().filter(a -> "AUSENCIA".equals(a.getEstado())).count();
+            int totalClases = asistencias.size();
+            double pctAsistencia = totalClases > 0 ? Math.round((double) presentes / totalClases * 100) : 0;
+
+            model.addAttribute("totalAsistidos", presentes);
+            model.addAttribute("retardos", retardos);
+            model.addAttribute("ausencias", ausencias);
+            model.addAttribute("totalClases", totalClases);
+            model.addAttribute("pctAsistencia", pctAsistencia);
+
+            List<EvaluacionNota> notas = evaluacionNotaRepository.findByAlumno_IdAlumnoOrderByFechaRegistroDesc(alumno.getIdAlumno());
+            double promedio = 0;
+            if (!notas.isEmpty()) {
+                promedio = notas.stream()
+                    .filter(n -> n.getNota() != null)
+                    .mapToDouble(n -> n.getNota().doubleValue())
+                    .average().orElse(0);
+            }
+            model.addAttribute("promedio", Math.round(promedio * 100.0) / 100.0);
+
+            List<Conducta> conductas = conductaRepository.findByAlumno_IdAlumno(alumno.getIdAlumno());
+            long positivas = conductas.stream().filter(c -> "POSITIVA".equals(c.getTipo())).count();
+            long negativas = conductas.stream().filter(c -> "NEGATIVA".equals(c.getTipo())).count();
+            model.addAttribute("conductas", conductas);
+            model.addAttribute("positivas", positivas);
+            model.addAttribute("negativas", negativas);
         }
         
         return "estudiante/panel"; 
@@ -100,21 +134,16 @@ public class EstudianteController {
         if (opt.isPresent()) {
             Alumno alumno = opt.get();
             model.addAttribute("alumno", alumno);
-            // Asegurarnos de que el alumno tiene aula asignada antes de llamar al repositorio
             if (alumno.getAula() == null) {
-                // Si no hay aula asignada, devolvemos listas vacías para evitar NPE y mostrar la vista
                 model.addAttribute("comunicados", List.of());
                 model.addAttribute("autorMap", Map.of());
             } else {
-                // 1. Buscamos los comunicados para el aula y grado del alumno
                 List<Comunicado> comunicados = comunicadoRepository.listarParaAulaOGrado(
                     alumno.getAula().getIdAula(), 
                     alumno.getAula().getGrado()
                 );
                 model.addAttribute("comunicados", comunicados);
 
-                // 2. Creamos el mapa de autores para que el nombre del docente salga en la vista
-                // (Esto es necesario porque la vista usa autorMap[c.autor.idUsuario])
                 Map<Integer, String> autorMap = new HashMap<>();
                 for (Comunicado c : comunicados) {
                     if (c.getAutor() != null) {
@@ -357,31 +386,94 @@ public class EstudianteController {
     // VISTA DE ASISTENCIA / BITÁCORA
     // ==========================================
     @GetMapping("/estudiante/asistencia")
-    public String verAsistencia(HttpSession session, Model model) {
+    public String verAsistencia(HttpSession session, Model model,
+                                @RequestParam(defaultValue = "0") int bimestre) {
+        return verCuadernoControl(session, model, bimestre);
+    }
+
+    // ==========================================
+    // CUADERNO DE CONTROL
+    // ==========================================
+    @GetMapping("/estudiante/cuaderno-control")
+    public String verCuadernoControl(HttpSession session, Model model,
+                                     @RequestParam(defaultValue = "0") int bimestre) {
         Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
         if (u == null || !"ESTUDIANTE".equalsIgnoreCase(u.getRol())) return "redirect:/login";
-        
+
         Optional<Alumno> opt = alumnoRepository.findByUsuario_IdUsuario(u.getIdUsuario());
         if (opt.isEmpty()) {
+            model.addAttribute("conductas", List.of());
             model.addAttribute("asistencias", List.of());
-            model.addAttribute("presentes", 0);
-            model.addAttribute("retardos", 0);
-            model.addAttribute("ausencias", 0);
-            return "estudiante/asistencia";
+            return "estudiante/cuaderno-control";
         }
-        
+
         Alumno alumno = opt.get();
-        model.addAttribute("alumno", alumno); 
+        model.addAttribute("alumno", alumno);
+
+        // Asistencia stats
         List<Asistencia> asistencias = asistenciaRepository.findByAlumno_IdAlumnoOrderByFechaDesc(alumno.getIdAlumno());
-        
         long presentes = asistencias.stream().filter(a -> "PRESENTE".equals(a.getEstado())).count();
         long retardos = asistencias.stream().filter(a -> "RETARDO".equals(a.getEstado())).count();
         long ausencias = asistencias.stream().filter(a -> "AUSENCIA".equals(a.getEstado())).count();
-        
+        int total = (int) (presentes + retardos + ausencias);
+        double pctAsistencia = total > 0 ? Math.round((double) presentes / total * 100) : 0;
+
+        // Notas stats
+        List<EvaluacionNota> notas = evaluacionNotaRepository.findByAlumno_IdAlumnoOrderByFechaRegistroDesc(alumno.getIdAlumno());
+        double promedioGeneral = 0;
+        if (!notas.isEmpty()) {
+            promedioGeneral = notas.stream()
+                .filter(n -> n.getNota() != null)
+                .mapToDouble(n -> n.getNota().doubleValue())
+                .average().orElse(0);
+        }
+
+        // Conducta annotations
+        List<Conducta> conductas = conductaService.listarPorAlumnoYBimestre(alumno.getIdAlumno(), bimestre > 0 ? bimestre : null);
+        long positivas = conductaService.contarPorAlumnoYTipoYBimestre(alumno.getIdAlumno(), "POSITIVA", bimestre > 0 ? bimestre : null);
+        long negativas = conductaService.contarPorAlumnoYTipoYBimestre(alumno.getIdAlumno(), "NEGATIVA", bimestre > 0 ? bimestre : null);
+
         model.addAttribute("asistencias", asistencias);
         model.addAttribute("presentes", presentes);
         model.addAttribute("retardos", retardos);
         model.addAttribute("ausencias", ausencias);
-        return "estudiante/asistencia";
+        model.addAttribute("total", total);
+        model.addAttribute("pctAsistencia", pctAsistencia);
+        model.addAttribute("promedioGeneral", Math.round(promedioGeneral * 100.0) / 100.0);
+        model.addAttribute("conductas", conductas);
+        model.addAttribute("positivas", positivas);
+        model.addAttribute("negativas", negativas);
+        model.addAttribute("bimestreSel", bimestre > 0 ? bimestre : 0);
+        model.addAttribute("bimestres", List.of(0, 1, 2, 3, 4));
+        return "estudiante/cuaderno-control";
+    }
+
+    @GetMapping("/estudiante/cuaderno-control/descargar")
+    public ResponseEntity<byte[]> descargarAnotaciones(HttpSession session,
+                                                       @RequestParam(defaultValue = "0") int bimestre) {
+        Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
+        if (u == null || !"ESTUDIANTE".equalsIgnoreCase(u.getRol())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Optional<Alumno> opt = alumnoRepository.findByUsuario_IdUsuario(u.getIdUsuario());
+        if (opt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        try {
+            Alumno alumno = opt.get();
+            List<Conducta> conductas = conductaService.listarPorAlumnoYBimestre(alumno.getIdAlumno(), bimestre > 0 ? bimestre : null);
+            byte[] pdfBytes = conductaPDFService.generarPDFReporte(alumno, conductas, bimestre);
+
+            HttpHeaders headers = new HttpHeaders();
+            String filename = "cuaderno_control_" + alumno.getNombreCompleto().replaceAll("\\s+", "_") + ".pdf";
+            headers.add("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+            headers.add("Content-Type", "application/pdf");
+
+            return ResponseEntity.ok().headers(headers).body(pdfBytes);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

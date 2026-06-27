@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/fragments/head :: head('Asignar Docentes')"></head>
 <body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
@@ -9,17 +9,17 @@
         <header class="h-20 bg-[#a03030] shadow-md px-8 flex items-center justify-between z-10 text-white">
             <h1 class="text-2xl font-bold">Asignar Docentes</h1>
             <span class="text-red-200 text-sm">
-                <span th:text="${aula.grado}"></span> - Sección <span th:text="${aula.seccion}"></span>
+                <span th:text="${aula.grado}"></span> - SecciÃ³n <span th:text="${aula.seccion}"></span>
                 (Capacidad: <span th:text="${aula.capacidad}"></span>)
             </span>
         </header>
 
         <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
             <div class="max-w-6xl mx-auto">
-                <!-- Form Card -->
+                
                 <form method="POST" th:action="@{/gestionaulas/asignar/{id}(id=${aula.idAula})}" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                     
-                    <!-- Tabla de docentes -->
+                    
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-gray-700">
                             <thead class="bg-gray-800 text-white sticky top-0">
@@ -59,7 +59,7 @@
                         </table>
                     </div>
 
-                    <!-- Rol por defecto -->
+                    
                     <div class="p-6 border-t border-gray-200 bg-gray-50">
                         <label for="rol" class="block text-sm font-bold text-gray-900 mb-2">
                             <i class="fas fa-crown mr-1 text-purple-600"></i>Rol por Defecto
@@ -71,12 +71,12 @@
                                 <option value="AUXILIAR">AUXILIAR</option>
                             </select>
                             <p class="text-xs text-gray-600">
-                                <i class="fas fa-info-circle mr-1"></i>Se aplicará a los docentes seleccionados
+                                <i class="fas fa-info-circle mr-1"></i>Se aplicarÃ¡ a los docentes seleccionados
                             </p>
                         </div>
                     </div>
 
-                    <!-- Buttons -->
+                    
                     <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex gap-3">
                         <button type="submit" class="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition font-medium flex items-center justify-center">
                             <i class="fas fa-save mr-2"></i>Guardar Asignaciones

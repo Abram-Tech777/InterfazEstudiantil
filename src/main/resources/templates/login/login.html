@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{/fragments/head :: head('Acceso al Sistema')}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
@@ -27,11 +27,11 @@
                 
                 <div class="w-full text-center mb-8">
                     <h1 class="portal-title mb-3">
-                        <span class="portal-title-text">Portal Académico</span>
+                        <span class="portal-title-text">Portal AcadÃ©mico</span>
                     </h1>
                     <p class="portal-subtitle">
                         <span class="subtitle-line"></span>
-                        Fe y Alegría 32
+                        Fe y AlegrÃ­a 32
                         <span class="subtitle-line"></span>
                     </p>
                 </div>
@@ -54,7 +54,7 @@
 					        <div class="bg-[#e60000] p-3 rounded-lg text-white"><i class="fas fa-calendar-alt"></i></div>
 					        <div>
 					            <h4 class="text-white font-bold text-sm">Horarios</h4>
-					            <p class="text-gray-300 text-xs">Gestiona tu carga académica.</p>
+					            <p class="text-gray-300 text-xs">Gestiona tu carga acadÃ©mica.</p>
 					        </div>
 					    </div>
 
@@ -78,7 +78,7 @@
 					        <div class="bg-[#e60000] p-3 rounded-lg text-white"><i class="fas fa-user-graduate"></i></div>
 					        <div>
 					            <h4 class="text-white font-bold text-sm">Seguimiento</h4>
-					            <p class="text-gray-300 text-xs">Notas y desempeño.</p>
+					            <p class="text-gray-300 text-xs">Notas y desempeÃ±o.</p>
 					        </div>
 					    </div>
 
@@ -92,12 +92,12 @@
 
 	<div class="w-full md:w-1/2 flex items-center justify-center bg-[#e60000] p-8 overflow-hidden relative min-h-screen">
 
-                <!-- Blobs de luz animados de fondo (diseño premium) -->
+                
                 <div class="glowing-blob blob-1"></div>
                 <div class="glowing-blob blob-2"></div>
                 <div class="glowing-blob blob-3"></div>
 
-                <!-- Partículas decorativas flotantes (círculos con icono) -->
+                
                 <div class="login-orb orb-1"><i class="fas fa-graduation-cap"></i></div>
                 <div class="login-orb orb-2"><i class="fas fa-book-open"></i></div>
                 <div class="login-orb orb-3"><i class="fas fa-star"></i></div>
@@ -105,17 +105,17 @@
 
 	            <div class="wrapper relative z-10">
 	                <form th:action="@{/login}" method="post">
-	                    <h1>Iniciar Sesión</h1>
+	                    <h1>Iniciar SesiÃ³n</h1>
 	                    
 	                    <div th:if="${error}" class="bg-white text-red-600 font-bold p-3 rounded-lg text-center mb-6 text-sm shadow-md" th:text="${error}"></div>
 	                    
 	                    <div class="input-box">
-	                        <input type="text" name="codUsuario" placeholder="Código de Usuario" required>
+	                        <input type="text" name="codUsuario" placeholder="CÃ³digo de Usuario" required>
 	                        <i class="fas fa-user"></i>
 	                    </div>
 	                    
 	                    <div class="input-box">
-	                        <input type="password" name="password" placeholder="Contraseña" required>
+	                        <input type="password" name="password" placeholder="ContraseÃ±a" required>
 	                        <i class="fas fa-lock"></i>
 	                    </div>
 	                    

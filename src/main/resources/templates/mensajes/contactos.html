@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{/fragments/head :: head('Contactos')}"></head>
 <body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
@@ -20,7 +20,7 @@
             <div th:if="${#lists.isEmpty(contactos)}" class="bg-blue-50 border border-blue-200 text-blue-800 px-6 py-12 rounded-2xl text-center shadow-sm">
                 <i class="fas fa-users text-4xl mb-4 text-blue-400"></i>
                 <p class="text-xl font-bold">Sin contactos</p>
-                <p class="text-sm text-blue-600 mt-2">Aún no has tenido conversaciones con nadie.</p>
+                <p class="text-sm text-blue-600 mt-2">AÃºn no has tenido conversaciones con nadie.</p>
             </div>
 
             <div class="space-y-3">
@@ -38,8 +38,8 @@
                             </div>
                             <i class="fas fa-chevron-right ml-auto text-gray-300"></i>
                         </a>
-                        <form th:action="@{/mensajes/eliminar-chat/{id}(id=${c.idUsuario})}" method="post" onsubmit="return confirm('¿Eliminar toda la conversación?')" class="shrink-0 ml-3">
-                            <button type="submit" class="w-9 h-9 rounded-xl bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-600 transition flex items-center justify-center" title="Eliminar conversación">
+                        <form th:action="@{/mensajes/eliminar-chat/{id}(id=${c.idUsuario})}" method="post" onsubmit="return confirm('Â¿Eliminar toda la conversaciÃ³n?')" class="shrink-0 ml-3">
+                            <button type="submit" class="w-9 h-9 rounded-xl bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-600 transition flex items-center justify-center" title="Eliminar conversaciÃ³n">
                                 <i class="fas fa-times"></i>
                             </button>
                         </form>

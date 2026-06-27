@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{/fragments/head :: head('Anuncios - Estudiante')}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
@@ -15,7 +15,7 @@
                 <a th:href="@{/gestioncomunicados/vaciar-bandeja}" 
                    th:if="${!#lists.isEmpty(comunicados)}"
                    class="px-4 py-2 bg-red-700 hover:bg-red-800 text-white rounded-xl text-sm font-semibold transition-all flex items-center gap-2 shadow-lg shadow-red-900/30"
-                   onclick="return confirm('¿Estás seguro de vaciar toda la bandeja? Se eliminarán todos los anuncios.')">
+                   onclick="return confirm('Â¿EstÃ¡s seguro de vaciar toda la bandeja? Se eliminarÃ¡n todos los anuncios.')">
                     <i class="fas fa-trash-alt"></i> Vaciar Bandeja
                 </a>
             </div>
@@ -37,7 +37,7 @@
                 <div th:if="${#lists.isEmpty(comunicados)}" class="bg-blue-50 border border-blue-200 text-blue-800 px-6 py-12 rounded-2xl text-center shadow-sm">
                     <i class="fas fa-inbox text-4xl mb-4 text-blue-400"></i>
                     <p class="text-xl font-bold">Sin comunicados nuevos</p>
-                    <p class="text-sm text-blue-600 mt-2">No tienes anuncios publicados en tu sección por el momento.</p>
+                    <p class="text-sm text-blue-600 mt-2">No tienes anuncios publicados en tu secciÃ³n por el momento.</p>
                 </div>
 
                 <div th:if="${!#lists.isEmpty(comunicados)}" class="space-y-6">
@@ -49,7 +49,7 @@
                                     <i class="fas fa-user-tie text-gray-400 mr-1"></i>
                                     <span th:text="${autorMap[c.autor.idUsuario] != null ? autorMap[c.autor.idUsuario] : (c.autor.rol + ' - ' + c.autor.nombreCompleto)}">Nombre Docente</span>
                                 </p>
-                                <h3 class="text-lg font-bold text-gray-800" th:text="${c.titulo}">Título del Anuncio</h3>
+                                <h3 class="text-lg font-bold text-gray-800" th:text="${c.titulo}">TÃ­tulo del Anuncio</h3>
                                 <div class="flex flex-wrap items-center gap-x-6 gap-y-2 mt-2 text-xs text-gray-500 font-medium">
                                     <span>
                                         <i class="fas fa-clock text-gray-400 mr-1"></i>
@@ -147,14 +147,14 @@
             <div class="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center mb-4 text-xl">
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">¿Eliminar este anuncio?</h3>
-            <p class="text-sm text-gray-500 mb-6">Esta acción quitará el comunicado de tu bandeja de forma permanente y no podrá revertirse.</p>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Â¿Eliminar este anuncio?</h3>
+            <p class="text-sm text-gray-500 mb-6">Esta acciÃ³n quitarÃ¡ el comunicado de tu bandeja de forma permanente y no podrÃ¡ revertirse.</p>
             <div class="flex justify-end gap-3">
                 <button type="button" id="cancelDelete" class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-all">
                     Cancelar
                 </button>
                 <button type="button" id="confirmDelete" class="px-4 py-2.5 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 shadow-md shadow-red-600/20 transition-all">
-                    Sí, eliminar
+                    SÃ­, eliminar
                 </button>
             </div>
         </div>
@@ -240,7 +240,7 @@
                     } else {
                         var div = document.createElement('div');
                         div.className = 'p-4 bg-gray-50 rounded-lg border border-gray-200';
-                        div.innerHTML = '<p class="font-semibold">Previsualización no disponible para este tipo de archivo.</p>' +
+                        div.innerHTML = '<p class="font-semibold">PrevisualizaciÃ³n no disponible para este tipo de archivo.</p>' +
                                         '<p class="text-sm text-gray-500 mt-2">Puedes descargar el archivo para abrirlo en tu equipo.</p>';
                         content.appendChild(div);
                     }

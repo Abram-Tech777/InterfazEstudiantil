@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{/fragments/head :: head('Panel Administrador')}"></head>
 <body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
@@ -7,59 +7,123 @@
 
     <main class="flex-1 flex flex-col h-full relative overflow-hidden">
         <header class="h-20 bg-[#a03030] shadow-md px-8 flex items-center justify-between z-10 text-white">
-            <h1 class="text-2xl font-bold">Panel de Control</h1>
-            <div class="flex items-center gap-6">
-                <button class="text-red-200 hover:text-white transition-colors text-xl">
-                    <i class="fas fa-question-circle"></i>
-                </button>
+            <div>
+                <h1 class="text-2xl font-bold">Panel de Control</h1>
+                <p class="text-xs text-rose-200 mt-0.5">Administrador</p>
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
-            <div class="w-[95%] mx-auto">
-                <p class="text-gray-600 mb-6">Bienvenido, selecciona un módulo para gestionar el colegio.</p>
+        <div class="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar">
+            <div class="max-w-7xl mx-auto space-y-6">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <a th:href="@{/gestionusuarios}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 p-6 border border-gray-100 flex items-center space-x-4 group">
-                        <div class="bg-blue-50 p-4 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                            <i class="fas fa-users text-2xl"></i>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Usuarios</p>
+                                <p class="text-3xl font-black text-gray-800 mt-1" th:text="${totalUsuarios}">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center"><i class="fas fa-users text-blue-500 text-xl"></i></div>
                         </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-800">Usuarios</h3>
-                            <p class="text-sm text-gray-500">Cuentas y roles</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Docentes</p>
+                                <p class="text-3xl font-black text-gray-800 mt-1" th:text="${totalDocentes}">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center"><i class="fas fa-chalkboard-teacher text-purple-500 text-xl"></i></div>
                         </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Estudiantes</p>
+                                <p class="text-3xl font-black text-gray-800 mt-1" th:text="${totalAlumnos}">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center"><i class="fas fa-user-graduate text-green-500 text-xl"></i></div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Aulas</p>
+                                <p class="text-3xl font-black text-gray-800 mt-1" th:text="${totalAulas}">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center"><i class="fas fa-door-open text-orange-500 text-xl"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Cursos</p>
+                                <p class="text-3xl font-black text-gray-800 mt-1" th:text="${totalCursos}">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center"><i class="fas fa-book text-indigo-500 text-xl"></i></div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Horarios</p>
+                                <p class="text-3xl font-black text-gray-800 mt-1" th:text="${totalHorarios}">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center"><i class="fas fa-calendar-alt text-pink-500 text-xl"></i></div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Comunicados</p>
+                                <p class="text-3xl font-black text-gray-800 mt-1" th:text="${totalComunicados}">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center"><i class="fas fa-bullhorn text-yellow-500 text-xl"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <h2 class="text-lg font-bold text-gray-800 mt-8">Acceso Rapido</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <a th:href="@{/gestionusuarios}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all p-5 border border-gray-100 group flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors text-blue-600"><i class="fas fa-users text-xl"></i></div>
+                        <div><h3 class="font-bold text-gray-800">Usuarios</h3><p class="text-xs text-gray-500">Gestionar cuentas</p></div>
                     </a>
-
-                    <a th:href="@{/gestionaulas}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 p-6 border border-gray-100 flex items-center space-x-4 group">
-                        <div class="bg-green-50 p-4 rounded-lg text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors">
-                            <i class="fas fa-chalkboard text-2xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-800">Aulas</h3>
-                            <p class="text-sm text-gray-500">Grados y secciones</p>
-                        </div>
+                    <a th:href="@{/gestionaulas}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all p-5 border border-gray-100 group flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-colors text-green-600"><i class="fas fa-door-open text-xl"></i></div>
+                        <div><h3 class="font-bold text-gray-800">Aulas</h3><p class="text-xs text-gray-500">Grados y secciones</p></div>
                     </a>
-
-                    <a th:href="@{/gestioncomunicados/lista}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 p-6 border border-gray-100 flex items-center space-x-4 group">
-                        <div class="bg-yellow-50 p-4 rounded-lg text-yellow-600 group-hover:bg-yellow-500 group-hover:text-white transition-colors">
-                            <i class="fas fa-bullhorn text-2xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-800">Comunicados</h3>
-                            <p class="text-sm text-gray-500">Anuncios oficiales</p>
-                        </div>
+                    <a th:href="@{/gestioncomunicados/lista}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all p-5 border border-gray-100 group flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-yellow-50 flex items-center justify-center group-hover:bg-yellow-500 group-hover:text-white transition-colors text-yellow-600"><i class="fas fa-bullhorn text-xl"></i></div>
+                        <div><h3 class="font-bold text-gray-800">Comunicados</h3><p class="text-xs text-gray-500">Anuncios oficiales</p></div>
                     </a>
-
-                    <a th:href="@{/gestionarhorarios}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 p-6 border border-gray-100 flex items-center space-x-4 group">
-                        <div class="bg-purple-50 p-4 rounded-lg text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                            <i class="fas fa-calendar-alt text-2xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-800">Horarios</h3>
-                            <p class="text-sm text-gray-500">Gestión de tiempos</p>
-                        </div>
+                    <a th:href="@{/gestionarhorarios}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all p-5 border border-gray-100 group flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors text-purple-600"><i class="fas fa-calendar-alt text-xl"></i></div>
+                        <div><h3 class="font-bold text-gray-800">Horarios</h3><p class="text-xs text-gray-500">Planificacion</p></div>
                     </a>
                 </div>
+
+                
+                <div th:if="${!#lists.isEmpty(ultimosComunicados)}" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-gray-800"><i class="fas fa-bullhorn text-[#a03030] mr-2"></i>Ultimos Comunicados</h3>
+                        <a th:href="@{/gestioncomunicados/lista}" class="text-xs font-semibold text-[#a03030] hover:underline">Ver todos</a>
+                    </div>
+                    <div class="space-y-3">
+                        <div th:each="c : ${ultimosComunicados}" class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition">
+                            <div class="w-8 h-8 rounded-full bg-[#a03030]/10 flex items-center justify-center shrink-0 mt-0.5"><i class="fas fa-envelope text-xs text-[#a03030]"></i></div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-gray-800 truncate" th:text="${c.titulo}"></p>
+                                <p class="text-xs text-gray-400"><span th:text="${c.fechaEmision != null ? #temporals.format(c.fechaEmision, 'dd/MM/yyyy') : ''}"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </main>

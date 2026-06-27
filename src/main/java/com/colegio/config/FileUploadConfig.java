@@ -10,7 +10,6 @@ public class FileUploadConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Configurar la ruta del directorio de uploads
         String uploadPath = Paths.get("uploads").toAbsolutePath().toString();
         
         registry.addResourceHandler("/uploads/**")

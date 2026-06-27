@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/fragments/head :: head('Evaluaciones y Notas')"></head>
 <body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
@@ -14,7 +14,7 @@
             <div class="max-w-6xl mx-auto">
                 <p class="text-gray-600 mb-6">Califica a tus estudiantes por bimestre</p>
 
-                <!-- Messages -->
+                
                 <div th:if="${session.mensajeExito}" class="mb-6 bg-green-50 border border-green-200 text-green-800 px-5 py-3 rounded-xl flex items-center gap-3">
                     <i class="fas fa-check-circle text-green-500"></i>
                     <span class="font-medium" th:text="${session.mensajeExito}"></span>
@@ -24,7 +24,7 @@
                     <span class="font-medium" th:text="${session.mensajeError}"></span>
                 </div>
 
-                <!-- Filtros -->
+                
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6 no-print">
                     <form method="get" action="/docente/evaluaciones" class="flex flex-wrap items-end gap-4">
                         <div class="flex-1 min-w-[180px]">
@@ -34,7 +34,7 @@
                             <select id="filtroAula" name="idAula" onchange="cambiarFiltroEvaluacion()"
                                     class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none font-medium cursor-pointer bg-gray-50 hover:bg-white transition-colors">
                                 <option value="">Todas las aulas</option>
-                                <option th:each="a : ${aulas}" th:value="${a.idAula}" th:text="${a.grado + ' - Sección ' + a.seccion}" th:selected="${a.idAula == idAulaSel}"></option>
+                                <option th:each="a : ${aulas}" th:value="${a.idAula}" th:text="${a.grado + ' - SecciÃ³n ' + a.seccion}" th:selected="${a.idAula == idAulaSel}"></option>
                             </select>
                         </div>
                         <div class="flex-1 min-w-[180px]">
@@ -59,14 +59,14 @@
                     </form>
                 </div>
 
-                <!-- Empty State -->
+                
                 <div th:if="${#lists.isEmpty(horarios)}" class="bg-blue-50 border border-blue-200 text-blue-800 px-6 py-8 rounded-lg text-center">
                     <i class="fas fa-info-circle text-3xl mb-4"></i>
                     <p class="text-lg font-medium">No se encontraron cursos</p>
-                    <p class="text-sm mt-2">Prueba ajustando los filtros o contacta con administración</p>
+                    <p class="text-sm mt-2">Prueba ajustando los filtros o contacta con administraciÃ³n</p>
                 </div>
 
-                <!-- Table -->
+                
                 <div th:if="${!#lists.isEmpty(horarios)}" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-gray-700">

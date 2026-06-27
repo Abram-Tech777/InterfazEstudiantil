@@ -1,18 +1,18 @@
-<div xmlns:th="http://www.thymeleaf.org" th:fragment="sidebar">
+﻿<div xmlns:th="http://www.thymeleaf.org" th:fragment="sidebar">
     <style>
-        /* Transición suave para el ancho de la barra lateral */
+        /* TransiciÃ³n suave para el ancho de la barra lateral */
         .sidebar-transition {
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        /* Ocultar elementos cuando la barra lateral está colapsada */
+        /* Ocultar elementos cuando la barra lateral estÃ¡ colapsada */
         .sidebar-collapsed .hide-on-collapse {
             display: none !important;
             opacity: 0;
             width: 0;
         }
         
-        /* Centrar iconos cuando la barra lateral está colapsada */
+        /* Centrar iconos cuando la barra lateral estÃ¡ colapsada */
         .sidebar-collapsed .center-on-collapse {
             justify-content: center !important;
             padding-left: 0 !important;
@@ -26,7 +26,7 @@
             justify-content: center !important;
         }
 
-        /* Estado de carga durante navegación AJAX */
+        /* Estado de carga durante navegaciÃ³n AJAX */
         main.loading {
             opacity: 0.5;
             pointer-events: none;
@@ -35,7 +35,7 @@
     </style>
 
     <aside id="mainSidebar" class="w-72 bg-[#7d1f1f] shadow-[4px_0_24px_rgba(0,0,0,0.25)] flex flex-col h-full z-20 relative sidebar-transition">
-        <!-- Botón Toggle de la Barra Lateral -->
+        
         <button id="sidebarToggle" class="absolute -right-3 top-8 bg-[#5c1515] hover:bg-[#4a1010] text-white rounded-full w-6 h-6 flex items-center justify-center border border-[#a03030] shadow-lg transition-all duration-300 z-50 focus:outline-none">
             <i class="fas fa-chevron-left text-[10px]" id="toggleIcon"></i>
         </button>
@@ -44,11 +44,11 @@
             <div class="w-14 h-14 mb-2 flex items-center justify-center transition-all duration-300">
                 <img th:src="@{/img/logo.png}" alt="Logo" class="w-full h-full object-contain" />
             </div>
-            <h2 class="text-lg font-bold text-white hide-on-collapse whitespace-nowrap">Fe y Alegría 32</h2>
-            <p class="text-[10px] text-rose-200 italic hide-on-collapse whitespace-nowrap">Portal Académico</p>
+            <h2 class="text-lg font-bold text-white hide-on-collapse whitespace-nowrap">Fe y AlegrÃ­a 32</h2>
+            <p class="text-[10px] text-rose-200 italic hide-on-collapse whitespace-nowrap">Portal AcadÃ©mico</p>
         </div>
 
-        <!-- ========== PERFIL (ESTUDIANTE) ========== -->
+        
         <div th:if="${session.usuarioLogueado != null and #strings.equalsIgnoreCase(session.usuarioLogueado.rol,'ESTUDIANTE')}"
              class="flex items-center gap-4 p-6 border-b border-[#a03030]/30 profile-container transition-all duration-300">
             <div class="w-12 h-12 rounded-full bg-[#5c1515] overflow-hidden border-2 border-[#c05050] shrink-0 shadow-md">
@@ -56,11 +56,11 @@
             </div>
             <div class="flex flex-col gap-0.5 hide-on-collapse overflow-hidden">
                 <h3 class="text-sm font-bold text-white leading-tight truncate" th:text="${alumno != null ? alumno.nombreCompleto : session.usuarioLogueado.nombreCompleto}">Estudiante</h3>
-                <p class="text-[10px] text-rose-200 font-medium truncate" th:text="${alumno != null and alumno.aula != null ? alumno.aula.nombre : 'Estudiante'}">Aula</p>
+                <p class="text-[10px] text-rose-200 font-medium uppercase truncate">Estudiante</p>
             </div>
         </div>
 
-        <!-- ========== PERFIL (DOCENTE / ADMINISTRADOR) ========== -->
+        
         <div th:if="${session.usuarioLogueado != null and !#strings.equalsIgnoreCase(session.usuarioLogueado.rol,'ESTUDIANTE')}"
              class="flex items-center gap-4 p-6 border-b border-[#a03030]/30 profile-container transition-all duration-300">
             <div class="w-12 h-12 rounded-full bg-[#5c1515] overflow-hidden border-2 border-[#c05050] shrink-0 flex items-center justify-center shadow-md">
@@ -73,7 +73,7 @@
         </div>
 
         <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto hide-scrollbar">
-            <!-- ========== ESTUDIANTE ========== -->
+            
             <th:block th:if="${session.usuarioLogueado != null and #strings.equalsIgnoreCase(session.usuarioLogueado.rol,'ESTUDIANTE')}">
                 <a th:href="@{/estudiante/panel}"
                    th:classappend="${currentUri == '/estudiante/panel'} ? 'bg-[#5c1515] text-white font-semibold shadow-md' : 'text-rose-100 hover:bg-[#9b3030]/40 hover:text-white font-medium'"
@@ -97,11 +97,11 @@
                     <span class="hide-on-collapse">Cursos / Notas</span>
                 </a>
                 <a th:href="@{/estudiante/asistencia}"
-                   th:classappend="${currentUri == '/estudiante/asistencia'} ? 'bg-[#5c1515] text-white font-semibold shadow-md' : 'text-rose-100 hover:bg-[#9b3030]/40 hover:text-white font-medium'"
+                   th:classappend="${currentUri == '/estudiante/asistencia'} or ${currentUri == '/estudiante/cuaderno-control'} ? 'bg-[#5c1515] text-white font-semibold shadow-md' : 'text-rose-100 hover:bg-[#9b3030]/40 hover:text-white font-medium'"
                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all center-on-collapse"
-                   title="Bitácora">
-                    <i class="fas fa-clipboard-list w-5 text-center text-lg shrink-0"></i>
-                    <span class="hide-on-collapse">Bitácora</span>
+                   title="Cuaderno de Control">
+                    <i class="fas fa-book-open w-5 text-center text-lg shrink-0"></i>
+                    <span class="hide-on-collapse">Cuaderno de Control</span>
                 </a>
                 <a th:href="@{/estudiante/horario}"
                    th:classappend="${currentUri == '/estudiante/horario'} ? 'bg-[#5c1515] text-white font-semibold shadow-md' : 'text-rose-100 hover:bg-[#9b3030]/40 hover:text-white font-medium'"
@@ -119,7 +119,7 @@
                 </a>
             </th:block>
 
-            <!-- ========== DOCENTE ========== -->
+            
             <th:block th:if="${session.usuarioLogueado != null and #strings.equalsIgnoreCase(session.usuarioLogueado.rol,'DOCENTE')}">
                 <a th:href="@{/docente/panel}"
                    th:classappend="${currentUri == '/docente/panel'} ? 'bg-[#5c1515] text-white font-semibold shadow-md' : 'text-rose-100 hover:bg-[#9b3030]/40 hover:text-white font-medium'"
@@ -163,6 +163,13 @@
                     <i class="fas fa-star w-5 text-center text-lg shrink-0"></i>
                     <span class="hide-on-collapse">Evaluaciones / Notas</span>
                 </a>
+                <a th:href="@{/docente/cuaderno-control}"
+                   th:classappend="${currentUri == '/docente/cuaderno-control'} or ${#strings.startsWith(currentUri, '/docente/cuaderno-control/')} ? 'bg-[#5c1515] text-white font-semibold shadow-md' : 'text-rose-100 hover:bg-[#9b3030]/40 hover:text-white font-medium'"
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all center-on-collapse"
+                   title="Cuaderno de Control">
+                    <i class="fas fa-book-open w-5 text-center text-lg shrink-0"></i>
+                    <span class="hide-on-collapse">Cuaderno de Control</span>
+                </a>
                 <a th:href="@{/mensajes/inbox}"
                    th:classappend="${#strings.startsWith(currentUri, '/mensajes') and !#strings.startsWith(currentUri, '/mensajes/chat') and !#strings.startsWith(currentUri, '/mensajes/contactos')} ? 'bg-[#5c1515] text-white font-semibold shadow-md' : 'text-rose-100 hover:bg-[#9b3030]/40 hover:text-white font-medium'"
                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all center-on-collapse"
@@ -181,7 +188,7 @@
                 </a>
             </th:block>
 
-            <!-- ========== ADMINISTRADOR ========== -->
+            
             <th:block th:if="${session.usuarioLogueado != null and #strings.equalsIgnoreCase(session.usuarioLogueado.rol,'ADMINISTRADOR')}">
                 <a th:href="@{/administrador/panel}"
                    th:classappend="${currentUri == '/administrador/panel'} ? 'bg-[#5c1515] text-white font-semibold shadow-md' : 'text-rose-100 hover:bg-[#9b3030]/40 hover:text-white font-medium'"
@@ -193,16 +200,16 @@
                 <a th:href="@{/gestionusuarios}"
                    th:classappend="${#strings.startsWith(currentUri, '/gestionusuarios')} ? 'bg-[#5c1515] text-white font-semibold shadow-md' : 'text-rose-100 hover:bg-[#9b3030]/40 hover:text-white font-medium'"
                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all center-on-collapse"
-                   title="Gestión de Usuarios">
+                   title="GestiÃ³n de Usuarios">
                     <i class="fas fa-users w-5 text-center text-lg shrink-0"></i>
-                    <span class="hide-on-collapse">Gestión de Usuarios</span>
+                    <span class="hide-on-collapse">GestiÃ³n de Usuarios</span>
                 </a>
                 <a th:href="@{/gestionaulas}"
                    th:classappend="${#strings.startsWith(currentUri, '/gestionaulas')} ? 'bg-[#5c1515] text-white font-semibold shadow-md' : 'text-rose-100 hover:bg-[#9b3030]/40 hover:text-white font-medium'"
                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all center-on-collapse"
-                   title="Gestión de Aulas">
+                   title="GestiÃ³n de Aulas">
                     <i class="fas fa-door-open w-5 text-center text-lg shrink-0"></i>
-                    <span class="hide-on-collapse">Gestión de Aulas</span>
+                    <span class="hide-on-collapse">GestiÃ³n de Aulas</span>
                 </a>
                 <a th:href="@{/gestioncomunicados/lista}"
                    th:classappend="${#strings.startsWith(currentUri, '/gestioncomunicados')} ? 'bg-[#5c1515] text-white font-semibold shadow-md' : 'text-rose-100 hover:bg-[#9b3030]/40 hover:text-white font-medium'"
@@ -239,9 +246,9 @@
 
         <div class="p-4 border-t border-[#a03030]/30">
             <form th:action="@{/logout}" method="post">
-                <button type="submit" class="w-full flex items-center justify-center gap-3 px-4 py-3 text-rose-100 rounded-xl font-semibold hover:bg-[#9b3030]/40 hover:text-white transition-all center-on-collapse" title="Cerrar Sesión">
+                <button type="submit" class="w-full flex items-center justify-center gap-3 px-4 py-3 text-rose-100 rounded-xl font-semibold hover:bg-[#9b3030]/40 hover:text-white transition-all center-on-collapse" title="Cerrar SesiÃ³n">
                     <i class="fas fa-sign-out-alt text-lg shrink-0"></i>
-                    <span class="hide-on-collapse">Cerrar Sesión</span>
+                    <span class="hide-on-collapse">Cerrar SesiÃ³n</span>
                 </button>
             </form>
         </div>

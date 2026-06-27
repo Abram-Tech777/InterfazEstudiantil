@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/fragments/head :: head('Gestión de Usuarios')"></head>
+<head th:replace="/fragments/head :: head('GestiÃ³n de Usuarios')"></head>
 <body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
 
     <div th:replace="~{/fragments/sidebar :: sidebar}"></div>
 
     <main class="flex-1 flex flex-col h-full relative overflow-hidden">
         <header class="h-20 bg-[#a03030] shadow-md px-8 flex items-center justify-between z-10 text-white">
-            <h1 class="text-2xl font-bold">Gestión de Usuarios</h1>
+            <h1 class="text-2xl font-bold">GestiÃ³n de Usuarios</h1>
             <a th:href="@{/gestionusuarios/nuevo}" class="px-4 py-2 bg-white text-[#e60000] hover:bg-gray-100 rounded-lg text-sm font-semibold transition-all flex items-center">
                 <i class="fas fa-plus mr-2"></i>Nuevo Usuario
             </a>
@@ -17,7 +17,7 @@
             <div class="max-w-6xl mx-auto">
                 <p class="text-gray-600 mb-6">Administra las cuentas del sistema</p>
 
-                <!-- Messages -->
+                
                 <div th:if="${mensajeExito}" class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-start">
                     <i class="fas fa-check-circle mr-3 mt-1 text-green-600"></i>
                     <span th:text="${mensajeExito}"></span>
@@ -28,14 +28,14 @@
                     <span th:text="${mensajeError}"></span>
                 </div>
 
-                <!-- Table -->
+                
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-gray-700">
                             <thead class="bg-gray-800 text-white sticky top-0">
                                 <tr>
                                     <th class="px-6 py-4 text-left font-semibold">ID</th>
-                                    <th class="px-6 py-4 text-left font-semibold">Código</th>
+                                    <th class="px-6 py-4 text-left font-semibold">CÃ³digo</th>
                                     <th class="px-6 py-4 text-left font-semibold">Nombre Completo</th>
                                     <th class="px-6 py-4 text-left font-semibold">Rol</th>
                                     <th class="px-6 py-4 text-left font-semibold">Estado</th>
@@ -80,7 +80,7 @@
                                         </a>
                                         <a th:href="@{/gestionusuarios/eliminar/{id}(id=${u.idUsuario})}" 
                                            class="inline-flex items-center px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded transition text-xs font-medium"
-                                           onclick="return confirm('¿Deseas inhabilitar este usuario?');">
+                                           onclick="return confirm('Â¿Deseas inhabilitar este usuario?');">
                                             <i class="fas fa-times-circle mr-1"></i>Inhabilitar
                                         </a>
                                     </td>

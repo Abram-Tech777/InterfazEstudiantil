@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{/fragments/head :: head('Registrar Notas')}"></head>
 <body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
@@ -24,11 +24,11 @@
         <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
             <div class="max-w-6xl mx-auto space-y-6">
 
-                <!-- Class Info -->
+                
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
-                            <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Día</p>
+                            <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">DÃ­a</p>
                             <p class="text-lg font-bold text-gray-900 flex items-center gap-2 mt-1">
                                 <i class="fas fa-calendar-day text-[#a03030]"></i>
                                 <span th:text="${horario.diaSemana}"></span>
@@ -58,12 +58,12 @@
                     </div>
                 </div>
 
-                <!-- Scale Selector + Messages -->
+                
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
                     <div class="flex flex-col md:flex-row md:items-center gap-4">
                         <div class="flex items-center gap-3">
                             <label class="text-sm font-semibold text-gray-700 whitespace-nowrap">
-                                <i class="fas fa-sliders-h text-[#a03030] mr-2"></i>Escala de calificación:
+                                <i class="fas fa-sliders-h text-[#a03030] mr-2"></i>Escala de calificaciÃ³n:
                             </label>
                             <select id="escalaSelector" 
                                     class="px-4 py-2.5 border border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none transition text-sm font-medium text-gray-700 min-w-[180px]">
@@ -77,7 +77,7 @@
                     </div>
                 </div>
 
-                <!-- Messages -->
+                
                 <div th:if="${session.mensajeExito}" class="bg-green-50 border border-green-200 text-green-800 px-5 py-3 rounded-xl flex items-center gap-3">
                     <i class="fas fa-check-circle text-green-500"></i>
                     <span class="font-medium" th:text="${session.mensajeExito}"></span>
@@ -87,7 +87,7 @@
                     <span class="font-medium" th:text="${session.mensajeError}"></span>
                 </div>
 
-                <!-- Students Table -->
+                
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm">
@@ -114,7 +114,7 @@
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 text-center">
-                                        <!-- DECIMAL input -->
+                                        
                                         <div th:if="${escala == 'DECIMAL'}" class="flex justify-center">
                                             <input type="number" step="0.01" min="0" max="20"
                                                    th:name="${'nota_' + a.idAlumno}"
@@ -125,7 +125,7 @@
                                                    data-alumno-id="${a.idAlumno}"
                                                    data-alumno-nombre="${a.nombreCompleto}" />
                                         </div>
-                                        <!-- LETRA select -->
+                                        
                                         <div th:if="${escala == 'LETRA'}" class="flex justify-center">
                                             <select th:name="${'nota_' + a.idAlumno}"
                                                     th:id="${'nota_' + a.idAlumno}"
@@ -139,7 +139,7 @@
                                                 <option value="C" th:selected="${notasMap.containsKey(a.idAlumno) and notasMap.get(a.idAlumno).notaLiteral == 'C'}">C - Inicio</option>
                                             </select>
                                         </div>
-                                        <!-- LOGRO select -->
+                                        
                                         <div th:if="${escala == 'LOGRO'}" class="flex justify-center">
                                             <select th:name="${'nota_' + a.idAlumno}"
                                                     th:id="${'nota_' + a.idAlumno}"
@@ -184,13 +184,13 @@
                         </table>
                     </div>
 
-                    <!-- Info + Buttons -->
+                    
                     <div class="bg-gray-50 px-6 py-4 border-t border-gray-100">
                         <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                             <div class="flex items-center gap-4">
                                 <p class="text-xs text-gray-500 flex items-center gap-1.5">
                                     <i class="fas fa-info-circle text-gray-400"></i>
-                                    Las notas se guardan automáticamente. Edición permitida dentro de 3 días.
+                                    Las notas se guardan automÃ¡ticamente. EdiciÃ³n permitida dentro de 3 dÃ­as.
                                 </p>
                             </div>
                             <div class="flex gap-2">
@@ -298,7 +298,7 @@
                     });
 
                     if (!hasData) {
-                        showStatus('warning', 'No hay notas para guardar. Ingresa al menos una calificación.');
+                        showStatus('warning', 'No hay notas para guardar. Ingresa al menos una calificaciÃ³n.');
                         return;
                     }
 
@@ -324,7 +324,7 @@
                         }
                     })
                     .catch(function(err) {
-                        showStatus('error', '<i class="fas fa-exclamation-circle mr-1"></i> Error de conexión');
+                        showStatus('error', '<i class="fas fa-exclamation-circle mr-1"></i> Error de conexiÃ³n');
                     })
                     .finally(function() {
                         btnGuardar.disabled = false;

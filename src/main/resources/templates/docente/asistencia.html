@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/fragments/head :: head('Control de Asistencia')"></head>
 <body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
@@ -14,7 +14,7 @@
             <div class="max-w-6xl mx-auto">
                 <p class="text-gray-600 mb-6">Registra la asistencia de tus estudiantes</p>
 
-                <!-- Filtros -->
+                
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6 no-print">
                     <form method="get" action="/docente/asistencia" class="flex flex-wrap items-end gap-4">
                         <div class="flex-1 min-w-[180px]">
@@ -24,7 +24,7 @@
                             <select id="filtroAula" name="idAula" onchange="cambiarFiltroAsistencia()"
                                     class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none font-medium cursor-pointer bg-gray-50 hover:bg-white transition-colors">
                                 <option value="">Todas las aulas</option>
-                                <option th:each="a : ${aulas}" th:value="${a.idAula}" th:text="${a.grado + ' - Sección ' + a.seccion}" th:selected="${a.idAula == idAulaSel}"></option>
+                                <option th:each="a : ${aulas}" th:value="${a.idAula}" th:text="${a.grado + ' - SecciÃ³n ' + a.seccion}" th:selected="${a.idAula == idAulaSel}"></option>
                             </select>
                         </div>
                         <div class="flex-1 min-w-[180px]">
@@ -39,37 +39,37 @@
                         </div>
                         <div class="flex-1 min-w-[160px]">
                             <label for="filtroDia" class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
-                                <i class="fas fa-calendar-day mr-1"></i> Día
+                                <i class="fas fa-calendar-day mr-1"></i> DÃ­a
                             </label>
                             <select id="filtroDia" name="diaSemana" onchange="cambiarFiltroAsistencia()"
                                     class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none font-medium cursor-pointer bg-gray-50 hover:bg-white transition-colors">
-                                <option value="">Todos los días</option>
+                                <option value="">Todos los dÃ­as</option>
                                 <option th:each="d : ${dias}" th:value="${d}" th:text="${d}" th:selected="${d == diaSel}"></option>
                             </select>
                         </div>
                     </form>
                 </div>
 
-                <!-- Empty State -->
+                
                 <div th:if="${#lists.isEmpty(horarios)}" class="bg-blue-50 border border-blue-200 text-blue-800 px-6 py-8 rounded-lg text-center">
                     <i class="fas fa-info-circle text-3xl mb-4"></i>
                     <p class="text-lg font-medium">No se encontraron horarios</p>
-                    <p class="text-sm mt-2">Prueba ajustando los filtros o contacta con administración</p>
+                    <p class="text-sm mt-2">Prueba ajustando los filtros o contacta con administraciÃ³n</p>
                 </div>
 
-                <!-- Table -->
+                
                 <div th:if="${!#lists.isEmpty(horarios)}" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-gray-700">
                             <thead class="bg-gray-800 text-white sticky top-0">
                                 <tr>
                                     <th class="px-6 py-4 text-left font-semibold">#</th>
-                                    <th class="px-6 py-4 text-left font-semibold">Día</th>
+                                    <th class="px-6 py-4 text-left font-semibold">DÃ­a</th>
                                     <th class="px-6 py-4 text-left font-semibold">Hora Inicio</th>
                                     <th class="px-6 py-4 text-left font-semibold">Hora Fin</th>
                                     <th class="px-6 py-4 text-left font-semibold">Aula</th>
                                     <th class="px-6 py-4 text-left font-semibold">Curso</th>
-                                    <th class="px-6 py-4 text-center font-semibold">Acción</th>
+                                    <th class="px-6 py-4 text-center font-semibold">AcciÃ³n</th>
                                 </tr>
                             </thead>
                             <tbody>

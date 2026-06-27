@@ -128,8 +128,23 @@ public class UsuarioPanelController {
         if (h.getAula() != null) {
             alumnos = alumnoRepository.findByAula_IdAula(h.getAula().getIdAula());
         }
+
+        // Cargar asistencias ya registradas hoy para pre-seleccionar los radio buttons
+        java.util.Map<Integer, String> estadosGuardados = new java.util.HashMap<>();
+        LocalDate fecha = LocalDate.now();
+        if (h != null) {
+            for (Alumno a : alumnos) {
+                Optional<Asistencia> existente = asistenciaRepository
+                    .findByAlumno_IdAlumnoAndHorario_IdHorarioAndFecha(a.getIdAlumno(), idHorario, fecha);
+                if (existente.isPresent()) {
+                    estadosGuardados.put(a.getIdAlumno(), existente.get().getEstado());
+                }
+            }
+        }
+
         model.addAttribute("horario", h);
         model.addAttribute("alumnos", alumnos);
+        model.addAttribute("estadosGuardados", estadosGuardados);
         return "docente/asistencia_detalle";
     }
 
@@ -158,10 +173,9 @@ public class UsuarioPanelController {
 
             for (Alumno a : alumnos) {
                 String estado = request.getParameter("estado_" + a.getIdAlumno());
-                String horaLlegadaStr = request.getParameter("horaLlegada_" + a.getIdAlumno());
                 
                 if (estado == null || estado.isBlank()) {
-                    estado = "AUSENCIA"; // Por defecto, si no se marca algo, es ausencia
+                    estado = "AUSENCIA";
                 }
 
                 Optional<Asistencia> existing = asistenciaRepository
@@ -178,20 +192,7 @@ public class UsuarioPanelController {
                     asistencia.setFecha(fecha);
                 }
                 
-                // Si se proporciona hora de llegada, parsearla y determinar estado automáticamente
-                if (horaLlegadaStr != null && !horaLlegadaStr.isBlank()) {
-                    try {
-                        asistencia.setHoraLlegada(java.time.LocalTime.parse(horaLlegadaStr));
-                        asistencia.determinarEstado(); // Calcula automáticamente si fue presente, retardo o ausencia
-                    } catch (java.time.format.DateTimeParseException e) {
-                        // Si la hora no es válida, usar el estado manual
-                        asistencia.setEstado(estado);
-                    }
-                } else {
-                    // Si no hay hora de llegada, usar el estado manual
-                    asistencia.setEstado(estado);
-                }
-                
+                asistencia.setEstado(estado);
                 asistenciaRepository.save(asistencia);
             }
 

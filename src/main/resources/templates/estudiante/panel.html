@@ -1,206 +1,154 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{/fragments/head :: head('Panel de Estudiante')}">
-    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
-</head>
+<head th:replace="~{/fragments/head :: head('Panel de Estudiante')}"></head>
 <body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
 
     <div th:replace="~{/fragments/sidebar :: sidebar}"></div>
 
     <main class="flex-1 flex flex-col h-full relative overflow-hidden">
-        
-		<header class="h-20 bg-[#a03030] shadow-md px-8 flex items-center justify-between z-10 text-white">
-		    <h1 class="text-2xl font-bold">Dashboard</h1>
-            
-            <div class="flex items-center gap-6">
-                <button class="text-red-200 hover:text-white transition-colors text-xl">
-                    <i class="fas fa-question-circle"></i>
-                </button>
+
+        <header class="h-20 bg-[#a03030] shadow-md px-8 flex items-center justify-between z-10 text-white">
+            <div>
+                <h1 class="text-2xl font-bold">Panel Estudiante</h1>
+                <p class="text-xs text-rose-200 mt-0.5" th:text="${alumno != null ? alumno.nombreCompleto : ''}"></p>
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
-            
-            <div class="w-[95%] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar">
+            <div class="max-w-7xl mx-auto space-y-6">
+
                 
-				<section class="lg:col-span-3 relative group">
-					<div class="flex justify-between items-end mb-4">
-					    <h2 class="text-xl font-bold text-gray-800">Anuncios Recientes</h2>
-					    <a th:href="@{/estudiante/anuncios}" class="text-sm font-semibold text-[#e60000] hover:underline">Ver Todo</a>
-					</div>
-
-				    <div class="relative">
-				        <button id="prevBtn" onclick="scrollAnuncios(-300)" class="nav-arrow absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 bg-white p-3 rounded-full shadow-lg text-[#e60000] hover:bg-[#e60000] hover:text-white transition-all hidden">
-				            <i class="fas fa-chevron-left"></i>
-				        </button>
-
-						<div id="anunciosScroll" class="flex gap-4 overflow-x-auto pb-4 scroll-smooth hide-scrollbar transition-all">
-						    
-						    <div th:each="anuncio : ${anuncios}" class="min-w-[300px] dash-card p-5 border-l-4 border-[#e60000]">
-						        <span th:text="${#temporals.format(anuncio.fechaEmision, 'dd MMM, HH:mm a')}" 
-						              class="text-xs font-bold text-gray-400 mb-1 block"></span>
-						        
-						        <h3 th:text="${anuncio.titulo}" class="font-bold text-gray-800 mb-2"></h3>
-						        
-						        <p th:text="${anuncio.contenido}" class="text-sm text-gray-600 line-clamp-2"></p>
-						    </div>
-
-						    <div th:if="${#lists.isEmpty(anuncios)}" class="p-5 text-gray-500">
-						        No hay anuncios recientes.
-						    </div>
-						</div>
-
-				        <button id="nextBtn" onclick="scrollAnuncios(300)" class="nav-arrow absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 bg-white p-3 rounded-full shadow-lg text-[#e60000] hover:bg-[#e60000] hover:text-white transition-all hidden">
-				            <i class="fas fa-chevron-right"></i>
-				        </button>
-				    </div>
-				</section>
-
-                <section class="lg:col-span-2 dash-card p-6 flex flex-col justify-between">
-                    <h2 class="text-xl font-bold text-gray-800 mb-6">Asistencia General</h2>
-                    
-                    <div class="flex items-center justify-between px-4 sm:px-10">
-                        <div class="text-center">
-                            <p class="text-gray-500 text-sm font-semibold mb-1">Días Asistidos</p>
-                            <div class="text-5xl font-black text-gray-800">
-                                18<span class="text-2xl text-gray-400">/43</span>
-                            </div>
-                        </div>
-                        
-                        <div class="relative w-32 h-32 rounded-full flex items-center justify-center bg-gray-100"
-                             style="background: conic-gradient(#e60000 0% 42%, #f3f4f6 42% 100%);">
-                            <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-inner">
-                                <span class="font-bold text-xl text-gray-800">42%</span>
+                <div th:if="${!#lists.isEmpty(anuncios)}" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-bold text-gray-800 text-lg"><i class="fas fa-bullhorn text-[#a03030] mr-2"></i>Anuncios Recientes</h2>
+                        <a th:href="@{/estudiante/anuncios}" class="text-xs font-semibold text-[#a03030] hover:underline">Ver todos</a>
+                    </div>
+                    <div class="relative">
+                        <div class="flex gap-4 overflow-x-auto pb-2 hide-scrollbar">
+                            <div th:each="anuncio : ${anuncios}" class="min-w-[280px] p-4 rounded-xl border border-gray-100 bg-gray-50 shrink-0">
+                                <span class="text-xs font-bold text-gray-400" th:text="${anuncio.fechaEmision != null ? #temporals.format(anuncio.fechaEmision, 'dd MMM, HH:mm') : ''}"></span>
+                                <h3 class="font-bold text-gray-800 mt-1 text-sm" th:text="${anuncio.titulo}"></h3>
+                                <p class="text-xs text-gray-600 mt-1 line-clamp-2" th:text="${anuncio.contenido}"></p>
                             </div>
                         </div>
                     </div>
-                </section>
+                </div>
 
-				<section class="lg:col-span-1 lg:row-span-2 dash-card p-6 flex flex-col">
-				    <div class="flex justify-between items-center mb-6">
-				        <h2 class="text-xl font-bold text-gray-800">Conducta</h2>
-				        <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full border border-green-200">
-				            Excelente
-				        </span>
-				    </div>
-				    
-				    <div class="space-y-4 flex-1 overflow-y-auto hide-scrollbar pr-2 max-h-[380px]">
-				        
-				        <div class="p-4 rounded-xl border border-gray-100 bg-gray-50">
-				            <div class="flex items-center gap-3 mb-2">
-				                <i class="fas fa-star text-yellow-400"></i>
-				                <span class="font-bold text-sm text-gray-800">Participación</span>
-				            </div>
-				            <p class="text-xs text-gray-600">Excelente aporte en la clase de Historia.</p>
-				        </div>
-				        
-				        <div class="p-4 rounded-xl border border-gray-100 bg-gray-50">
-				            <div class="flex items-center gap-3 mb-2">
-				                <i class="fas fa-hands-helping text-blue-500"></i>
-				                <span class="font-bold text-sm text-gray-800">Compañerismo</span>
-				            </div>
-				            <p class="text-xs text-gray-600">Ayudó a un compañero con sus tareas.</p>
-				        </div>
-
-				        <div class="p-4 rounded-xl border border-gray-100 bg-gray-50">
-				            <div class="flex items-center gap-3 mb-2">
-				                <i class="fas fa-clock text-green-500"></i>
-				                <span class="font-bold text-sm text-gray-800">Puntualidad</span>
-				            </div>
-				            <p class="text-xs text-gray-600">Ingreso temprano a las aulas virtuales y presenciales de la institución.</p>
-				        </div>
-
-				        <div class="p-4 rounded-xl border border-gray-100 bg-gray-50">
-				            <div class="flex items-center gap-3 mb-2">
-				                <i class="fas fa-check-circle text-purple-500"></i>
-				                <span class="font-bold text-sm text-gray-800">Responsabilidad</span>
-				            </div>
-				            <p class="text-xs text-gray-600">Cumplimiento impecable en la entrega oportuna de los proyectos del bimestre.</p>
-				        </div>
-				        
-				    </div>
-				</section>
-
-                <section class="lg:col-span-2 dash-card p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-6">Reconocimientos</h2>
-                    
-                    <div class="flex flex-wrap gap-6 justify-around">
-                        <div class="flex flex-col items-center group cursor-pointer">
-                            <div class="w-16 h-16 rounded-2xl bg-yellow-50 border-2 border-yellow-200 flex items-center justify-center mb-2 group-hover:-translate-y-2 transition-transform">
-                                <i class="fas fa-trophy text-2xl text-yellow-500"></i>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Asistencia</p>
+                                <p class="text-3xl font-black text-gray-800 mt-1" th:text="${pctAsistencia + '%'}">0%</p>
                             </div>
-                            <span class="text-xs font-bold text-gray-600">1er Puesto</span>
+                            <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center"><i class="fas fa-calendar-check text-green-500 text-xl"></i></div>
                         </div>
-                        
-                        <div class="flex flex-col items-center group cursor-pointer">
-                            <div class="w-16 h-16 rounded-2xl bg-blue-50 border-2 border-blue-200 flex items-center justify-center mb-2 group-hover:-translate-y-2 transition-transform">
-                                <i class="fas fa-medal text-2xl text-blue-500"></i>
-                            </div>
-                            <span class="text-xs font-bold text-gray-600">Matemáticas</span>
-                        </div>
-
-                        <div class="flex flex-col items-center group cursor-pointer">
-                            <div class="w-16 h-16 rounded-2xl bg-green-50 border-2 border-green-200 flex items-center justify-center mb-2 group-hover:-translate-y-2 transition-transform">
-                                <i class="fas fa-leaf text-2xl text-green-500"></i>
-                            </div>
-                            <span class="text-xs font-bold text-gray-600">Ecológico</span>
-                        </div>
-                        
-                        <div class="flex flex-col items-center group cursor-pointer opacity-40 grayscale">
-                            <div class="w-16 h-16 rounded-2xl bg-gray-100 border-2 border-gray-200 flex items-center justify-center mb-2">
-                                <i class="fas fa-lock text-xl text-gray-400"></i>
-                            </div>
-                            <span class="text-xs font-bold text-gray-500">Bloqueado</span>
+                        <div class="mt-3 w-full bg-gray-100 rounded-full h-2">
+                            <div class="h-2 rounded-full bg-green-500 transition-all duration-500" th:style="'width: ' + ${pctAsistencia} + '%'"></div>
                         </div>
                     </div>
-                </section>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Tardanzas</p>
+                                <p class="text-3xl font-black text-gray-800 mt-1" th:text="${retardos}">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center"><i class="fas fa-clock text-yellow-500 text-xl"></i></div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-3">de <span th:text="${totalClases}"></span> clases</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Ausencias</p>
+                                <p class="text-3xl font-black text-gray-800 mt-1" th:text="${ausencias}">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center"><i class="fas fa-times-circle text-red-500 text-xl"></i></div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-3">de <span th:text="${totalClases}"></span> clases</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Promedio</p>
+                                <p class="text-3xl font-black text-gray-800 mt-1" th:text="${promedio}">--</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center"><i class="fas fa-chart-line text-blue-500 text-xl"></i></div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-3">nota general</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 lg:col-span-1">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="font-bold text-gray-800"><i class="fas fa-book-open text-[#a03030] mr-2"></i>Conducta</h2>
+                            <a th:href="@{/estudiante/cuaderno-control}" class="text-xs font-semibold text-[#a03030] hover:underline">Ver mas</a>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="p-3 rounded-xl bg-green-50 border border-green-100 text-center">
+                                <p class="text-2xl font-black text-green-600" th:text="${positivas}">0</p>
+                                <p class="text-xs text-green-700 font-semibold">Positivas</p>
+                            </div>
+                            <div class="p-3 rounded-xl bg-red-50 border border-red-100 text-center">
+                                <p class="text-2xl font-black text-red-600" th:text="${negativas}">0</p>
+                                <p class="text-xs text-red-700 font-semibold">Negativas</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 max-h-[300px] overflow-y-auto hide-scrollbar">
+                            <div th:if="${#lists.isEmpty(conductas)}" class="text-center text-gray-400 text-sm py-4">Sin anotaciones</div>
+                            <div th:each="c : ${conductas}" class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition">
+                                <div th:classappend="${c.tipo == 'POSITIVA'} ? 'bg-green-50 text-green-500' : 'bg-red-50 text-red-500'"
+                                     class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
+                                    <i th:classappend="${c.tipo == 'POSITIVA'} ? 'fas fa-star' : 'fas fa-exclamation-triangle'" class="text-xs"></i>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-xs font-bold text-gray-800 truncate" th:text="${c.titulo}"></p>
+                                    <p class="text-xs text-gray-400 truncate" th:text="${c.descripcion}"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="lg:col-span-2 space-y-4">
+                        <h2 class="font-bold text-gray-800 text-lg">Acceso Rapido</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <a th:href="@{/estudiante/horario}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all p-5 border border-gray-100 group flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors text-purple-600"><i class="fas fa-calendar-alt text-xl"></i></div>
+                                <div><h3 class="font-bold text-gray-800 text-sm">Mi Horario</h3><p class="text-xs text-gray-500">Clases semanales</p></div>
+                            </a>
+                            <a th:href="@{/estudiante/notas}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all p-5 border border-gray-100 group flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-pink-50 flex items-center justify-center group-hover:bg-pink-600 group-hover:text-white transition-colors text-pink-600"><i class="fas fa-star text-xl"></i></div>
+                                <div><h3 class="font-bold text-gray-800 text-sm">Mis Notas</h3><p class="text-xs text-gray-500">Calificaciones</p></div>
+                            </a>
+                            <a th:href="@{/estudiante/cuaderno-control}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all p-5 border border-gray-100 group flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors text-indigo-600"><i class="fas fa-book-open text-xl"></i></div>
+                                <div><h3 class="font-bold text-gray-800 text-sm">Cuaderno de Control</h3><p class="text-xs text-gray-500">Conducta y asistencia</p></div>
+                            </a>
+                            <a th:href="@{/estudiante/anuncios}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all p-5 border border-gray-100 group flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-yellow-50 flex items-center justify-center group-hover:bg-yellow-500 group-hover:text-white transition-colors text-yellow-600"><i class="fas fa-bullhorn text-xl"></i></div>
+                                <div><h3 class="font-bold text-gray-800 text-sm">Anuncios</h3><p class="text-xs text-gray-500">Comunicados</p></div>
+                            </a>
+                        </div>
+                        <a th:href="@{/mensajes/contactos}" class="block bg-gradient-to-r from-[#a03030] to-[#7d1f1f] rounded-2xl p-5 text-white shadow-md hover:shadow-lg transition-all">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-bold"><i class="fas fa-comments mr-2"></i>Chat</h3>
+                                    <p class="text-xs text-rose-200 mt-0.5">Conversa con tus docentes</p>
+                                </div>
+                                <i class="fas fa-arrow-right text-rose-200"></i>
+                            </div>
+                        </a>
+                    </div>
+                </div>
 
             </div>
         </div>
     </main>
-    
+
     <div th:replace="~{/fragments/scripts :: scripts}"></div>
-	
-	<script>
-	    const container = document.getElementById('anunciosScroll');
-	    const prevBtn = document.getElementById('prevBtn');
-	    const nextBtn = document.getElementById('nextBtn');
-
-	    function updateScrollStatus() {
-	        if (!container) return;
-
-	        // 1. ¿Existe desbordamiento? (¿Hay contenido oculto?)
-	        const isOverflowing = container.scrollWidth > container.clientWidth;
-
-	        // 2. Lógica para Flecha IZQUIERDA
-	        // Se oculta si NO hay scroll o si estamos al puro principio
-	        if (!isOverflowing || container.scrollLeft <= 0) {
-	            prevBtn.classList.add('hidden');
-	        } else {
-	            prevBtn.classList.remove('hidden');
-	        }
-
-	        // 3. Lógica para Flecha DERECHA
-	        // Se oculta si NO hay scroll o si llegamos al final (con margen de 5px)
-	        if (!isOverflowing || (container.scrollLeft + container.clientWidth >= container.scrollWidth - 5)) {
-	            nextBtn.classList.add('hidden');
-	        } else {
-	            nextBtn.classList.remove('hidden');
-	        }
-	    }
-
-	    // Funcionalidad de scroll
-	    function scrollAnuncios(offset) {
-	        container.scrollBy({ left: offset, behavior: 'smooth' });
-	    }
-
-	    // --- EVENTOS ---
-	    // Detecta scroll en tiempo real mientras el usuario desliza
-	    container.addEventListener('scroll', updateScrollStatus);
-
-	    // Ajustes iniciales al cargar y si cambian el tamaño de la ventana
-	    window.addEventListener('load', updateScrollStatus);
-	    window.addEventListener('resize', updateScrollStatus);
-	</script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{/fragments/head :: head('Mis Notas - Estudiante')}">
     <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
@@ -18,7 +18,7 @@
         <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar bg-gradient-to-b from-[#f4f6f9] to-white">
             <div class="max-w-7xl mx-auto space-y-6">
 
-                <!-- Stats Cards -->
+                
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="statsContainer">
                     <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                         <div class="flex items-center justify-between">
@@ -66,7 +66,7 @@
                     </div>
                 </div>
 
-                <!-- Filters -->
+                
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
                     <div class="flex flex-col md:flex-row md:items-center gap-4">
                         <div class="flex-1">
@@ -97,7 +97,7 @@
                     </div>
                 </div>
 
-                <!-- Table -->
+                
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                         <h2 class="text-lg font-bold text-gray-800">Historial de Calificaciones</h2>
@@ -173,7 +173,7 @@
                                                 <i class="fas fa-folder-open text-2xl text-gray-300"></i>
                                             </div>
                                             <p class="text-gray-400 font-medium">No hay notas registradas</p>
-                                            <p class="text-xs text-gray-300">Las notas aparecerán aquí cuando tu docente las registre</p>
+                                            <p class="text-xs text-gray-300">Las notas aparecerÃ¡n aquÃ­ cuando tu docente las registre</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -182,14 +182,14 @@
                     </div>
                 </div>
 
-                <!-- Chart -->
+                
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                         <h3 class="text-sm font-bold text-gray-700 mb-4">Rendimiento por Curso</h3>
                         <canvas id="rendimientoChart" height="200"></canvas>
                     </div>
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                        <h3 class="text-sm font-bold text-gray-700 mb-4">Distribución de Logros</h3>
+                        <h3 class="text-sm font-bold text-gray-700 mb-4">DistribuciÃ³n de Logros</h3>
                         <canvas id="logrosChart" height="200"></canvas>
                     </div>
                 </div>
@@ -264,7 +264,7 @@
                         '<div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">' +
                         '<i class="fas fa-folder-open text-2xl text-gray-300"></i></div>' +
                         '<p class="text-gray-400 font-medium">No hay notas registradas</p>' +
-                        '<p class="text-xs text-gray-300">Las notas aparecerán aquí cuando tu docente las registre</p>' +
+                        '<p class="text-xs text-gray-300">Las notas aparecerÃ¡n aquÃ­ cuando tu docente las registre</p>' +
                         '</div></td></tr>';
                     return;
                 }

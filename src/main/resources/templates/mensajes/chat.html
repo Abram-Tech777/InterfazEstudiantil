@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{/fragments/head :: head('Chat')}"></head>
 <body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
@@ -14,7 +14,7 @@
             </a>
             <div>
                 <h1 class="text-xl font-bold" th:text="${contacto.nombreCompleto}"></h1>
-                <p class="text-xs text-white/70"><i class="fas fa-comment mr-1"></i>Conversación</p>
+                <p class="text-xs text-white/70"><i class="fas fa-comment mr-1"></i>ConversaciÃ³n</p>
             </div>
         </div>
         <a th:href="@{/mensajes/nuevo(to=${contacto.idUsuario})}" class="px-4 py-2 bg-white text-[#a03030] rounded-lg text-sm font-bold hover:bg-red-50 transition">
@@ -50,8 +50,8 @@
                 <div class="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-comment-dots text-3xl text-gray-400"></i>
                 </div>
-                <p class="text-gray-500 font-bold text-lg">No hay mensajes aún</p>
-                <p class="text-gray-400 text-sm mt-1">Envía el primer mensaje para iniciar la conversación.</p>
+                <p class="text-gray-500 font-bold text-lg">No hay mensajes aÃºn</p>
+                <p class="text-gray-400 text-sm mt-1">EnvÃ­a el primer mensaje para iniciar la conversaciÃ³n.</p>
             </div>
 
             <div th:each="m : ${conversacion}" th:class="${m.remitente.idUsuario == currentUserId} ? 'flex justify-end' : 'flex justify-start'">
@@ -116,7 +116,7 @@
             <div id="filePreviewList" class="flex flex-wrap gap-2 hidden"></div>
             <div id="fileErrorCard" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm flex items-center gap-3">
                 <i class="fas fa-exclamation-circle text-lg shrink-0"></i>
-                <span id="fileErrorMsg">Tamaño máximo alcanzado. Elimine algunos archivos.</span>
+                <span id="fileErrorMsg">TamaÃ±o mÃ¡ximo alcanzado. Elimine algunos archivos.</span>
             </div>
 
             <div class="flex gap-2 items-end">

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/fragments/head :: head('Panel Docente')"></head>
 <body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
@@ -7,59 +7,98 @@
 
     <main class="flex-1 flex flex-col h-full relative overflow-hidden">
         <header class="h-20 bg-[#a03030] shadow-md px-8 flex items-center justify-between z-10 text-white">
-            <h1 class="text-2xl font-bold">Panel Docente</h1>
-            <div class="flex items-center gap-6">
-                <button class="text-red-200 hover:text-white transition-colors text-xl">
-                    <i class="fas fa-question-circle"></i>
-                </button>
+            <div>
+                <h1 class="text-2xl font-bold">Panel Docente</h1>
+                <p class="text-xs text-rose-200 mt-0.5" th:text="${docente != null ? docente.nombreCompleto : ''}"></p>
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
-            <div class="w-[95%] mx-auto">
-                <p class="text-gray-600 mb-6">Acceso rápido a tus funciones principales como docente.</p>
+        <div class="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar">
+            <div class="max-w-7xl mx-auto space-y-6">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <a th:href="@{/gestioncomunicados/nuevo}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
-                        <div class="bg-green-50 p-4 rounded-lg text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors w-fit mb-4">
-                            <i class="fas fa-pen text-2xl"></i>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Clases Hoy</p>
+                                <p class="text-3xl font-black text-gray-800 mt-1" th:text="${clasesHoy}">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center"><i class="fas fa-clock text-purple-500 text-xl"></i></div>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-800 mb-2">Crear Comunicado</h3>
-                        <p class="text-sm text-gray-500">Envía mensajes a padres y estudiantes</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Aulas Asignadas</p>
+                                <p class="text-3xl font-black text-gray-800 mt-1" th:text="${totalAulas}">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center"><i class="fas fa-door-open text-green-500 text-xl"></i></div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Estudiantes</p>
+                                <p class="text-3xl font-black text-gray-800 mt-1" th:text="${totalAlumnos}">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center"><i class="fas fa-user-graduate text-blue-500 text-xl"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <h2 class="text-lg font-bold text-gray-800 pt-2">Acceso Rapido</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <a th:href="@{/gestioncomunicados/nuevo}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all p-5 border border-gray-100 group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-colors text-green-600"><i class="fas fa-pen text-xl"></i></div>
+                            <div><h3 class="font-bold text-gray-800">Crear Comunicado</h3><p class="text-xs text-gray-500">Envia mensajes a padres y estudiantes</p></div>
+                        </div>
                     </a>
-
-                    <a th:href="@{/gestioncomunicados/lista}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
-                        <div class="bg-blue-50 p-4 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors w-fit mb-4">
-                            <i class="fas fa-list text-2xl"></i>
+                    <a th:href="@{/gestioncomunicados/lista}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all p-5 border border-gray-100 group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors text-blue-600"><i class="fas fa-list text-xl"></i></div>
+                            <div><h3 class="font-bold text-gray-800">Mis Comunicados</h3><p class="text-xs text-gray-500">Historial de mensajes</p></div>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-800 mb-2">Mis Comunicados</h3>
-                        <p class="text-sm text-gray-500">Visualiza tu historial de mensajes</p>
                     </a>
-
-                    <a th:href="@{/docente/horario}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
-                        <div class="bg-purple-50 p-4 rounded-lg text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors w-fit mb-4">
-                            <i class="fas fa-clock text-2xl"></i>
+                    <a th:href="@{/docente/horario}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all p-5 border border-gray-100 group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors text-purple-600"><i class="fas fa-clock text-xl"></i></div>
+                            <div><h3 class="font-bold text-gray-800">Mi Horario</h3><p class="text-xs text-gray-500">Programacion semanal</p></div>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-800 mb-2">Mi Horario</h3>
-                        <p class="text-sm text-gray-500">Consulta tu programación semanal</p>
                     </a>
-
-                    <a th:href="@{/docente/asistencia}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
-                        <div class="bg-orange-50 p-4 rounded-lg text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-colors w-fit mb-4">
-                            <i class="fas fa-clipboard-check text-2xl"></i>
+                    <a th:href="@{/docente/asistencia}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all p-5 border border-gray-100 group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-colors text-orange-600"><i class="fas fa-clipboard-check text-xl"></i></div>
+                            <div><h3 class="font-bold text-gray-800">Control de Asistencia</h3><p class="text-xs text-gray-500">Registra asistencia</p></div>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-800 mb-2">Control de Asistencia</h3>
-                        <p class="text-sm text-gray-500">Registra la asistencia de estudiantes</p>
                     </a>
-
-                    <a th:href="@{/docente/evaluaciones}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 card-hover group">
-                        <div class="bg-pink-50 p-4 rounded-lg text-pink-600 group-hover:bg-pink-600 group-hover:text-white transition-colors w-fit mb-4">
-                            <i class="fas fa-star text-2xl"></i>
+                    <a th:href="@{/docente/evaluaciones}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all p-5 border border-gray-100 group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-pink-50 flex items-center justify-center group-hover:bg-pink-600 group-hover:text-white transition-colors text-pink-600"><i class="fas fa-star text-xl"></i></div>
+                            <div><h3 class="font-bold text-gray-800">Evaluaciones y Notas</h3><p class="text-xs text-gray-500">Gestiona calificaciones</p></div>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-800 mb-2">Evaluaciones y Notas</h3>
-                        <p class="text-sm text-gray-500">Registra y gestiona las calificaciones</p>
+                    </a>
+                    <a th:href="@{/docente/cuaderno-control}" class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all p-5 border border-gray-100 group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors text-indigo-600"><i class="fas fa-book-open text-xl"></i></div>
+                            <div><h3 class="font-bold text-gray-800">Cuaderno de Control</h3><p class="text-xs text-gray-500">Anotaciones de conducta</p></div>
+                        </div>
                     </a>
                 </div>
+
+                
+                <a th:href="@{/mensajes/inbox}" class="block bg-gradient-to-r from-[#a03030] to-[#7d1f1f] rounded-2xl p-6 text-white shadow-md hover:shadow-lg transition-all">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold"><i class="fas fa-comments mr-2"></i>Mensajes y Chat</h3>
+                            <p class="text-sm text-rose-200 mt-1">Comunicate con otros docentes, administradores y estudiantes</p>
+                        </div>
+                        <i class="fas fa-arrow-right text-2xl text-rose-200"></i>
+                    </div>
+                </a>
+
             </div>
         </div>
     </main>

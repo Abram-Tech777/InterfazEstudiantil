@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/fragments/head :: head( ${comunicado.idComunicado > 0} ? 'Editar Comunicado' : 'Registrar Comunicado')"></head>
 <body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
@@ -30,7 +30,7 @@
                             <div class="space-y-3">
                                 <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
                                     <input class="w-4 h-4 text-blue-600 cursor-pointer" type="radio" name="destinoTipo" id="destAula" value="AULA" th:checked="${destinoTipo == null or destinoTipo == 'AULA'}">
-                                    <span class="ml-3 font-medium text-gray-900">Aula específica</span>
+                                    <span class="ml-3 font-medium text-gray-900">Aula especÃ­fica</span>
                                     <i class="fas fa-door-open ml-2 text-blue-600"></i>
                                 </label>
                                 <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
@@ -50,7 +50,7 @@
                             <label class="block text-sm font-bold text-gray-900 mb-2">Seleccionar Aula</label>
                             <select th:field="*{aula.idAula}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
                                 <option value="0">-- Seleccione Aula --</option>
-                                <option th:each="a : ${aulas}" th:value="${a.idAula}" th:text="${a.grado + ' - Sección ' + a.seccion}"></option>
+                                <option th:each="a : ${aulas}" th:value="${a.idAula}" th:text="${a.grado + ' - SecciÃ³n ' + a.seccion}"></option>
                             </select>
                         </div>
 
@@ -63,13 +63,13 @@
                         </div>
 
                         <div class="mb-8">
-                            <label class="block text-sm font-bold text-gray-900 mb-2">Título</label>
-                            <input type="text" th:field="*{titulo}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" placeholder="Ej: Cambio de horario - Suspensión de clases" required />
+                            <label class="block text-sm font-bold text-gray-900 mb-2">TÃ­tulo</label>
+                            <input type="text" th:field="*{titulo}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" placeholder="Ej: Cambio de horario - SuspensiÃ³n de clases" required />
                         </div>
 
                         <div class="mb-8">
                             <label class="block text-sm font-bold text-gray-900 mb-2">Contenido</label>
-                            <textarea th:field="*{contenido}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" rows="8" placeholder="Escribe aquí el anuncio o comunicado detallado..." required></textarea>
+                            <textarea th:field="*{contenido}" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition" rows="8" placeholder="Escribe aquÃ­ el anuncio o comunicado detallado..." required></textarea>
                             <p class="text-xs text-gray-500 mt-2">
                                 <i class="fas fa-info-circle mr-1"></i>Se recomienda ser claro y conciso en el mensaje
                             </p>
@@ -85,7 +85,7 @@
 
                             <div id="fileErrorCard" class="hidden mt-3 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm flex items-center gap-3">
                                 <i class="fas fa-exclamation-circle text-lg shrink-0"></i>
-                                <span id="fileErrorMsg">Tamaño máximo alcanzado. Elimine algunos archivos.</span>
+                                <span id="fileErrorMsg">TamaÃ±o mÃ¡ximo alcanzado. Elimine algunos archivos.</span>
                             </div>
 
                             <div th:if="${comunicado.idComunicado > 0 and comunicado.archivos != null and !comunicado.archivos.isEmpty()}" id="existingFiles" class="mt-3">
@@ -103,7 +103,7 @@
                             </div>
 
                             <p class="text-xs text-gray-500 mt-3">
-                                <i class="fas fa-info-circle mr-1"></i>Formatos: Imágenes, PDF, Word, Excel, PowerPoint. Tamaño máximo total: 20 MB.
+                                <i class="fas fa-info-circle mr-1"></i>Formatos: ImÃ¡genes, PDF, Word, Excel, PowerPoint. TamaÃ±o mÃ¡ximo total: 20 MB.
                             </p>
                         </div>
 
@@ -124,10 +124,10 @@
                         <i class="fas fa-lightbulb mr-2"></i>Consejos para tu comunicado
                     </h3>
                     <ul class="text-sm text-blue-800 space-y-1 ml-6">
-                        <li>✓ Usa un título claro y descriptivo</li>
-                        <li>✓ Incluye fechas y horarios importantes</li>
-                        <li>✓ Sé específico sobre a quién va dirigido</li>
-                        <li>✓ Revisa la información antes de publicar</li>
+                        <li>âœ“ Usa un tÃ­tulo claro y descriptivo</li>
+                        <li>âœ“ Incluye fechas y horarios importantes</li>
+                        <li>âœ“ SÃ© especÃ­fico sobre a quiÃ©n va dirigido</li>
+                        <li>âœ“ Revisa la informaciÃ³n antes de publicar</li>
                     </ul>
                 </div>
             </div>

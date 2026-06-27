@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{/fragments/head :: head('Nuevo Mensaje')}"></head>
 <body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
@@ -60,7 +60,7 @@
                         <label class="block text-sm font-bold text-gray-700 mb-2">
                             <i class="fas fa-comment mr-1 text-gray-400"></i> Mensaje
                         </label>
-                        <textarea th:field="*{contenido}" rows="6" class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-[#a03030] focus:ring-1 focus:ring-[#a03030] transition" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                        <textarea th:field="*{contenido}" rows="6" class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-[#a03030] focus:ring-1 focus:ring-[#a03030] transition" placeholder="Escribe tu mensaje aquÃ­..." required></textarea>
                     </div>
                     <div class="mb-8">
                         <label class="block text-sm font-bold text-gray-700 mb-2">
@@ -70,13 +70,13 @@
                         <div id="filePreviewList" class="flex flex-wrap gap-2 mb-3 hidden"></div>
                         <div id="fileErrorCard" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm flex items-center gap-3 mb-3">
                             <i class="fas fa-exclamation-circle text-lg shrink-0"></i>
-                            <span id="fileErrorMsg">Tamaño máximo alcanzado (20 MB). Elimine algunos archivos.</span>
+                            <span id="fileErrorMsg">TamaÃ±o mÃ¡ximo alcanzado (20 MB). Elimine algunos archivos.</span>
                         </div>
                         <div class="border-2 border-dashed border-gray-200 rounded-xl p-4 bg-gray-50 hover:bg-gray-100 transition cursor-pointer text-center" onclick="document.getElementById('fileInput').click()">
                             <input type="file" name="files" multiple class="hidden" id="fileInput" accept=".jpg,.jpeg,.png,.gif,.bmp,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip" />
                             <span class="text-sm text-gray-500"><i class="fas fa-upload mr-2"></i>Haz clic para seleccionar archivos</span>
                         </div>
-                        <p class="text-xs text-gray-400 mt-2"><i class="fas fa-info-circle mr-1"></i>Máximo 20 MB total. Formatos: .jpg, .png, .gif, .pdf, .doc, .docx</p>
+                        <p class="text-xs text-gray-400 mt-2"><i class="fas fa-info-circle mr-1"></i>MÃ¡ximo 20 MB total. Formatos: .jpg, .png, .gif, .pdf, .doc, .docx</p>
                     </div>
                     <div class="flex gap-4 pt-4 border-t border-gray-100">
                         <button type="submit" class="px-6 py-3 bg-[#a03030] text-white rounded-xl font-bold hover:bg-[#7d1f1f] transition shadow-sm flex items-center gap-2">

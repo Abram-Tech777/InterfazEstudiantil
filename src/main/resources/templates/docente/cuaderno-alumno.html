@@ -1,0 +1,321 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/head :: head('Cuaderno de ' + ${alumno.nombreCompleto})"></head>
+<body class="m-0 p-0 h-screen flex bg-[#f4f6f9] font-sans overflow-hidden">
+
+    <div th:replace="~{/fragments/sidebar :: sidebar}"></div>
+
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+        <header class="h-20 bg-gradient-to-r from-[#8b1a1a] to-[#a03030] shadow-lg px-8 flex items-center justify-between z-10 text-white">
+            <div class="flex items-center gap-4">
+                <a href="/docente/cuaderno-control" class="no-print px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition-all">
+                    <i class="fas fa-arrow-left mr-1"></i> Volver
+                </a>
+                <h1 class="text-2xl font-bold tracking-tight" th:text="${alumno.nombreCompleto}"></h1>
+                <span class="hidden md:inline-block px-3 py-1 bg-white/15 rounded-full text-xs font-medium" th:text="${alumno.aula != null ? alumno.aula.grado + ' - ' + alumno.aula.seccion : ''}"></span>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 lg:p-8 custom-scrollbar">
+            <div class="max-w-7xl mx-auto space-y-6">
+
+                
+                <div th:if="${session.mensajeExito}" class="mb-0 bg-green-50 border border-green-200 text-green-800 px-5 py-3 rounded-xl flex items-center gap-3">
+                    <i class="fas fa-check-circle text-green-500"></i>
+                    <span class="font-medium" th:text="${session.mensajeExito}"></span>
+                </div>
+
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Asistencia</p>
+                                <p class="text-2xl font-black text-gray-800 mt-1" th:text="${pctAsistencia + '%'}">0%</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-calendar-check text-green-500 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3 w-full bg-gray-100 rounded-full h-2">
+                            <div class="h-2 rounded-full bg-green-500 transition-all duration-500" th:style="'width: ' + ${pctAsistencia} + '%'"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Tardanzas</p>
+                                <p class="text-2xl font-black text-gray-800 mt-1" th:text="${retardos}">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-clock text-yellow-500 text-xl"></i>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-3">de <span th:text="${total}"></span> clases</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Ausencias</p>
+                                <p class="text-2xl font-black text-gray-800 mt-1" th:text="${ausencias}">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-times-circle text-red-500 text-xl"></i>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-3">de <span th:text="${total}"></span> clases</p>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Promedio</p>
+                                <p class="text-2xl font-black text-gray-800 mt-1" th:text="${promedio}">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-chart-line text-blue-500 text-xl"></i>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-3">nota general</p>
+                    </div>
+                </div>
+
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 border-l-4 border-l-green-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Positivas</p>
+                                <p class="text-2xl font-black text-green-600 mt-1" th:text="${positivas}">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-star text-green-500 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 border-l-4 border-l-red-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Negativas</p>
+                                <p class="text-2xl font-black text-red-600 mt-1" th:text="${negativas}">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Bimestre</label>
+                            <div class="flex gap-1.5">
+                                <a th:each="b : ${bimestres}" th:href="@{/docente/cuaderno-control/alumno/{id}(id=${alumno.idAlumno}, bimestre=${b})}"
+                                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                                   th:classappend="${b == bimestreSel} ? 'bg-[#a03030] text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                                   th:text="'B' + ${b}"></a>
+                            </div>
+                        </div>
+                        <button onclick="document.getElementById('modalNueva').classList.remove('hidden')"
+                                class="px-4 py-2 bg-[#a03030] hover:bg-[#7d1f1f] text-white rounded-lg text-sm font-semibold transition-all">
+                            <i class="fas fa-plus mr-1"></i> Nueva Anotaci&oacute;n
+                        </button>
+                    </div>
+                </div>
+
+                
+                <div th:if="${#lists.isEmpty(conductas)}" class="bg-blue-50 border border-blue-200 text-blue-800 px-6 py-8 rounded-lg text-center">
+                    <i class="fas fa-info-circle text-3xl mb-4"></i>
+                    <p class="text-lg font-medium">No hay anotaciones para este bimestre</p>
+                </div>
+
+                <div th:if="${!#lists.isEmpty(conductas)}" class="space-y-4">
+                    <div th:each="c : ${conductas}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 transition-all hover:shadow-md"
+                         th:style="'border-left: 4px solid ' + (${c.tipo == 'POSITIVA'} ? '#22c55e' : '#ef4444') + ';'">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span th:if="${c.tipo == 'POSITIVA'}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700">
+                                        <i class="fas fa-star text-[10px]"></i> Positiva
+                                    </span>
+                                    <span th:if="${c.tipo == 'NEGATIVA'}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700">
+                                        <i class="fas fa-exclamation-triangle text-[10px]"></i> Negativa
+                                    </span>
+                                    <span class="text-xs text-gray-400 font-medium ml-2">
+                                        <i class="far fa-calendar-alt mr-1"></i>
+                                        <span th:text="${c.fechaRegistro != null ? #temporals.format(c.fechaRegistro, 'dd/MM/yyyy') : ''}"></span>
+                                        <span class="ml-2">B<span th:text="${c.bimestre}"></span></span>
+                                    </span>
+                                </div>
+                                <h3 class="font-bold text-gray-800 text-base" th:text="${c.titulo}"></h3>
+                                <p th:if="${c.descripcion != null and !c.descripcion.isEmpty()}" class="text-sm text-gray-600 mt-2 leading-relaxed" th:text="${c.descripcion}"></p>
+                                <p th:if="${c.observaciones != null and !c.observaciones.isEmpty()}" class="text-xs text-gray-400 mt-2 italic">
+                                    <i class="fas fa-pen mr-1"></i> <span th:text="${c.observaciones}"></span>
+                                </p>
+                                <p class="text-xs text-gray-400 mt-2" th:if="${c.docente != null}">
+                                    <i class="fas fa-user-tie mr-1"></i> <span th:text="${c.docente.nombreCompleto}"></span>
+                                </p>
+                            </div>
+                            <div class="flex gap-2 shrink-0">
+                                <button onclick="editarAnotacion(this)"
+                                        data-id="${c.idConducta}"
+                                        data-titulo="${c.titulo}"
+                                        data-descripcion="${c.descripcion}"
+                                        data-observaciones="${c.observaciones}"
+                                        data-bimestre="${c.bimestre}"
+                                        class="px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold transition-all">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <a th:href="@{/docente/cuaderno-control/anotacion/eliminar/{id}(id=${c.idConducta})}"
+                                   class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-semibold transition-all"
+                                   onclick="return confirm('Eliminar esta anotaci\u00f3n?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    
+    <div id="modalNueva" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+                <h2 class="text-lg font-bold text-gray-800">Nueva Anotaci&oacute;n</h2>
+                <button onclick="document.getElementById('modalNueva').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form method="post" action="/docente/cuaderno-control/anotacion/crear" class="p-6 space-y-4">
+                <input type="hidden" name="idAlumno" th:value="${alumno.idAlumno}">
+                <input type="hidden" name="origen" value="alumno">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Tipo</label>
+                    <div class="flex gap-3">
+                        <label class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all has-[:checked]:border-green-500 has-[:checked]:bg-green-50 border-gray-200">
+                            <input type="radio" name="tipo" value="POSITIVA" class="hidden" checked>
+                            <i class="fas fa-star text-green-500"></i>
+                            <span class="font-semibold text-sm text-gray-700">Positiva</span>
+                        </label>
+                        <label class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all has-[:checked]:border-red-500 has-[:checked]:bg-red-50 border-gray-200">
+                            <input type="radio" name="tipo" value="NEGATIVA" class="hidden">
+                            <i class="fas fa-exclamation-triangle text-red-500"></i>
+                            <span class="font-semibold text-sm text-gray-700">Negativa</span>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">T&iacute;tulo</label>
+                    <input type="text" name="titulo" required
+                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none"
+                           placeholder="Ej: Participaci&oacute;n destacada">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Descripci&oacute;n</label>
+                    <textarea name="descripcion" rows="3"
+                              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none resize-none"
+                              placeholder="Describe la anotaci&oacute;n..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Observaciones</label>
+                    <textarea name="observaciones" rows="2"
+                              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none resize-none"
+                              placeholder="Notas adicionales..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Bimestre</label>
+                    <select name="bimestre"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none">
+                        <option th:each="i : ${#numbers.sequence(1, 4)}" th:value="${i}" th:text="'Bimestre ' + ${i}"></option>
+                    </select>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="submit"
+                            class="flex-1 px-6 py-3 bg-[#a03030] hover:bg-[#7d1f1f] text-white font-bold rounded-xl transition-all text-sm">
+                        <i class="fas fa-save mr-2"></i> Guardar Anotaci&oacute;n
+                    </button>
+                    <button type="button" onclick="document.getElementById('modalNueva').classList.add('hidden')"
+                            class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-all text-sm">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    
+    <div id="modalEditar" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+                <h2 class="text-lg font-bold text-gray-800">Editar Anotaci&oacute;n</h2>
+                <button onclick="document.getElementById('modalEditar').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form method="post" action="/docente/cuaderno-control/anotacion/actualizar" class="p-6 space-y-4">
+                <input type="hidden" name="idConducta" id="editIdConducta">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">T&iacute;tulo</label>
+                    <input type="text" name="titulo" id="editTitulo" required
+                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Descripci&oacute;n</label>
+                    <textarea name="descripcion" id="editDescripcion" rows="3"
+                              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Observaciones</label>
+                    <textarea name="observaciones" id="editObservaciones" rows="2"
+                              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Bimestre</label>
+                    <select name="bimestre" id="editBimestre"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#a03030]/20 focus:border-[#a03030] outline-none">
+                        <option th:each="i : ${#numbers.sequence(1, 4)}" th:value="${i}" th:text="'Bimestre ' + ${i}"></option>
+                    </select>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="submit"
+                            class="flex-1 px-6 py-3 bg-[#a03030] hover:bg-[#7d1f1f] text-white font-bold rounded-xl transition-all text-sm">
+                        <i class="fas fa-save mr-2"></i> Actualizar
+                    </button>
+                    <button type="button" onclick="document.getElementById('modalEditar').classList.add('hidden')"
+                            class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-all text-sm">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div th:replace="~{/fragments/scripts :: scripts}"></div>
+    <script>
+        function editarAnotacion(btn) {
+            document.getElementById('editIdConducta').value = btn.getAttribute('data-id');
+            document.getElementById('editTitulo').value = btn.getAttribute('data-titulo');
+            document.getElementById('editDescripcion').value = btn.getAttribute('data-descripcion') || '';
+            document.getElementById('editObservaciones').value = btn.getAttribute('data-observaciones') || '';
+            var bim = btn.getAttribute('data-bimestre');
+            var sel = document.getElementById('editBimestre');
+            for (var i = 0; i < sel.options.length; i++) {
+                if (sel.options[i].value === bim) { sel.selectedIndex = i; break; }
+            }
+            document.getElementById('modalEditar').classList.remove('hidden');
+        }
+
+        // Close modals on Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.getElementById('modalNueva').classList.add('hidden');
+                document.getElementById('modalEditar').classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

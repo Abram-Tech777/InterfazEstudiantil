@@ -137,7 +137,6 @@ public class DocenteController {
             }
         }
 
-        // Calcular jornada real desde los horarios
         String jornadaInicioReal = jornadaConfig.getInicio().toString();
         String jornadaFinReal = jornadaConfig.getFin().toString();
         if (!horarios.isEmpty()) {
@@ -149,7 +148,6 @@ public class DocenteController {
                 .map(Horario::getHoraFin)
                 .max(Comparator.naturalOrder())
                 .orElse(jornadaConfig.getFin());
-            // Adjust to show full jornada (round down/up to nearest 15 min)
             int startMin = (minInicio.getHour() * 60 + minInicio.getMinute()) / 15 * 15;
             int endMin = ((maxFin.getHour() * 60 + maxFin.getMinute()) + 14) / 15 * 15;
             jornadaInicioReal = LocalTime.of(startMin / 60, startMin % 60).toString();
@@ -241,13 +239,11 @@ public class DocenteController {
         HorarioMatrizDTO matriz = new HorarioMatrizDTO(aulaNombre, aulaGrado);
         List<String> dias = matriz.getDias();
 
-        // Organize horarios by start time
         Map<LocalTime, List<Horario>> horariosPorInicio = new java.util.LinkedHashMap<>();
         for (Horario h : horarios) {
             horariosPorInicio.computeIfAbsent(h.getHoraInicio(), k -> new ArrayList<>()).add(h);
         }
 
-        // Build rows for each unique start time
         List<LocalTime> startTimesOrdenados = new ArrayList<>(horariosPorInicio.keySet());
         startTimesOrdenados.sort(Comparator.naturalOrder());
 
@@ -284,7 +280,6 @@ public class DocenteController {
                 horariosEnInicio.stream().map(h -> h.getCurso().getNombreCurso() + "(" + h.getDiaSemana() + ")").toList());
         }
 
-        // Insert recreo row
         boolean insertadoRecreo = false;
         List<FilaHorarioDTO> filasConRecreo = new ArrayList<>();
         for (FilaHorarioDTO fila : matriz.getFilas()) {
