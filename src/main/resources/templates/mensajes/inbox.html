@@ -32,14 +32,16 @@
                 <p class="text-sm text-blue-600 mt-2">No tienes mensajes recibidos por el momento.</p>
             </div>
 
-            <div th:each="m : ${inbox}" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300 mb-4">
+            <div th:each="m : ${inbox}" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300 mb-4" th:classappend="${m.remitente.idUsuario == currentUserId} ? 'border-l-4 border-l-blue-400' : ''">
                 <div class="px-6 py-5 flex justify-between items-start">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
                             <strong class="text-gray-800" th:text="${m.remitente.nombreCompleto}"></strong>
-                            <span th:if="${!m.leido}" class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block shrink-0"></span>
+                            <span th:if="${m.remitente.idUsuario == currentUserId}" class="text-xs text-blue-500 font-semibold bg-blue-50 px-2 py-0.5 rounded-full">Enviado</span>
+                            <span th:if="${!m.leido and m.remitente.idUsuario != currentUserId}" class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block shrink-0"></span>
                         </div>
                         <p class="text-sm text-gray-500 mt-1 truncate">
+                            <span th:if="${m.remitente.idUsuario == currentUserId}" class="text-xs text-gray-400 mr-1"><i class="fas fa-arrow-right"></i> Para: <span th:text="${m.destinatario.nombreCompleto}"></span></span>
                             <span th:text="${m.asunto}"></span>
                             <span class="text-xs text-gray-400 ml-2" th:text="${#temporals.format(m.fechaEnvio, 'dd/MM/yyyy hh:mm a')}"></span>
                         </p>
@@ -115,42 +117,172 @@ function appendReplyBubble(data, id) {
     if (!repliesContainer) return;
     var currentUserId = parseInt(document.getElementById('currentUserId').value);
     var isMine = data.remitenteId === currentUserId;
-    var bubble = document.createElement('div');
-    bubble.className = isMine ? 'flex justify-end' : 'flex justify-start';
+
+    // Collapse all previous bubbles: hide their content, show summary bar
+    var allExisting = repliesContainer.children;
+    for (var ei = 0; ei < allExisting.length; ei++) {
+        var eb = allExisting[ei];
+        if (eb.classList.contains('minimized')) continue;
+        eb.classList.add('minimized');
+        var ebContent = eb.querySelector('.bubble-content');
+        var ebName = eb.querySelector('.reply-name');
+        var ebTime = eb.querySelector('.reply-time');
+        if (ebContent) ebContent.style.display = 'none';
+        var summary = eb.querySelector('.bubble-summary');
+        if (!summary) {
+            summary = document.createElement('div');
+            summary.className = 'bubble-summary';
+            var sName = ebName ? ebName.textContent : '';
+            var sTime = ebTime ? ebTime.textContent : '';
+            summary.innerHTML = '<div class="text-xs text-gray-400 cursor-pointer hover:text-gray-600 transition flex items-center gap-1.5 px-2 py-1 select-none" onclick="toggleMinimized(this)"><i class="fas fa-chevron-right text-[10px]"></i><span>' + sName + '</span><span class="text-gray-300">·</span><span>' + sTime + '</span></div>';
+            var inner = eb.firstChild || eb;
+            inner.insertBefore(summary, ebContent);
+        }
+    }
+
+    // Collapse pre-rendered thread responses into "Ver X anteriores"
+    var threadContainer = document.getElementById('threadContainer-' + id);
+    if (threadContainer && !threadContainer.classList.contains('compacted')) {
+        threadContainer.classList.add('compacted');
+        var respItems = threadContainer.querySelectorAll('.respuesta-item');
+        var threadVerMas = threadContainer.querySelector('.ver-mas-respuestas');
+        if (threadVerMas) threadVerMas.remove();
+        var total = respItems.length;
+        // Hide all pre-rendered items
+        for (var ri2 = 0; ri2 < respItems.length; ri2++) {
+            respItems[ri2].style.display = 'none';
+        }
+        var counterDiv = document.createElement('div');
+        counterDiv.className = 'text-xs text-gray-400 mb-2 flex items-center gap-2';
+        counterDiv.innerHTML = '<button class="show-more-thread text-[#a03030] font-bold hover:underline flex items-center gap-1" onclick="expandAllThread(\'' + id + '\')"><i class="fas fa-chevron-up text-[10px]"></i> Ver ' + total + ' respuestas anteriores</button>';
+        threadContainer.insertBefore(counterDiv, threadContainer.querySelector('.space-y-3'));
+    }
+
+    // Create new bubble
+    var wrapper = document.createElement('div');
+    wrapper.className = isMine ? 'flex justify-end' : 'flex justify-start';
+
     var inner = document.createElement('div');
     inner.className = isMine ? 'max-w-[80%] bg-[#a03030] text-white rounded-2xl rounded-br-md px-4 py-3 shadow-sm' : 'max-w-[80%] bg-white text-gray-800 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm border border-gray-100';
+
+    var bContent = document.createElement('div');
+    bContent.className = 'bubble-content';
+
+    var nameLine = document.createElement('div');
+    nameLine.className = 'reply-name text-xs font-semibold mb-1 ' + (isMine ? 'text-white/70' : 'text-gray-500');
+    nameLine.textContent = data.remitenteNombre || '';
+    bContent.appendChild(nameLine);
+
     var p = document.createElement('p');
     p.className = 'whitespace-pre-wrap text-sm leading-relaxed';
     p.textContent = data.contenido || '';
-    inner.appendChild(p);
+    bContent.appendChild(p);
 
     if (data.archivos && data.archivos.length > 0) {
         var filesDiv = document.createElement('div');
-        filesDiv.className = 'mt-2 pt-2 border-t';
+        filesDiv.className = 'flex flex-col gap-2 mt-2 pt-2 border-t';
         filesDiv.style.borderTopColor = isMine ? 'rgba(255,255,255,0.2)' : '#e5e7eb';
         for (var ai = 0; ai < data.archivos.length; ai++) {
             var a = data.archivos[ai];
-            var ext = a.archivoNombre.split('.').pop().toLowerCase();
-            var isImg = ['jpg','jpeg','png','gif','bmp','webp'].indexOf(ext) !== -1;
-            var isPdf = ext === 'pdf';
-            var isDoc = ext === 'docx' || ext === 'doc';
-            var icon = isImg ? 'fa-image' : isPdf ? 'fa-file-pdf' : isDoc ? 'fa-file-word' : 'fa-file';
-            var row = document.createElement('div');
-            row.className = 'flex items-center gap-2 text-xs mt-1';
-            row.innerHTML = '<i class="fas ' + icon + '"></i><span class="truncate max-w-[100px]">' + a.archivoNombre + '</span>' +
-                '<a href="/mensajes/descargarArchivo/' + a.idArchivo + '" class="ml-auto hover:opacity-80"><i class="fas fa-download"></i></a>';
-            filesDiv.appendChild(row);
+            filesDiv.insertAdjacentHTML('beforeend', renderArchivo(a, data.idMensaje));
         }
-        inner.appendChild(filesDiv);
+        bContent.appendChild(filesDiv);
     }
 
     var time = document.createElement('div');
-    time.className = 'text-xs mt-2 ' + (isMine ? 'text-white/60 text-right' : 'text-gray-400 text-left');
+    time.className = 'reply-time text-xs mt-2 ' + (isMine ? 'text-white/60 text-right' : 'text-gray-400 text-left');
     time.textContent = data.fechaEnvio || '';
-    inner.appendChild(time);
-    bubble.appendChild(inner);
-    repliesContainer.appendChild(bubble);
+    bContent.appendChild(time);
+
+    inner.appendChild(bContent);
+    wrapper.appendChild(inner);
+    repliesContainer.appendChild(wrapper);
+
+    // Attach preview listeners to new file buttons
+    var newItems = wrapper.querySelectorAll('.preview-btn');
+    for (var pbi = 0; pbi < newItems.length; pbi++) {
+        (function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var parent = btn.closest('.archivo-item');
+                if (!parent) return;
+                var previewCont = parent.querySelector('.archivo-preview-cont');
+                if (!previewCont) return;
+                if (!previewCont.classList.contains('hidden')) {
+                    previewCont.classList.add('hidden');
+                    previewCont.innerHTML = '';
+                    return;
+                }
+                var url = btn.getAttribute('data-url');
+                var ext = btn.getAttribute('data-ext');
+                if (ext === 'pdf') {
+                    previewCont.innerHTML = '<embed src="' + url + '#toolbar=0" type="application/pdf" class="w-full h-[500px] rounded-xl border" />';
+                    previewCont.classList.remove('hidden');
+                } else if (ext === 'docx') {
+                    previewCont.innerHTML = '<div class="flex items-center justify-center p-8"><i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i></div>';
+                    previewCont.classList.remove('hidden');
+                    fetch(url)
+                        .then(function(r) {
+                            if (!r.ok) throw new Error('Error al cargar');
+                            return r.arrayBuffer();
+                        })
+                        .then(function(buffer) {
+                            mammoth.convertToHtml({arrayBuffer: buffer})
+                                .then(function(result) {
+                                    previewCont.innerHTML = '<div class="p-6 bg-white rounded-xl border prose prose-sm max-w-none">' + result.value + '</div>';
+                                })
+                                .catch(function() {
+                                    previewCont.innerHTML = '<div class="p-4 text-red-500 text-sm">Error al procesar el documento.</div>';
+                                });
+                        })
+                        .catch(function() {
+                            previewCont.innerHTML = '<div class="p-4 text-red-500 text-sm">Error al cargar el archivo.</div>';
+                        });
+                } else if (['jpg','jpeg','png','gif','bmp','webp'].indexOf(ext) !== -1) {
+                    previewCont.innerHTML = '<img src="' + url + '" class="max-h-96 w-full object-contain rounded-xl border" alt="Preview" />';
+                    previewCont.classList.remove('hidden');
+                } else {
+                    previewCont.innerHTML = '<div class="p-4 text-gray-500 text-sm text-center"><i class="fas fa-file mr-2"></i>Vista previa no disponible</div>';
+                    previewCont.classList.remove('hidden');
+                }
+            });
+        })(newItems[pbi]);
+    }
+
     repliesContainer.scrollTop = repliesContainer.scrollHeight;
+}
+
+function toggleMinimized(el) {
+    var parent = el.closest('[class*="flex justify-"]') || el.closest('.respuesta-item');
+    if (!parent) return;
+    parent.classList.toggle('minimized');
+    var content = parent.querySelector('.bubble-content');
+    if (content) {
+        content.style.display = parent.classList.contains('minimized') ? 'none' : '';
+    }
+    var summary = parent.querySelector('.bubble-summary');
+    if (summary) {
+        summary.style.display = parent.classList.contains('minimized') ? '' : 'none';
+    }
+}
+
+function expandAllThread(id) {
+    var tc = document.getElementById('threadContainer-' + id);
+    if (!tc) return;
+    var space = tc.querySelector('.space-y-3');
+    if (space) {
+        space.style.display = '';
+        var items = space.querySelectorAll('.respuesta-item');
+        for (var i = 0; i < items.length; i++) {
+            items[i].style.display = '';
+        }
+    }
+    var btn = tc.querySelector('.show-more-thread');
+    if (btn) {
+        var parentDiv = btn.closest('[class*="text-xs text-gray-400"]');
+        if (parentDiv) parentDiv.remove();
+    }
+    tc.classList.remove('compacted');
 }
 
 document.querySelectorAll('.abrir-msj').forEach(function(btn) {
@@ -182,7 +314,9 @@ document.querySelectorAll('.abrir-msj').forEach(function(btn) {
                 var html = '<div class="px-6 py-5 bg-gray-50">' +
                     '<div class="flex items-center gap-2 text-sm text-gray-600 mb-3">' +
                     '<i class="fas fa-user-circle text-gray-400"></i>' +
-                    '<strong>De:</strong> ' + (data.remitente != null ? (data.remitente.rol + ' - ' + data.remitente.nombreCompleto || '') : '') +
+                    (data.remitente && data.remitente.idUsuario === currentUserId
+                        ? '<strong>Para:</strong> ' + (data.destinatario ? (data.destinatario.rol + ' - ' + data.destinatario.nombreCompleto || '') : '')
+                        : '<strong>De:</strong> ' + (data.remitente != null ? (data.remitente.rol + ' - ' + data.remitente.nombreCompleto || '') : '')) +
                     '</div>' +
                     '<p class="font-bold text-gray-800 text-lg mb-3">' + (data.asunto || '') + '</p>' +
                     '<div class="bg-white rounded-xl p-4 border border-gray-200">' +
@@ -203,7 +337,7 @@ document.querySelectorAll('.abrir-msj').forEach(function(btn) {
                     html += '<div class="mt-4 pt-4 border-t border-gray-200" id="threadContainer-' + id + '">' +
                         '<p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3"><i class="fas fa-reply-all mr-1"></i>Respuestas (' + data.respuestas.length + ')</p>' +
                         '<div class="space-y-3">';
-                    var showFrom = Math.max(0, data.respuestas.length - 2);
+                    var showFrom = Math.max(0, data.respuestas.length - 1);
                     for (var ri = 0; ri < data.respuestas.length; ri++) {
                         var r = data.respuestas[ri];
                         var isMine = r.remitenteId === currentUserId;
@@ -235,6 +369,8 @@ document.querySelectorAll('.abrir-msj').forEach(function(btn) {
 
                 if (data.destinatario && data.destinatario.idUsuario === currentUserId) {
                     html += renderReplyForm(id, data.remitente ? data.remitente.idUsuario : '', 'Re: ' + (data.asunto || ''));
+                } else if (data.remitente && data.remitente.idUsuario === currentUserId) {
+                    html += renderReplyForm(id, data.destinatario ? data.destinatario.idUsuario : '', 'Re: ' + (data.asunto || ''));
                 } else if (otherUserId) {
                     html += '<div class="mt-4 pt-4 border-t border-gray-200">' +
                         '<a href="/mensajes/chat/' + otherUserId + '" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition shadow-sm">' +

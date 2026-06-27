@@ -12,7 +12,7 @@ public interface MensajeRepository extends JpaRepository<Mensaje, Integer> {
     List<Mensaje> findByDestinatario_IdUsuarioOrderByFechaEnvioDesc(int idUsuario);
     List<Mensaje> findByRemitente_IdUsuarioOrderByFechaEnvioDesc(int idUsuario);
 
-    @Query("SELECT m FROM Mensaje m WHERE m.destinatario.idUsuario = :userId AND m.mensajePadre IS NULL AND (m.remitente.rol = 'DOCENTE' OR m.remitente.rol = 'ADMINISTRADOR') ORDER BY m.fechaEnvio DESC")
+    @Query("SELECT m FROM Mensaje m WHERE m.mensajePadre IS NULL AND ((m.destinatario.idUsuario = :userId AND (m.remitente.rol = 'DOCENTE' OR m.remitente.rol = 'ADMINISTRADOR')) OR m.remitente.idUsuario = :userId) ORDER BY m.fechaEnvio DESC")
     List<Mensaje> findInboxByUserId(@Param("userId") int userId);
 
     @Query("SELECT DISTINCT m FROM Mensaje m LEFT JOIN FETCH m.archivos WHERE m.mensajePadre.idMensaje = :parentId ORDER BY m.fechaEnvio ASC")

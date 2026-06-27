@@ -98,7 +98,8 @@ public class MensajeServiceImpl implements MensajeService {
     public void eliminarMensaje(int idMensaje, int idUsuario) {
         Mensaje m = mensajeRepository.findById(idMensaje)
                 .orElseThrow(() -> new IllegalArgumentException("Mensaje no encontrado."));
-        if (m.getDestinatario() == null || m.getDestinatario().getIdUsuario() != idUsuario) {
+        if ((m.getDestinatario() == null || m.getDestinatario().getIdUsuario() != idUsuario) &&
+            (m.getRemitente() == null || m.getRemitente().getIdUsuario() != idUsuario)) {
             throw new IllegalArgumentException("No tienes permiso para eliminar este mensaje.");
         }
         mensajeRepository.delete(m);
