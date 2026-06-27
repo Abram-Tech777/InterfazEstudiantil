@@ -52,6 +52,16 @@ public class Mensaje {
     @JsonIgnoreProperties({"archivoData", "contenido", "aula", "grado", "rutaAdjunto"})
     private Comunicado comunicadoReferencia;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_mensaje_padre")
+    @JsonIgnoreProperties({"respuestas", "mensajePadre", "archivos"})
+    private Mensaje mensajePadre;
+
+    @OneToMany(mappedBy = "mensajePadre", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"mensajePadre", "mensajePadre"})
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private List<Mensaje> respuestas;
+
     public Mensaje() {}
 
     public Integer getIdMensaje() { return idMensaje; }
@@ -80,4 +90,13 @@ public class Mensaje {
 
     public Comunicado getComunicadoReferencia() { return comunicadoReferencia; }
     public void setComunicadoReferencia(Comunicado comunicadoReferencia) { this.comunicadoReferencia = comunicadoReferencia; }
+
+    public Mensaje getMensajePadre() { return mensajePadre; }
+    public void setMensajePadre(Mensaje mensajePadre) { this.mensajePadre = mensajePadre; }
+
+    public List<Mensaje> getRespuestas() { return respuestas; }
+    public void setRespuestas(List<Mensaje> respuestas) { this.respuestas = respuestas; }
+
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    public boolean isEsRespuesta() { return mensajePadre != null; }
 }

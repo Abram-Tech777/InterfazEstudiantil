@@ -264,15 +264,14 @@ public class ComunicadoController {
 
         Map<Integer, String> autorMap = new HashMap<>();
         for (Usuario au : autores) {
+            String rolePrefix = au.getRol().substring(0, 1).toUpperCase() + au.getRol().substring(1).toLowerCase();
             String label;
             if ("DOCENTE".equalsIgnoreCase(au.getRol())) {
                 label = docenteRepository.findByUsuario_IdUsuario(au.getIdUsuario())
-                        .map(d -> "Docente " + d.getNombre() + " " + d.getApellido())
-                        .orElse(au.getNombreCompleto());
-            } else if ("ADMINISTRADOR".equalsIgnoreCase(au.getRol())) {
-                label = "Administrador";
+                        .map(d -> rolePrefix + " - " + d.getNombre() + " " + d.getApellido())
+                        .orElse(rolePrefix + " - " + au.getNombreCompleto());
             } else {
-                label = au.getNombreCompleto();
+                label = rolePrefix + " - " + au.getNombreCompleto();
             }
             autorMap.put(au.getIdUsuario(), label);
         }
@@ -300,15 +299,14 @@ public class ComunicadoController {
         List<Usuario> autores = usuarioRepository.findAllById(authorIds);
         Map<Integer, String> autorMap = new HashMap<>();
         for (Usuario au : autores) {
+            String rolePrefix = au.getRol().substring(0, 1).toUpperCase() + au.getRol().substring(1).toLowerCase();
             String label;
             if ("DOCENTE".equalsIgnoreCase(au.getRol())) {
                 label = docenteRepository.findByUsuario_IdUsuario(au.getIdUsuario())
-                        .map(d -> "Docente " + d.getNombre() + " " + d.getApellido())
-                        .orElse(au.getNombreCompleto());
-            } else if ("ADMINISTRADOR".equalsIgnoreCase(au.getRol())) {
-                label = "Administrador";
+                        .map(d -> rolePrefix + " - " + d.getNombre() + " " + d.getApellido())
+                        .orElse(rolePrefix + " - " + au.getNombreCompleto());
             } else {
-                label = au.getNombreCompleto();
+                label = rolePrefix + " - " + au.getNombreCompleto();
             }
             autorMap.put(au.getIdUsuario(), label);
         }

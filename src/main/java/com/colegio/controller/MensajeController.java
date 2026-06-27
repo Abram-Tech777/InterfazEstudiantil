@@ -1,5 +1,6 @@
 package com.colegio.controller;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,45 +71,67 @@ public class MensajeController {
         }
         model.addAttribute("mensaje", mensaje);
 
-        List<Usuario> destinatarios;
+        List<Usuario> todos = usuarioRepository.findAll().stream()
+                .filter(u -> !u.getIdUsuario().equals(remitente.getIdUsuario()))
+                .collect(Collectors.toList());
 
         if (remitente != null && "ESTUDIANTE".equalsIgnoreCase(remitente.getRol())) {
-            destinatarios = usuarioRepository.findAll().stream()
+            List<Usuario> docentes = todos.stream()
                     .filter(u -> "DOCENTE".equalsIgnoreCase(u.getRol()))
                     .collect(Collectors.toList());
-        } else if (remitente != null && "DOCENTE".equalsIgnoreCase(remitente.getRol())) {
-            destinatarios = docenteRepository.findByUsuario_IdUsuario(remitente.getIdUsuario())
-                    .map(docente -> {
-                        List<Integer> aulaIds = aulaDocenteRepository.findAulaIdsByDocenteId(docente.getIdDocente());
-                        return aulaIds.stream()
-                                .flatMap(aulaId -> alumnoRepository.findByAula_IdAula(aulaId).stream())
-                                .map(Alumno::getUsuario)
-                                .filter(u -> u != null && "ESTUDIANTE".equalsIgnoreCase(u.getRol()))
-                                .distinct()
-                                .collect(Collectors.toList());
-                    })
-                    .orElseGet(List::of);
+            model.addAttribute("docenteList", docentes);
+            model.addAttribute("adminList", List.of());
+            model.addAttribute("docentes", docentes);
+        } else if (remitente != null && ("DOCENTE".equalsIgnoreCase(remitente.getRol()) || "ADMINISTRADOR".equalsIgnoreCase(remitente.getRol()))) {
+            List<Usuario> docentes = todos.stream()
+                    .filter(u -> "DOCENTE".equalsIgnoreCase(u.getRol()))
+                    .collect(Collectors.toList());
+            List<Usuario> admins = todos.stream()
+                    .filter(u -> "ADMINISTRADOR".equalsIgnoreCase(u.getRol()))
+                    .collect(Collectors.toList());
+            List<Usuario> todosJuntos = new ArrayList<>();
+            todosJuntos.addAll(docentes);
+            todosJuntos.addAll(admins);
+            model.addAttribute("docenteList", docentes);
+            model.addAttribute("adminList", admins);
+            model.addAttribute("docentes", todosJuntos);
         } else {
-            destinatarios = usuarioRepository.findAll().stream()
-                    .filter(u -> "DOCENTE".equalsIgnoreCase(u.getRol()))
-                    .collect(Collectors.toList());
+            model.addAttribute("docenteList", List.of());
+            model.addAttribute("adminList", List.of());
+            model.addAttribute("docentes", List.of());
         }
 
-        model.addAttribute("docentes", destinatarios);
         return "mensajes/nuevo";
     }
 
     @PostMapping("/enviar")
-    public String enviarMensaje(Mensaje mensaje,
+    public Object enviarMensaje(Mensaje mensaje,
                                 @RequestParam(value = "files", required = false) MultipartFile[] archivos,
-                                HttpSession session, RedirectAttributes redirectAttrs) {
+                                @RequestParam(value = "replyToId", required = false) Integer replyToId,
+                                HttpSession session, HttpServletRequest request,
+                                RedirectAttributes redirectAttrs) {
         Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
         if (u == null) {
+            if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+                return ResponseEntity.status(401).body(Map.of("error", "Debes iniciar sesión."));
+            }
             redirectAttrs.addFlashAttribute("mensajeError", "Debes iniciar sesión para enviar mensajes.");
             return "redirect:/login";
         }
+        boolean isAjax = "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
+
         try {
             mensaje.setRemitente(u);
+
+            if (replyToId != null) {
+                Mensaje padre = mensajeService.obtenerPorId(replyToId, u.getIdUsuario());
+                if (padre != null) {
+                    mensaje.setMensajePadre(padre);
+                    if (mensaje.getAsunto() == null || mensaje.getAsunto().isBlank()) {
+                        mensaje.setAsunto("Re: " + padre.getAsunto());
+                    }
+                }
+            }
 
             if (archivos != null && archivos.length > 0) {
                 long totalSize = 0;
@@ -129,9 +152,36 @@ public class MensajeController {
                 mensaje.setArchivos(listaArchivos);
             }
 
-            mensajeService.enviarMensaje(mensaje);
+            Mensaje saved = mensajeService.enviarMensaje(mensaje);
+
+            if (isAjax) {
+                DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a");
+                Map<String, Object> result = new java.util.LinkedHashMap<>();
+                result.put("idMensaje", saved.getIdMensaje());
+                result.put("contenido", saved.getContenido());
+                result.put("asunto", saved.getAsunto());
+                result.put("fechaEnvio", saved.getFechaEnvio() != null ? saved.getFechaEnvio().format(fmt) : "");
+                result.put("remitenteId", saved.getRemitente().getIdUsuario());
+                result.put("remitenteNombre", saved.getRemitente().getNombreCompleto());
+                List<Map<String, Object>> archivosJson = new ArrayList<>();
+                if (saved.getArchivos() != null) {
+                    for (MensajeArchivo ma : saved.getArchivos()) {
+                        Map<String, Object> am = new java.util.HashMap<>();
+                        am.put("idArchivo", ma.getIdArchivo());
+                        am.put("archivoNombre", ma.getArchivoNombre());
+                        am.put("archivoTipo", ma.getArchivoTipo());
+                        archivosJson.add(am);
+                    }
+                }
+                result.put("archivos", archivosJson);
+                return ResponseEntity.ok(result);
+            }
+
             redirectAttrs.addFlashAttribute("mensajeExito", "Mensaje enviado correctamente.");
         } catch (Exception e) {
+            if (isAjax) {
+                return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            }
             redirectAttrs.addFlashAttribute("mensajeError", e.getMessage());
         }
         return "redirect:/mensajes/inbox";
@@ -147,13 +197,59 @@ public class MensajeController {
         return "mensajes/inbox";
     }
 
+    @PostMapping("/eliminar/{id}")
+    public String eliminarMensaje(@PathVariable int id, HttpSession session, RedirectAttributes redirectAttrs) {
+        Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
+        if (u == null) return "redirect:/login";
+        try {
+            mensajeService.eliminarMensaje(id, u.getIdUsuario());
+            redirectAttrs.addFlashAttribute("mensajeExito", "Mensaje eliminado.");
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("mensajeError", e.getMessage());
+        }
+        return "redirect:/mensajes/inbox";
+    }
+
+    @PostMapping("/vaciar-inbox")
+    public String vaciarInbox(HttpSession session, RedirectAttributes redirectAttrs) {
+        Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
+        if (u == null) return "redirect:/login";
+        try {
+            mensajeService.vaciarInbox(u.getIdUsuario());
+            redirectAttrs.addFlashAttribute("mensajeExito", "Bandeja vaciada.");
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("mensajeError", e.getMessage());
+        }
+        return "redirect:/mensajes/inbox";
+    }
+
+    @PostMapping("/eliminar-chat/{conUserId}")
+    public String eliminarChat(@PathVariable int conUserId, HttpSession session, RedirectAttributes redirectAttrs) {
+        Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
+        if (u == null) return "redirect:/login";
+        try {
+            mensajeService.eliminarConversacion(u.getIdUsuario(), conUserId);
+            redirectAttrs.addFlashAttribute("mensajeExito", "Conversación eliminada.");
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("mensajeError", e.getMessage());
+        }
+        return "redirect:/mensajes/contactos";
+    }
+
     @GetMapping("/contactos")
     public String contactos(HttpSession session, Model model) {
         Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
         if (u == null) return "redirect:/login";
         List<Usuario> contactos = mensajeService.listarContactos(u.getIdUsuario());
+        if ("ADMINISTRADOR".equalsIgnoreCase(u.getRol())) {
+            contactos = contactos.stream()
+                    .filter(c -> "DOCENTE".equalsIgnoreCase(c.getRol()) || "ADMINISTRADOR".equalsIgnoreCase(c.getRol()))
+                    .collect(Collectors.toList());
+        }
         model.addAttribute("contactos", contactos);
         model.addAttribute("currentUserId", u.getIdUsuario());
+        Map<Integer, Long> noLeidos = mensajeService.contarNoLeidosPorContacto(u.getIdUsuario());
+        model.addAttribute("noLeidos", noLeidos);
         return "mensajes/contactos";
     }
 
@@ -171,6 +267,15 @@ public class MensajeController {
         model.addAttribute("currentUserId", u.getIdUsuario());
         model.addAttribute("refTitulo", refTitulo);
         model.addAttribute("refId", refId);
+        String enlaceAnuncio = "DOCENTE".equalsIgnoreCase(u.getRol()) ? "/gestioncomunicados/lista" : "/gestioncomunicados/bandeja";
+        model.addAttribute("enlaceAnuncio", enlaceAnuncio);
+        String lastCheck = conversacion.stream()
+                .map(Mensaje::getFechaEnvio)
+                .filter(java.util.Objects::nonNull)
+                .max(java.time.LocalDateTime::compareTo)
+                .map(java.time.LocalDateTime::toString)
+                .orElse(java.time.LocalDateTime.now().minusMinutes(5).toString());
+        model.addAttribute("lastCheck", lastCheck);
         return "mensajes/chat";
     }
 
@@ -332,6 +437,50 @@ public class MensajeController {
         }
     }
 
+    @GetMapping("/chat/nuevos/{conUserId}")
+    @ResponseBody
+    public ResponseEntity<?> chatNuevos(@PathVariable int conUserId,
+                                         @RequestParam("after") String after,
+                                         HttpSession session) {
+        Usuario u = (Usuario) session.getAttribute("usuarioLogueado");
+        if (u == null) return ResponseEntity.status(401).body(Map.of("error", "No autenticado"));
+        try {
+            LocalDateTime afterDate = LocalDateTime.parse(after, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            List<Mensaje> nuevos = mensajeService.obtenerNuevosDesde(u.getIdUsuario(), conUserId, afterDate);
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a");
+            List<Map<String, Object>> result = new ArrayList<>();
+            for (Mensaje m : nuevos) {
+                if (m.getRemitente().getIdUsuario().intValue() == u.getIdUsuario().intValue()) continue;
+                Map<String, Object> item = new java.util.HashMap<>();
+                item.put("id", m.getIdMensaje());
+                item.put("contenido", m.getContenido());
+                item.put("fechaEnvio", m.getFechaEnvio() != null ? m.getFechaEnvio().format(fmt) : "");
+                item.put("fechaIso", m.getFechaEnvio() != null ? m.getFechaEnvio().toString() : "");
+                item.put("remitenteId", m.getRemitente().getIdUsuario());
+                item.put("remitenteNombre", m.getRemitente().getNombreCompleto());
+                if (m.getComunicadoReferencia() != null) {
+                    item.put("refId", m.getComunicadoReferencia().getIdComunicado());
+                    item.put("refTitulo", m.getComunicadoReferencia().getTitulo());
+                }
+                List<Map<String, Object>> archivosJson = new ArrayList<>();
+                if (m.getArchivos() != null) {
+                    for (MensajeArchivo ma : m.getArchivos()) {
+                        Map<String, Object> am = new java.util.HashMap<>();
+                        am.put("idArchivo", ma.getIdArchivo());
+                        am.put("archivoNombre", ma.getArchivoNombre());
+                        am.put("archivoTipo", ma.getArchivoTipo());
+                        archivosJson.add(am);
+                    }
+                }
+                item.put("archivos", archivosJson);
+                result.add(item);
+            }
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
     @GetMapping("/no-leidos")
     @ResponseBody
     public ResponseEntity<?> noLeidos(HttpSession session) {
@@ -352,7 +501,53 @@ public class MensajeController {
             if (m.getDestinatario() != null && m.getDestinatario().getIdUsuario().intValue() == u.getIdUsuario().intValue()) {
                 mensajeService.marcarLeido(id, u.getIdUsuario());
             }
-            return ResponseEntity.ok(m);
+            // Build response manually to include respuestas (ignored by @JsonIgnore)
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a");
+            Map<String, Object> result = new java.util.LinkedHashMap<>();
+            result.put("idMensaje", m.getIdMensaje());
+            result.put("asunto", m.getAsunto());
+            result.put("contenido", m.getContenido());
+            result.put("fechaEnvio", m.getFechaEnvio() != null ? m.getFechaEnvio().format(fmt) : "");
+            result.put("leido", m.getLeido());
+            result.put("remitente", Map.of("idUsuario", m.getRemitente().getIdUsuario(), "nombreCompleto", m.getRemitente().getNombreCompleto(), "rol", m.getRemitente().getRol()));
+            result.put("destinatario", m.getDestinatario() != null ? Map.of("idUsuario", m.getDestinatario().getIdUsuario(), "nombreCompleto", m.getDestinatario().getNombreCompleto(), "rol", m.getDestinatario().getRol()) : null);
+            List<Map<String, Object>> archivosJson = new ArrayList<>();
+            if (m.getArchivos() != null) {
+                for (MensajeArchivo ma : m.getArchivos()) {
+                    Map<String, Object> am = new java.util.HashMap<>();
+                    am.put("idArchivo", ma.getIdArchivo());
+                    am.put("archivoNombre", ma.getArchivoNombre());
+                    am.put("archivoTipo", ma.getArchivoTipo());
+                    archivosJson.add(am);
+                }
+            }
+            result.put("archivos", archivosJson);
+            List<Map<String, Object>> respuestasJson = new ArrayList<>();
+            List<Mensaje> respuestas = mensajeService.obtenerRespuestas(id);
+            if (respuestas != null) {
+                for (Mensaje r : respuestas) {
+                    Map<String, Object> rm = new java.util.LinkedHashMap<>();
+                    rm.put("idMensaje", r.getIdMensaje());
+                    rm.put("contenido", r.getContenido());
+                    rm.put("fechaEnvio", r.getFechaEnvio() != null ? r.getFechaEnvio().format(fmt) : "");
+                    rm.put("remitenteId", r.getRemitente().getIdUsuario());
+                    rm.put("remitenteNombre", r.getRemitente().getNombreCompleto());
+                    List<Map<String, Object>> rArchivos = new ArrayList<>();
+                    if (r.getArchivos() != null) {
+                        for (MensajeArchivo ra : r.getArchivos()) {
+                            Map<String, Object> ram = new java.util.HashMap<>();
+                            ram.put("idArchivo", ra.getIdArchivo());
+                            ram.put("archivoNombre", ra.getArchivoNombre());
+                            ram.put("archivoTipo", ra.getArchivoTipo());
+                            rArchivos.add(ram);
+                        }
+                    }
+                    rm.put("archivos", rArchivos);
+                    respuestasJson.add(rm);
+                }
+            }
+            result.put("respuestas", respuestasJson);
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }

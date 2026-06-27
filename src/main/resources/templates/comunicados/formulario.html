@@ -6,7 +6,7 @@
     <div th:replace="~{/fragments/sidebar :: sidebar}"></div>
 
     <main class="flex-1 flex flex-col h-full relative overflow-hidden">
-        <header class="h-20 bg-[#e60000] shadow-md px-8 flex items-center justify-between z-10 text-white">
+        <header class="h-20 bg-[#a03030] shadow-md px-8 flex items-center justify-between z-10 text-white">
             <h1 class="text-2xl font-bold" th:text="${comunicado.idComunicado > 0} ? 'Editar Comunicado' : 'Registrar Comunicado'"></h1>
         </header>
 
@@ -135,17 +135,17 @@
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        (function() {
             var radios = document.querySelectorAll('input[name="destinoTipo"]');
             var aulaBlock = document.getElementById('selectAulaBlock');
             var gradoBlock = document.getElementById('selectGradoBlock');
 
             function update() {
                 var v = document.querySelector('input[name="destinoTipo"]:checked').value;
-                aulaBlock.style.display = (v === 'AULA') ? '' : 'none';
-                gradoBlock.style.display = (v === 'GRADO') ? '' : 'none';
+                if (aulaBlock) aulaBlock.style.display = (v === 'AULA') ? '' : 'none';
+                if (gradoBlock) gradoBlock.style.display = (v === 'GRADO') ? '' : 'none';
             }
-            radios.forEach(function(r) { r.addEventListener('change', update); });
+            for (var r = 0; r < radios.length; r++) radios[r].addEventListener('change', update);
 
             // ========== MULTI-FILE UPLOAD ==========
             var fileInput = document.getElementById('fileAdjuntos');
@@ -153,16 +153,21 @@
             var selectedFiles = [];
             var MAX_FILE_SIZE = 20 * 1024 * 1024;
 
-            fileInput.addEventListener('change', function() {
-                for (var i = 0; i < this.files.length; i++) {
-                    var file = this.files[i];
-                    var exists = selectedFiles.some(function(f) { return f.name === file.name && f.size === file.size && f.lastModified === file.lastModified; });
-                    if (!exists) selectedFiles.push(file);
-                }
-                this.value = '';
-                renderFilePreviews();
-                checkFileSize();
-            });
+            if (fileInput) {
+                fileInput.addEventListener('change', function() {
+                    for (var i = 0; i < this.files.length; i++) {
+                        var file = this.files[i];
+                        var exists = false;
+                        for (var s = 0; s < selectedFiles.length; s++) {
+                            if (selectedFiles[s].name === file.name && selectedFiles[s].size === file.size && selectedFiles[s].lastModified === file.lastModified) { exists = true; break; }
+                        }
+                        if (!exists) selectedFiles.push(file);
+                    }
+                    this.value = '';
+                    renderFilePreviews();
+                    checkFileSize();
+                });
+            }
 
             function removeFile(index) {
                 selectedFiles.splice(index, 1);
@@ -171,13 +176,15 @@
             }
 
             function renderFilePreviews() {
+                if (!filePreviewList) return;
                 filePreviewList.innerHTML = '';
                 if (selectedFiles.length === 0) {
                     filePreviewList.classList.add('hidden');
                     return;
                 }
                 filePreviewList.classList.remove('hidden');
-                selectedFiles.forEach(function(file, idx) {
+                for (var idx = 0; idx < selectedFiles.length; idx++) {
+                    var file = selectedFiles[idx];
                     var ext = (file.name.split('.').pop() || '').toLowerCase();
                     var isImage = ['jpg','jpeg','png','gif','bmp','webp'].indexOf(ext) !== -1;
                     var isPdf = ext === 'pdf';
@@ -191,7 +198,7 @@
 
                     var row = document.createElement('div');
                     row.className = 'flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs';
-                    row.innerHTML = '<i class="fas ' + icon + '"></i><span class="truncate max-w-[150px]">' + file.name + '</span><span class="text-gray-400">' + size + '</span><button type="button" onclick="removeFile(' + idx + ')" class="ml-1 w-4 h-4 rounded-full bg-red-100 text-red-500 flex items-center justify-center hover:bg-red-200 transition"><i class="fas fa-times text-[10px]"></i></button>';
+                    row.innerHTML = '<i class="fas ' + icon + '"></i><span class="truncate max-w-[150px]">' + file.name + '</span><span class="text-gray-400">' + size + '</span><button type="button" onclick="window.removeFile(' + idx + ')" class="ml-1 w-4 h-4 rounded-full bg-red-100 text-red-500 flex items-center justify-center hover:bg-red-200 transition"><i class="fas fa-times text-[10px]"></i></button>';
 
                     div.appendChild(row);
 
@@ -200,9 +207,11 @@
                         imgCont.className = 'rounded-lg overflow-hidden border border-gray-200';
                         var img = document.createElement('img');
                         img.className = 'w-full max-h-96 object-contain';
-                        var reader = new FileReader();
-                        reader.onload = function(e) { img.src = e.target.result; };
-                        reader.readAsDataURL(file);
+                        (function(f) {
+                            var reader = new FileReader();
+                            reader.onload = function(e) { img.src = e.target.result; };
+                            reader.readAsDataURL(f);
+                        })(file);
                         imgCont.appendChild(img);
                         div.appendChild(imgCont);
                     } else if (isPdf) {
@@ -210,21 +219,24 @@
                         pdfCont.className = 'rounded-lg overflow-hidden border border-gray-200';
                         var embed = document.createElement('embed');
                         embed.className = 'w-full h-[500px]';
-                        var reader = new FileReader();
-                        reader.onload = function(e) { embed.src = e.target.result; };
-                        reader.readAsDataURL(file);
+                        (function(f) {
+                            var reader = new FileReader();
+                            reader.onload = function(e) { embed.src = e.target.result; };
+                            reader.readAsDataURL(f);
+                        })(file);
                         pdfCont.appendChild(embed);
                         div.appendChild(pdfCont);
                     }
 
                     filePreviewList.appendChild(div);
-                });
+                }
             }
 
             function checkFileSize() {
                 var card = document.getElementById('fileErrorCard');
+                if (!card) return;
                 var total = 0;
-                selectedFiles.forEach(function(f) { total += f.size; });
+                for (var i = 0; i < selectedFiles.length; i++) total += selectedFiles[i].size;
                 card.classList.toggle('hidden', total <= MAX_FILE_SIZE);
             }
 
@@ -233,35 +245,41 @@
             // ========== PER-FILE DELETE IN EDIT MODE ==========
             var deletedFileIds = [];
 
-            document.querySelectorAll('.delete-existing-file').forEach(function(btn) {
-                btn.addEventListener('click', function() {
+            var delBtns = document.querySelectorAll('.delete-existing-file');
+            for (var i = 0; i < delBtns.length; i++) {
+                delBtns[i].addEventListener('click', function() {
                     var item = this.closest('.existing-file-item');
+                    if (!item) return;
                     var id = parseInt(item.getAttribute('data-archivoid'));
                     if (!deletedFileIds.includes(id)) {
                         deletedFileIds.push(id);
                     }
                     item.classList.add('opacity-30', 'line-through');
                     this.disabled = true;
-                    document.getElementById('eliminarArchivosIds').value = deletedFileIds.join(',');
+                    var hiddenInput = document.getElementById('eliminarArchivosIds');
+                    if (hiddenInput) hiddenInput.value = deletedFileIds.join(',');
                 });
-            });
+            }
 
             // Append selectedFiles to FormData on submit
             var form = document.getElementById('formComunicado');
-            form.addEventListener('submit', function(e) {
-                var total = 0;
-                selectedFiles.forEach(function(f) { total += f.size; });
-                if (total > MAX_FILE_SIZE) {
-                    e.preventDefault();
-                    document.getElementById('fileErrorCard').classList.remove('hidden');
-                    return;
-                }
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    var total = 0;
+                    for (var i = 0; i < selectedFiles.length; i++) total += selectedFiles[i].size;
+                    if (total > MAX_FILE_SIZE) {
+                        e.preventDefault();
+                        var errCard = document.getElementById('fileErrorCard');
+                        if (errCard) errCard.classList.remove('hidden');
+                        return;
+                    }
 
-                var dt = new DataTransfer();
-                selectedFiles.forEach(function(f) { dt.items.add(f); });
-                fileInput.files = dt.files;
-            });
-        });
+                    var dt = new DataTransfer();
+                    for (var i = 0; i < selectedFiles.length; i++) dt.items.add(selectedFiles[i]);
+                    fileInput.files = dt.files;
+                });
+            }
+        })();
     </script>
 
     <div th:replace="~{/fragments/scripts :: scripts}"></div>

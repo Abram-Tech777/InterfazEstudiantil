@@ -18,14 +18,33 @@
         <div class="w-[95%] mx-auto max-w-3xl">
 
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-                <form th:action="@{/mensajes/enviar}" method="post" th:object="${mensaje}" enctype="multipart/form-data">
+                <form th:action="@{/mensajes/enviar}" method="post" th:object="${mensaje}" enctype="multipart/form-data" id="mensajeForm">
                     <div class="mb-6">
                         <label class="block text-sm font-bold text-gray-700 mb-2">
                             <i class="fas fa-user mr-1 text-gray-400"></i> Destinatario
                         </label>
-                        <select th:field="*{destinatario.idUsuario}" required class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-[#a03030] focus:ring-1 focus:ring-[#a03030] transition">
+                        <div th:if="${!#lists.isEmpty(docentes)}" class="flex gap-1 mb-3 p-1 bg-gray-100 rounded-xl w-fit text-xs font-semibold" id="filtroRoles">
+                            <label class="px-4 py-1.5 rounded-lg cursor-pointer transition has-[:checked]:bg-white has-[:checked]:text-[#a03030] has-[:checked]:shadow-sm text-gray-500 hover:text-gray-700">
+                                <input type="radio" name="filtroRol" value="todos" checked class="hidden" onchange="filtrarDestinatarios()" />
+                                <i class="fas fa-users mr-1"></i>Todos
+                            </label>
+                            <label class="px-4 py-1.5 rounded-lg cursor-pointer transition has-[:checked]:bg-white has-[:checked]:text-[#a03030] has-[:checked]:shadow-sm text-gray-500 hover:text-gray-700">
+                                <input type="radio" name="filtroRol" value="docentes" class="hidden" onchange="filtrarDestinatarios()" />
+                                <i class="fas fa-chalkboard-teacher mr-1"></i>Docentes
+                            </label>
+                            <label class="px-4 py-1.5 rounded-lg cursor-pointer transition has-[:checked]:bg-white has-[:checked]:text-[#a03030] has-[:checked]:shadow-sm text-gray-500 hover:text-gray-700">
+                                <input type="radio" name="filtroRol" value="admins" class="hidden" onchange="filtrarDestinatarios()" />
+                                <i class="fas fa-user-tie mr-1"></i>Administradores
+                            </label>
+                        </div>
+                        <select th:field="*{destinatario.idUsuario}" required class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-[#a03030] focus:ring-1 focus:ring-[#a03030] transition" id="destinatarioSelect">
                             <option value="">-- Seleccione --</option>
-                            <option th:each="d : ${docentes}" th:value="${d.idUsuario}" th:text="${d.nombreCompleto}" th:if="${!#lists.isEmpty(docentes)}"></option>
+                            <optgroup label="Docentes" class="grupo-docentes" th:if="${!#lists.isEmpty(docenteList)}">
+                                <option th:each="d : ${docenteList}" th:value="${d.idUsuario}" th:text="${d.nombreCompleto}"></option>
+                            </optgroup>
+                            <optgroup label="Administradores" class="grupo-admins" th:if="${!#lists.isEmpty(adminList)}">
+                                <option th:each="d : ${adminList}" th:value="${d.idUsuario}" th:text="${d.nombreCompleto}"></option>
+                            </optgroup>
                         </select>
                         <div th:if="${#lists.isEmpty(docentes)}" class="text-sm text-gray-500 mt-2 bg-yellow-50 border border-yellow-200 rounded-xl p-3">
                             <i class="fas fa-info-circle mr-1 text-yellow-600"></i>No hay destinatarios disponibles para seleccionar.
@@ -45,13 +64,19 @@
                     </div>
                     <div class="mb-8">
                         <label class="block text-sm font-bold text-gray-700 mb-2">
-                            <i class="fas fa-paperclip mr-1 text-gray-400"></i> Adjuntar archivos <span class="text-gray-400 font-normal">(opcional, máx. 4)</span>
-                            <span id="fileCount" class="ml-2 text-xs text-gray-500 font-normal bg-gray-100 px-3 py-1 rounded-full">0/4</span>
+                            <i class="fas fa-paperclip mr-1 text-gray-400"></i> Adjuntar archivos <span class="text-gray-400 font-normal">(opcional)</span>
+                            <span id="fileCount" class="ml-2 text-xs text-gray-500 font-normal bg-gray-100 px-3 py-1 rounded-full">0 archivos</span>
                         </label>
-                        <div class="border-2 border-dashed border-gray-200 rounded-xl p-4 bg-gray-50 hover:bg-gray-100 transition cursor-pointer">
-                            <input type="file" name="files" multiple class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-[#a03030] file:text-white hover:file:bg-[#7d1f1f] transition" id="fileInput" onchange="updateFileCount(this)" />
+                        <div id="filePreviewList" class="flex flex-wrap gap-2 mb-3 hidden"></div>
+                        <div id="fileErrorCard" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm flex items-center gap-3 mb-3">
+                            <i class="fas fa-exclamation-circle text-lg shrink-0"></i>
+                            <span id="fileErrorMsg">Tamaño máximo alcanzado (20 MB). Elimine algunos archivos.</span>
                         </div>
-                        <p class="text-xs text-gray-400 mt-2"><i class="fas fa-info-circle mr-1"></i>Máximo 20 MB total. Hasta 4 archivos. Formatos: .jpg, .png, .gif, .pdf, .doc, .docx</p>
+                        <div class="border-2 border-dashed border-gray-200 rounded-xl p-4 bg-gray-50 hover:bg-gray-100 transition cursor-pointer text-center" onclick="document.getElementById('fileInput').click()">
+                            <input type="file" name="files" multiple class="hidden" id="fileInput" accept=".jpg,.jpeg,.png,.gif,.bmp,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip" />
+                            <span class="text-sm text-gray-500"><i class="fas fa-upload mr-2"></i>Haz clic para seleccionar archivos</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2"><i class="fas fa-info-circle mr-1"></i>Máximo 20 MB total. Formatos: .jpg, .png, .gif, .pdf, .doc, .docx</p>
                     </div>
                     <div class="flex gap-4 pt-4 border-t border-gray-100">
                         <button type="submit" class="px-6 py-3 bg-[#a03030] text-white rounded-xl font-bold hover:bg-[#7d1f1f] transition shadow-sm flex items-center gap-2">
@@ -71,21 +96,109 @@
 
 <div th:replace="~{/fragments/scripts :: scripts}"></div>
 <script>
-function updateFileCount(input) {
-    const count = input.files.length;
-    document.getElementById('fileCount').textContent = count + '/4';
-    if (count > 4) {
-        alert('Máximo 4 archivos permitidos.');
-        input.value = '';
-        document.getElementById('fileCount').textContent = '0/4';
+var selectedFiles = [];
+var MAX_FILE_SIZE = 20 * 1024 * 1024;
+var fileInput = document.getElementById('fileInput');
+var filePreviewList = document.getElementById('filePreviewList');
+var fileCount = document.getElementById('fileCount');
+var fileErrorCard = document.getElementById('fileErrorCard');
+
+function filtrarDestinatarios() {
+    var val = document.querySelector('input[name="filtroRol"]:checked');
+    if (!val) return;
+    var v = val.value;
+    var select = document.getElementById('destinatarioSelect');
+    var grupos = select.querySelectorAll('optgroup');
+    for (var i = 0; i < grupos.length; i++) {
+        var g = grupos[i];
+        if (v === 'todos') {
+            g.style.display = '';
+        } else if (v === 'docentes') {
+            g.style.display = g.classList.contains('grupo-docentes') ? '' : 'none';
+        } else if (v === 'admins') {
+            g.style.display = g.classList.contains('grupo-admins') ? '' : 'none';
+        }
     }
 }
-document.querySelector('form').addEventListener('submit', function(e) {
-    const fileInput = document.getElementById('fileInput');
-    if (fileInput.files.length > 4) {
-        e.preventDefault();
-        alert('Máximo 4 archivos permitidos.');
+
+filtrarDestinatarios();
+
+fileInput.addEventListener('change', function() {
+    for (var i = 0; i < this.files.length; i++) {
+        var file = this.files[i];
+        var exists = selectedFiles.some(function(f) { return f.name === file.name && f.size === file.size && f.lastModified === file.lastModified; });
+        if (!exists) selectedFiles.push(file);
     }
+    this.value = '';
+    renderFilePreviews();
+    checkFileSize();
+});
+
+function removeFile(index) {
+    selectedFiles.splice(index, 1);
+    renderFilePreviews();
+    checkFileSize();
+}
+
+function renderFilePreviews() {
+    filePreviewList.innerHTML = '';
+    if (selectedFiles.length === 0) {
+        filePreviewList.classList.add('hidden');
+        fileCount.textContent = '0 archivos';
+        return;
+    }
+    filePreviewList.classList.remove('hidden');
+    fileCount.textContent = selectedFiles.length + ' archivo(s)';
+    for (var idx = 0; idx < selectedFiles.length; idx++) {
+        var file = selectedFiles[idx];
+        var isImage = file.type.startsWith('image/');
+        var isPdf = file.name.toLowerCase().endsWith('.pdf');
+        var icon = isImage ? 'fa-image text-blue-500' : isPdf ? 'fa-file-pdf text-red-500' : 'fa-file text-yellow-500';
+        var size = (file.size / 1024).toFixed(1) + ' KB';
+        var div = document.createElement('div');
+        div.className = 'flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-xs';
+        div.innerHTML = '<i class="fas ' + icon + '"></i><span class="truncate max-w-[200px]">' + file.name + '</span><span class="text-gray-400">' + size + '</span><button type="button" onclick="removeFile(' + idx + ')" class="ml-1 w-4 h-4 rounded-full bg-red-100 text-red-500 flex items-center justify-center hover:bg-red-200 transition"><i class="fas fa-times text-[10px]"></i></button>';
+        filePreviewList.appendChild(div);
+    }
+    var eliminarTodos = document.createElement('button');
+    eliminarTodos.type = 'button';
+    eliminarTodos.className = 'text-xs text-red-600 hover:text-red-800 font-semibold transition flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-red-50';
+    eliminarTodos.innerHTML = '<i class="fas fa-trash-alt"></i> Eliminar todos';
+    eliminarTodos.onclick = function() {
+        selectedFiles = [];
+        renderFilePreviews();
+        checkFileSize();
+    };
+    filePreviewList.appendChild(eliminarTodos);
+}
+
+function checkFileSize() {
+    var total = 0;
+    for (var i = 0; i < selectedFiles.length; i++) {
+        total += selectedFiles[i].size;
+    }
+    if (total > MAX_FILE_SIZE) {
+        fileErrorCard.classList.remove('hidden');
+    } else {
+        fileErrorCard.classList.add('hidden');
+    }
+}
+
+document.getElementById('mensajeForm').addEventListener('submit', function(e) {
+    var total = 0;
+    for (var i = 0; i < selectedFiles.length; i++) {
+        total += selectedFiles[i].size;
+    }
+    if (total > MAX_FILE_SIZE) {
+        e.preventDefault();
+        fileErrorCard.classList.remove('hidden');
+        return;
+    }
+    var dt = new DataTransfer();
+    for (var i = 0; i < selectedFiles.length; i++) {
+        dt.items.add(selectedFiles[i]);
+    }
+    fileInput.files = dt.files;
 });
 </script>
 </body>

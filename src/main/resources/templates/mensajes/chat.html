@@ -22,19 +22,26 @@
         </a>
     </header>
 
+    <div id="newMsgBanner" class="hidden bg-blue-600 text-white px-6 py-3 flex items-center justify-between shadow-md cursor-pointer hover:bg-blue-700 transition" onclick="scrollToNewMessages()">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-bell"></i>
+            <span id="newMsgText">Nuevo mensaje</span>
+        </div>
+        <i class="fas fa-chevron-down"></i>
+    </div>
+
     <div class="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar" id="chatBox">
         <div class="max-w-4xl mx-auto space-y-4" id="chatMessages">
 
-            <div th:if="${refTitulo != null}" class="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 shadow-sm flex items-start gap-3" id="refCard">
+            <div th:if="${refTitulo != null}" class="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 shadow-sm flex items-start gap-3 cursor-pointer hover:bg-amber-100 transition" id="refCard" th:attr="onclick='window.location.href=\'' + ${enlaceAnuncio} + '\''" title="Ver anuncio">
                 <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
                     <i class="fas fa-quote-left text-amber-600"></i>
                 </div>
-                <div class="min-w-0">
+                <div class="min-w-0 flex-1">
                     <p class="text-xs text-amber-600 font-semibold uppercase tracking-wide">Respondiendo a anuncio</p>
                     <p class="text-sm text-amber-900 font-semibold mt-0.5 truncate" th:text="${refTitulo}"></p>
-                    <a th:href="@{/comunicados/bandeja}" class="text-xs text-amber-600 hover:text-amber-800 transition mt-1 inline-block"><i class="fas fa-external-link-alt mr-1"></i>Ver anuncio</a>
                 </div>
-                <button type="button" onclick="this.parentElement.remove()" class="ml-auto w-6 h-6 rounded-full bg-amber-200 text-amber-600 flex items-center justify-center hover:bg-amber-300 transition shrink-0">
+                <button type="button" onclick="event.stopPropagation(); this.parentElement.remove()" class="ml-auto w-6 h-6 rounded-full bg-amber-200 text-amber-600 flex items-center justify-center hover:bg-amber-300 transition shrink-0">
                     <i class="fas fa-times text-xs"></i>
                 </button>
             </div>
@@ -49,7 +56,7 @@
 
             <div th:each="m : ${conversacion}" th:class="${m.remitente.idUsuario == currentUserId} ? 'flex justify-end' : 'flex justify-start'">
                 <div th:class="${m.remitente.idUsuario == currentUserId} ? 'max-w-[70%] bg-[#a03030] text-white rounded-2xl rounded-br-md px-5 py-3 shadow-sm' : 'max-w-[70%] bg-white text-gray-800 rounded-2xl rounded-bl-md px-5 py-3 shadow-sm border border-gray-100'">
-                    <div th:if="${m.comunicadoReferencia != null}" class="mb-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 text-xs flex items-start gap-2">
+                    <div th:if="${m.comunicadoReferencia != null}" class="mb-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 text-xs flex items-start gap-2 cursor-pointer hover:bg-amber-100 transition" th:attr="onclick='window.location.href=\'' + ${enlaceAnuncio} + '\''" title="Ver anuncio">
                         <i class="fas fa-quote-left text-amber-500 mt-0.5"></i>
                         <div class="min-w-0">
                             <p class="text-amber-700 font-semibold truncate" th:text="${m.comunicadoReferencia.titulo}"></p>
@@ -61,13 +68,13 @@
                     <div th:if="${m.archivos != null and !m.archivos.isEmpty()}" class="mt-3 space-y-2">
                         <div th:each="archivo : ${m.archivos}" class="flex flex-col gap-1">
                             <div th:class="${m.remitente.idUsuario == currentUserId} ? 'bg-white/20 rounded-lg p-2 flex items-center gap-2' : 'bg-gray-100 rounded-lg p-2 flex items-center gap-2'" style="min-width:0;">
-                                <i th:class="${#strings.endsWith(#strings.toLowerCase(archivo.archivoNombre), '.pdf') ? 'fas fa-file-pdf' : (#strings.startsWith(archivo.archivoTipo, 'image/') ? 'fas fa-image' : 'fas fa-file')}"></i>
+                                <i th:class="${#strings.endsWith(#strings.toLowerCase(archivo.archivoNombre), '.pdf') ? 'fas fa-file-pdf text-red-500' : (#strings.startsWith(archivo.archivoTipo, 'image/') ? 'fas fa-image text-blue-500' : (#strings.endsWith(#strings.toLowerCase(archivo.archivoNombre), '.docx') or #strings.endsWith(#strings.toLowerCase(archivo.archivoNombre), '.doc') ? 'fas fa-file-word text-blue-600' : 'fas fa-file text-yellow-500'))}"></i>
                                 <span class="text-xs truncate max-w-[120px]" th:text="${archivo.archivoNombre}"></span>
                                 <div class="flex gap-1 ml-1 shrink-0">
-                                    <button th:if="${#strings.startsWith(archivo.archivoTipo, 'image/') or #strings.endsWith(#strings.toLowerCase(archivo.archivoNombre), '.pdf')}"
+                                    <button th:if="${#strings.startsWith(archivo.archivoTipo, 'image/') or #strings.endsWith(#strings.toLowerCase(archivo.archivoNombre), '.pdf') or #strings.endsWith(#strings.toLowerCase(archivo.archivoNombre), '.docx')}"
                                             class="preview-toggle px-2 py-0.5 rounded text-xs hover:bg-white/50 transition"
                                             th:classappend="${m.remitente.idUsuario == currentUserId} ? 'bg-white/30' : 'bg-gray-200'"
-                                            th:attr="data-archivoid=${archivo.idArchivo}, data-url=@{/mensajes/abrirArchivo/{id}(id=${archivo.idArchivo})}, data-tipo=${archivo.archivoTipo}">
+                                            th:attr="data-archivoid=${archivo.idArchivo}, data-url=@{/mensajes/abrirArchivo/{id}(id=${archivo.idArchivo})}, data-tipo=${archivo.archivoTipo}, data-ext=${#strings.toLowerCase(#strings.substringAfter(archivo.archivoNombre, '.'))}">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     <a th:href="@{/mensajes/descargarArchivo/{id}(id=${archivo.idArchivo})}" class="px-2 py-0.5 bg-white/30 rounded text-xs hover:bg-white/50 transition">
@@ -77,10 +84,14 @@
                             </div>
                             <div class="preview-cont hidden">
                                 <div th:if="${#strings.startsWith(archivo.archivoTipo, 'image/')}" class="rounded-lg overflow-hidden border" th:classappend="${m.remitente.idUsuario == currentUserId} ? 'border-white/20' : 'border-gray-200'">
-                                    <img th:src="@{/mensajes/abrirArchivo/{id}(id=${archivo.idArchivo})}" class="w-full max-h-48 object-contain rounded-lg" />
+                                    <img th:src="@{/mensajes/abrirArchivo/{id}(id=${archivo.idArchivo})}" class="w-full max-h-96 object-contain rounded-lg" />
                                 </div>
                                 <div th:if="${#strings.endsWith(#strings.toLowerCase(archivo.archivoNombre), '.pdf')}" class="rounded-lg overflow-hidden border" th:classappend="${m.remitente.idUsuario == currentUserId} ? 'border-white/20' : 'border-gray-200'">
-                                    <embed th:src="@{/mensajes/abrirArchivo/{id}(id=${archivo.idArchivo})}" type="application/pdf" class="w-full h-40 rounded-lg" />
+                                    <embed th:src="${'/mensajes/abrirArchivo/' + archivo.idArchivo + '#toolbar=0'}" type="application/pdf" class="w-full h-[500px] rounded-lg" />
+                                </div>
+                                <div th:if="${#strings.endsWith(#strings.toLowerCase(archivo.archivoNombre), '.docx')}" class="docx-preview-placeholder text-center py-4 text-sm text-gray-500">
+                                    <i class="fas fa-file-word text-blue-500 text-2xl mb-2"></i>
+                                    <p>Cargando vista previa...</p>
                                 </div>
                             </div>
                         </div>
@@ -95,8 +106,12 @@
 
     <div class="bg-white border-t border-gray-200 px-4 md:px-8 py-4">
         <form id="chatForm" enctype="multipart/form-data" class="max-w-4xl mx-auto flex flex-col gap-2">
+            <input type="hidden" id="hdnCurrentUserId" th:value="${currentUserId}" />
+            <input type="hidden" id="hdnDestinatarioId" th:value="${contacto.idUsuario}" />
             <input type="hidden" name="destinatarioId" th:value="${contacto.idUsuario}" />
             <input type="hidden" name="refId" th:if="${refId != null}" th:value="${refId}" />
+            <input type="hidden" id="lastCheckVal" th:value="${lastCheck}" />
+            <input type="hidden" id="hdnEnlaceAnuncio" th:value="${enlaceAnuncio}" />
 
             <div id="filePreviewList" class="flex flex-wrap gap-2 hidden"></div>
             <div id="fileErrorCard" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm flex items-center gap-3">
@@ -125,8 +140,9 @@
 
 <div th:replace="~{/fragments/scripts :: scripts}"></div>
 <script>
-var currentUserId = [[${currentUserId}]];
-var destinatarioId = [[${contacto.idUsuario}]];
+var currentUserId = parseInt(document.getElementById('hdnCurrentUserId').value);
+var destinatarioId = parseInt(document.getElementById('hdnDestinatarioId').value);
+var enlaceAnuncio = document.getElementById('hdnEnlaceAnuncio').value;
 var chatBox = document.getElementById('chatBox');
 var chatMessages = document.getElementById('chatMessages');
 var form = document.getElementById('chatForm');
@@ -140,9 +156,6 @@ var MAX_FILE_SIZE = 20 * 1024 * 1024;
 chatBox.scrollTop = chatBox.scrollHeight;
 
 document.querySelectorAll('.preview-toggle').forEach(function(btn) {
-    var archivoId = btn.getAttribute('data-archivoid');
-    var expanded = localStorage.getItem('chat-preview-' + archivoId) === '1';
-    if (expanded) togglePreview(btn, true);
     btn.addEventListener('click', function(e) {
         e.stopPropagation();
         togglePreview(this);
@@ -153,16 +166,38 @@ function togglePreview(btn, forceExpand) {
     var cont = btn.closest('.flex.flex-col').querySelector('.preview-cont');
     if (!cont) return;
     var archivoId = btn.getAttribute('data-archivoid');
+    var url = btn.getAttribute('data-url');
+    var ext = btn.getAttribute('data-ext') || '';
     var isHidden = cont.classList.contains('hidden');
     var expand = forceExpand !== undefined ? forceExpand : isHidden;
     if (expand) {
         cont.classList.remove('hidden');
         btn.querySelector('i').className = 'fas fa-eye-slash';
         localStorage.setItem('chat-preview-' + archivoId, '1');
+        if (ext === 'docx' || (!ext && cont.querySelector('.docx-preview-placeholder'))) {
+            var placeholder = cont.querySelector('.docx-preview-placeholder');
+            if (placeholder) {
+                var docUrl = url || '/mensajes/abrirArchivo/' + archivoId;
+                fetch(docUrl)
+                    .then(function(r) {
+                        if (!r.ok) throw new Error('Error');
+                        return r.arrayBuffer();
+                    })
+                    .then(function(buffer) {
+                        return mammoth.convertToHtml({arrayBuffer: buffer});
+                    })
+                    .then(function(result) {
+                        cont.innerHTML = '<div class="rounded-xl border border-gray-200 p-4 bg-white max-h-[400px] overflow-y-auto text-xs leading-relaxed">' + result.value + '</div>';
+                    })
+                    .catch(function() {
+                        if (placeholder) placeholder.innerHTML = '<i class="fas fa-exclamation-triangle text-yellow-500 text-lg mb-1"></i><p>No se pudo cargar la vista previa.</p>';
+                    });
+            }
+        }
     } else {
         cont.classList.add('hidden');
         btn.querySelector('i').className = 'fas fa-eye';
-        localStorage.setItem('chat-preview-' + archivoId, '0');
+        // Don't clear preview content - just hide it
     }
 }
 
@@ -233,6 +268,8 @@ form.addEventListener('submit', function(e) {
     var fd = new FormData();
     fd.append('destinatarioId', destinatarioId);
     fd.append('contenido', chatInput.value.trim());
+    var refInput = document.querySelector('input[name="refId"]');
+    if (refInput) fd.append('refId', refInput.value);
     selectedFiles.forEach(function(file) { fd.append('files', file); });
 
     fetch('/mensajes/chat/enviar', {
@@ -271,7 +308,9 @@ function appendMessage(data) {
 
     if (data.refId) {
         var refDiv = document.createElement('div');
-        refDiv.className = 'mb-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 text-xs flex items-start gap-2';
+        refDiv.className = 'mb-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 text-xs flex items-start gap-2 cursor-pointer hover:bg-amber-100 transition';
+        refDiv.setAttribute('onclick', "window.location.href='" + enlaceAnuncio + "'");
+        refDiv.setAttribute('title', 'Ver anuncio');
         refDiv.innerHTML = '<i class="fas fa-quote-left text-amber-500 mt-0.5"></i><div class="min-w-0"><p class="text-amber-700 font-semibold truncate">' + (data.refTitulo || 'Anuncio') + '</p><p class="text-amber-500">Anuncio relacionado</p></div>';
         bubble.appendChild(refDiv);
     }
@@ -288,22 +327,26 @@ function appendMessage(data) {
             var ext = archivo.archivoNombre.split('.').pop().toLowerCase();
             var isImage = ['jpg','jpeg','png','gif','bmp','webp'].indexOf(ext) !== -1;
             var isPdf = ext === 'pdf';
-            var icon = isImage ? 'fa-image' : isPdf ? 'fa-file-pdf' : 'fa-file';
+            var isDocx = ext === 'docx';
+            var icon = isImage ? 'fa-image' : isPdf ? 'fa-file-pdf' : isDocx ? 'fa-file-word' : 'fa-file';
+            var hasPreview = isImage || isPdf || isDocx;
             var fileItem = document.createElement('div');
             fileItem.className = 'flex flex-col gap-1';
             var row = document.createElement('div');
             row.className = isMine ? 'bg-white/20 rounded-lg p-2 flex items-center gap-2' : 'bg-gray-100 rounded-lg p-2 flex items-center gap-2';
             row.style.minWidth = '0';
             row.innerHTML = '<i class="fas ' + icon + '"></i><span class="text-xs truncate max-w-[120px]">' + archivo.archivoNombre + '</span><div class="flex gap-1 ml-1 shrink-0">' +
-                (isImage || isPdf ? '<button class="preview-toggle px-2 py-0.5 rounded text-xs ' + (isMine ? 'bg-white/30' : 'bg-gray-200') + ' hover:bg-white/50 transition" data-archivoid="' + archivo.idArchivo + '" data-url="/mensajes/abrirArchivo/' + archivo.idArchivo + '" data-tipo="' + (archivo.archivoTipo || '') + '"><i class="fas fa-eye"></i></button>' : '') +
+                (hasPreview ? '<button class="preview-toggle px-2 py-0.5 rounded text-xs ' + (isMine ? 'bg-white/30' : 'bg-gray-200') + ' hover:bg-white/50 transition" data-archivoid="' + archivo.idArchivo + '" data-url="/mensajes/abrirArchivo/' + archivo.idArchivo + '" data-tipo="' + (archivo.archivoTipo || '') + '" data-ext="' + ext + '"><i class="fas fa-eye"></i></button>' : '') +
                 '<a href="/mensajes/descargarArchivo/' + archivo.idArchivo + '" class="px-2 py-0.5 bg-white/30 rounded text-xs hover:bg-white/50 transition"><i class="fas fa-download"></i></a></div>';
             fileItem.appendChild(row);
             var previewCont = document.createElement('div');
             previewCont.className = 'preview-cont hidden';
             if (isImage) {
-                previewCont.innerHTML = '<div class="rounded-lg overflow-hidden border ' + (isMine ? 'border-white/20' : 'border-gray-200') + '"><img src="/mensajes/abrirArchivo/' + archivo.idArchivo + '" class="w-full max-h-48 object-contain rounded-lg" /></div>';
+                previewCont.innerHTML = '<div class="rounded-lg overflow-hidden border ' + (isMine ? 'border-white/20' : 'border-gray-200') + '"><img src="/mensajes/abrirArchivo/' + archivo.idArchivo + '" class="w-full max-h-96 object-contain rounded-lg" /></div>';
             } else if (isPdf) {
-                previewCont.innerHTML = '<div class="rounded-lg overflow-hidden border ' + (isMine ? 'border-white/20' : 'border-gray-200') + '"><embed src="/mensajes/abrirArchivo/' + archivo.idArchivo + '" type="application/pdf" class="w-full h-40 rounded-lg" /></div>';
+                previewCont.innerHTML = '<div class="rounded-lg overflow-hidden border ' + (isMine ? 'border-white/20' : 'border-gray-200') + '"><embed src="/mensajes/abrirArchivo/' + archivo.idArchivo + '#toolbar=0" type="application/pdf" class="w-full h-[500px] rounded-lg" /></div>';
+            } else if (isDocx) {
+                previewCont.innerHTML = '<div class="docx-preview-placeholder text-center py-3 text-xs text-gray-400"><i class="fas fa-file-word text-blue-500 text-xl mb-1"></i><p>Cargando vista previa...</p></div>';
             }
             fileItem.appendChild(previewCont);
             filesDiv.appendChild(fileItem);
@@ -327,6 +370,79 @@ function appendMessage(data) {
         });
     });
 }
+
+// ===== NEW MESSAGE POLLING =====
+var lastCheck = document.getElementById('lastCheckVal').value;
+var newMsgBanner = document.getElementById('newMsgBanner');
+var newMsgText = document.getElementById('newMsgText');
+var pollingActive = true;
+
+// Mark incoming messages as read on page load
+fetch('/mensajes/chat/nuevos/' + destinatarioId + '?after=2000-01-01T00:00:00')
+    .then(function(r) { return r.json(); })
+    .then(function(mensajes) {
+        mensajes.forEach(function(m) {
+            if (m.remitenteId !== currentUserId) {
+                fetch('/mensajes/ver/' + m.id, { method: 'GET' }).catch(function(){});
+            }
+        });
+    }).catch(function(){});
+
+setInterval(function() {
+    if (!pollingActive) return;
+    fetch('/mensajes/chat/nuevos/' + destinatarioId + '?after=' + encodeURIComponent(lastCheck))
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.error) return;
+            if (data.length > 0) {
+                data.forEach(function(m) {
+                    appendMessage(m);
+                    var emptyMsg = document.getElementById('emptyMsg');
+                    if (emptyMsg) emptyMsg.remove();
+                    if (m.remitenteId !== currentUserId) {
+                        fetch('/mensajes/ver/' + m.id, { method: 'GET' }).catch(function(){});
+                    }
+                });
+                lastCheck = data[data.length - 1].fechaIso || lastCheck;
+                var isAtBottom = chatBox.scrollTop + chatBox.clientHeight >= chatBox.scrollHeight - 50;
+                if (!isAtBottom) {
+                    var name = data[0].remitenteNombre || ' alguien';
+                    newMsgText.textContent = 'Nuevo mensaje de ' + name;
+                    newMsgBanner.classList.remove('hidden');
+                } else {
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+                updateUnreadBadge();
+            }
+        }).catch(function(){});
+}, 5000);
+
+function scrollToNewMessages() {
+    newMsgBanner.classList.add('hidden');
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function updateUnreadBadge() {
+    var badge = document.getElementById('noLeidosBadge');
+    if (!badge) return;
+    fetch('/mensajes/no-leidos')
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.count > 0) {
+                badge.textContent = d.count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }).catch(function(){});
+}
+
+chatBox.addEventListener('scroll', function() {
+    var isAtBottom = chatBox.scrollTop + chatBox.clientHeight >= chatBox.scrollHeight - 50;
+    if (isAtBottom) {
+        newMsgBanner.classList.add('hidden');
+    }
+});
 </script>
 </body>
 </html>

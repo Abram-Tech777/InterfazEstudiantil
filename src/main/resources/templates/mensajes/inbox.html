@@ -9,9 +9,16 @@
 
     <header class="h-20 bg-[#a03030] shadow-md px-8 flex items-center justify-between z-10 text-white">
         <h1 class="text-2xl font-bold">Bandeja de Mensajes</h1>
-        <a th:href="@{/mensajes/nuevo}" class="px-4 py-2 bg-white text-[#a03030] rounded-lg text-sm font-bold hover:bg-red-50 transition">
-            <i class="fas fa-pen mr-1"></i>Nuevo Mensaje
-        </a>
+        <div class="flex items-center gap-3">
+            <form th:action="@{/mensajes/vaciar-inbox}" method="post" onsubmit="return confirm('¿Vaciar toda la bandeja?')" th:if="${!#lists.isEmpty(inbox)}">
+                <button type="submit" class="px-4 py-2 bg-white/20 text-white rounded-lg text-sm font-bold hover:bg-white/30 transition flex items-center gap-2">
+                    <i class="fas fa-trash-alt"></i>Vaciar buzón
+                </button>
+            </form>
+            <a th:href="@{/mensajes/nuevo}" class="px-4 py-2 bg-white text-[#a03030] rounded-lg text-sm font-bold hover:bg-red-50 transition">
+                <i class="fas fa-pen mr-1"></i>Nuevo Mensaje
+            </a>
+        </div>
     </header>
 
     <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
@@ -37,9 +44,16 @@
                             <span class="text-xs text-gray-400 ml-2" th:text="${#temporals.format(m.fechaEnvio, 'dd/MM/yyyy hh:mm a')}"></span>
                         </p>
                     </div>
-                    <button class="abrir-msj px-4 py-2 bg-[#a03030] text-white rounded-xl text-sm font-bold hover:bg-[#7d1f1f] transition shrink-0 ml-4" th:attr="data-id=${m.idMensaje}">
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
+                    <div class="flex items-center gap-2 shrink-0 ml-4">
+                        <button class="abrir-msj px-4 py-2 bg-[#a03030] text-white rounded-xl text-sm font-bold hover:bg-[#7d1f1f] transition" th:attr="data-id=${m.idMensaje},data-to=${m.remitente.idUsuario},data-asunto='Re: ' + ${m.asunto}">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <form th:action="@{/mensajes/eliminar/{id}(id=${m.idMensaje})}" method="post" onsubmit="return confirm('¿Eliminar este mensaje?')">
+                            <button type="submit" class="w-9 h-9 rounded-xl bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-600 transition flex items-center justify-center" title="Eliminar mensaje">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
                 <div class="hidden contenido-msj border-t border-gray-100" th:attrappend="id='msj-' + ${m.idMensaje}"></div>
             </div>
@@ -55,8 +69,9 @@ function renderArchivo(archivo, mensajeId) {
     var ext = archivo.archivoNombre.split('.').pop().toLowerCase();
     var isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext);
     var isPdf = ext === 'pdf';
-    var icon = isImage ? 'fa-image text-blue-500' : isPdf ? 'fa-file-pdf text-red-500' : 'fa-file text-yellow-500';
-    var previewUrl = isImage ? '/mensajes/abrirArchivo/' + archivo.idArchivo : (isPdf ? '/mensajes/abrirArchivo/' + archivo.idArchivo : null);
+    var isDoc = ext === 'docx' || ext === 'doc';
+    var icon = isImage ? 'fa-image text-blue-500' : isPdf ? 'fa-file-pdf text-red-500' : isDoc ? 'fa-file-word text-blue-600' : 'fa-file text-yellow-500';
+    var previewUrl = isImage ? '/mensajes/abrirArchivo/' + archivo.idArchivo : (isPdf ? '/mensajes/abrirArchivo/' + archivo.idArchivo : (isDoc ? '/mensajes/abrirArchivo/' + archivo.idArchivo : null));
     var downloadUrl = '/mensajes/descargarArchivo/' + archivo.idArchivo;
     var html = '<div class="archivo-item bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-sm transition">';
     html += '<div class="p-3 flex items-center gap-3">';
@@ -64,7 +79,7 @@ function renderArchivo(archivo, mensajeId) {
     html += '<span class="text-sm font-semibold text-gray-700 truncate flex-1">' + archivo.archivoNombre + '</span>';
     html += '<div class="flex gap-1 shrink-0">';
     if (previewUrl) {
-        html += '<button class="preview-btn px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition" data-url="' + previewUrl + '" data-ext="' + ext + '"><i class="fas fa-eye"></i></button>';
+        html += '<button class="preview-btn px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition" data-url="' + previewUrl + '" data-ext="' + ext + '" data-archivoid="' + archivo.idArchivo + '"><i class="fas fa-eye"></i></button>';
     }
     html += '<a href="' + downloadUrl + '" class="px-2 py-1 text-xs bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"><i class="fas fa-download"></i></a>';
     html += '</div></div>';
@@ -73,10 +88,77 @@ function renderArchivo(archivo, mensajeId) {
     return html;
 }
 
-document.querySelectorAll('.abrir-msj').forEach(btn => {
+function renderReplyForm(id, toUserId, asunto) {
+    var html = '<div class="reply-section mt-4 pt-4 border-t border-gray-200" id="replySection-' + id + '">';
+    html += '<p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3"><i class="fas fa-reply mr-1"></i>Responder</p>';
+    html += '<div class="replies-container space-y-3 mb-4" id="replies-' + id + '"></div>';
+    html += '<textarea rows="2" class="reply-input w-full p-3 border border-gray-200 rounded-xl resize-none focus:border-[#a03030] focus:ring-1 focus:ring-[#a03030] transition" placeholder="Escribe tu respuesta..." id="replyInput-' + id + '"></textarea>';
+    html += '<div class="flex items-center gap-2 mt-3">';
+    html += '<label class="flex items-center gap-1.5 text-xs text-gray-500 cursor-pointer hover:text-[#a03030] transition px-3 py-2 rounded-lg hover:bg-gray-100">';
+    html += '<i class="fas fa-paperclip"></i><span>Adjuntar archivos</span>';
+    html += '<input type="file" multiple class="hidden reply-file-input" accept=".jpg,.jpeg,.png,.gif,.bmp,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip" data-id="' + id + '" />';
+    html += '</label>';
+    html += '<div class="reply-file-previews flex flex-wrap gap-2 flex-1" id="replyFilePreviews-' + id + '"></div>';
+    html += '<button class="send-reply-btn px-5 py-2 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-700 transition shadow-sm flex items-center gap-2" data-id="' + id + '" data-to="' + toUserId + '" data-asunto="' + asunto.replace(/"/g, '&quot;') + '">';
+    html += '<i class="fas fa-paper-plane text-xs"></i> Enviar';
+    html += '</button>';
+    html += '</div>';
+    html += '<div class="reply-error hidden mt-2 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-2 text-xs flex items-center gap-2" id="replyError-' + id + '">';
+    html += '<i class="fas fa-exclamation-circle"></i><span class="reply-error-msg">Error</span>';
+    html += '</div>';
+    html += '</div>';
+    return html;
+}
+
+function appendReplyBubble(data, id) {
+    var repliesContainer = document.getElementById('replies-' + id);
+    if (!repliesContainer) return;
+    var currentUserId = parseInt(document.getElementById('currentUserId').value);
+    var isMine = data.remitenteId === currentUserId;
+    var bubble = document.createElement('div');
+    bubble.className = isMine ? 'flex justify-end' : 'flex justify-start';
+    var inner = document.createElement('div');
+    inner.className = isMine ? 'max-w-[80%] bg-[#a03030] text-white rounded-2xl rounded-br-md px-4 py-3 shadow-sm' : 'max-w-[80%] bg-white text-gray-800 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm border border-gray-100';
+    var p = document.createElement('p');
+    p.className = 'whitespace-pre-wrap text-sm leading-relaxed';
+    p.textContent = data.contenido || '';
+    inner.appendChild(p);
+
+    if (data.archivos && data.archivos.length > 0) {
+        var filesDiv = document.createElement('div');
+        filesDiv.className = 'mt-2 pt-2 border-t';
+        filesDiv.style.borderTopColor = isMine ? 'rgba(255,255,255,0.2)' : '#e5e7eb';
+        for (var ai = 0; ai < data.archivos.length; ai++) {
+            var a = data.archivos[ai];
+            var ext = a.archivoNombre.split('.').pop().toLowerCase();
+            var isImg = ['jpg','jpeg','png','gif','bmp','webp'].indexOf(ext) !== -1;
+            var isPdf = ext === 'pdf';
+            var isDoc = ext === 'docx' || ext === 'doc';
+            var icon = isImg ? 'fa-image' : isPdf ? 'fa-file-pdf' : isDoc ? 'fa-file-word' : 'fa-file';
+            var row = document.createElement('div');
+            row.className = 'flex items-center gap-2 text-xs mt-1';
+            row.innerHTML = '<i class="fas ' + icon + '"></i><span class="truncate max-w-[100px]">' + a.archivoNombre + '</span>' +
+                '<a href="/mensajes/descargarArchivo/' + a.idArchivo + '" class="ml-auto hover:opacity-80"><i class="fas fa-download"></i></a>';
+            filesDiv.appendChild(row);
+        }
+        inner.appendChild(filesDiv);
+    }
+
+    var time = document.createElement('div');
+    time.className = 'text-xs mt-2 ' + (isMine ? 'text-white/60 text-right' : 'text-gray-400 text-left');
+    time.textContent = data.fechaEnvio || '';
+    inner.appendChild(time);
+    bubble.appendChild(inner);
+    repliesContainer.appendChild(bubble);
+    repliesContainer.scrollTop = repliesContainer.scrollHeight;
+}
+
+document.querySelectorAll('.abrir-msj').forEach(function(btn) {
     btn.addEventListener('click', function() {
-        const id = this.getAttribute('data-id');
-        const cont = document.getElementById('msj-' + id);
+        var id = this.getAttribute('data-id');
+        var to = this.getAttribute('data-to');
+        var asunto = this.getAttribute('data-asunto');
+        var cont = document.getElementById('msj-' + id);
         if (!cont) return;
         if (!cont.classList.contains('hidden')) {
             cont.classList.add('hidden');
@@ -85,47 +167,78 @@ document.querySelectorAll('.abrir-msj').forEach(btn => {
             return;
         }
         fetch('/mensajes/ver/' + id)
-            .then(response => {
+            .then(function(response) {
                 if (!response.ok) {
-                    return response.text().then(t => { throw new Error(t || 'Error al obtener el mensaje'); });
+                    return response.text().then(function(t) { throw new Error(t || 'Error al obtener el mensaje'); });
                 }
                 return response.json();
             })
-            .then(data => {
+            .then(function(data) {
                 var currentUserId = parseInt(document.getElementById('currentUserId').value);
                 var otherUserId = data.remitente && data.remitente.idUsuario === currentUserId
                     ? (data.destinatario ? data.destinatario.idUsuario : '')
                     : (data.remitente ? data.remitente.idUsuario : '');
 
-                let html = '<div class="px-6 py-5 bg-gray-50">' +
+                var html = '<div class="px-6 py-5 bg-gray-50">' +
                     '<div class="flex items-center gap-2 text-sm text-gray-600 mb-3">' +
                     '<i class="fas fa-user-circle text-gray-400"></i>' +
-                    '<strong>De:</strong> ' + (data.remitente != null ? (data.remitente.nombreCompleto || '') : '') +
+                    '<strong>De:</strong> ' + (data.remitente != null ? (data.remitente.rol + ' - ' + data.remitente.nombreCompleto || '') : '') +
                     '</div>' +
                     '<p class="font-bold text-gray-800 text-lg mb-3">' + (data.asunto || '') + '</p>' +
                     '<div class="bg-white rounded-xl p-4 border border-gray-200">' +
                     '<p class="whitespace-pre-wrap text-gray-700 leading-relaxed">' + (data.contenido || '') + '</p>' +
-                    '</div>' +
-                    '<div class="mt-4 flex gap-3">';
-
-                if (data.destinatario && data.destinatario.idUsuario === currentUserId) {
-                    html += '<a href="/mensajes/nuevo?to=' + otherUserId + '" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-700 transition shadow-sm">' +
-                        '<i class="fas fa-reply mr-2"></i>Responder</a>';
-                }
-                if (otherUserId) {
-                    html += '<a href="/mensajes/chat/' + otherUserId + '" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition shadow-sm">' +
-                        '<i class="fas fa-comments mr-2"></i>Chat</a>';
-                }
-                html += '</div>';
+                    '</div>';
 
                 if (data.archivos && data.archivos.length > 0) {
                     html += '<div class="mt-4 pt-4 border-t border-gray-200">' +
                         '<p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Archivos adjuntos (' + data.archivos.length + ')</p>' +
-                        '<div class="grid gap-3" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">';
-                    data.archivos.forEach(function(archivo) {
-                        html += renderArchivo(archivo, data.idMensaje);
-                    });
+                        '<div class="flex flex-col gap-3">';
+                    for (var ai = 0; ai < data.archivos.length; ai++) {
+                        html += renderArchivo(data.archivos[ai], data.idMensaje);
+                    }
                     html += '</div></div>';
+                }
+
+                if (data.respuestas && data.respuestas.length > 0) {
+                    html += '<div class="mt-4 pt-4 border-t border-gray-200" id="threadContainer-' + id + '">' +
+                        '<p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3"><i class="fas fa-reply-all mr-1"></i>Respuestas (' + data.respuestas.length + ')</p>' +
+                        '<div class="space-y-3">';
+                    var showFrom = Math.max(0, data.respuestas.length - 2);
+                    for (var ri = 0; ri < data.respuestas.length; ri++) {
+                        var r = data.respuestas[ri];
+                        var isMine = r.remitenteId === currentUserId;
+                        var isHidden = ri < showFrom;
+                        var rClass = 'rounded-xl px-4 py-3 border text-sm ' + (isMine ? 'bg-[#a03030]/5 border-[#a03030]/20 ml-8' : 'bg-gray-50 border-gray-200 mr-8');
+                        var hiddenStyle = isHidden ? ' style="display:none"' : '';
+                        html += '<div class="respuesta-item ' + rClass + '" data-idx="' + ri + '"' + hiddenStyle + '>' +
+                            '<div class="flex items-center gap-2 text-xs text-gray-500 mb-1">' +
+                            '<i class="fas fa-user-circle"></i><strong>' + (r.remitenteNombre || '') + '</strong>' +
+                            '<span class="ml-auto">' + (r.fechaEnvio || '') + '</span></div>' +
+                            '<p class="whitespace-pre-wrap text-gray-700">' + (r.contenido || '') + '</p>';
+                        if (r.archivos && r.archivos.length > 0) {
+                            html += '<div class="mt-2 flex flex-wrap gap-2">';
+                            for (var rai = 0; rai < r.archivos.length; rai++) {
+                                var ra = r.archivos[rai];
+                                var raExt = ra.archivoNombre.split('.').pop().toLowerCase();
+                                var raIcon = ['jpg','jpeg','png','gif','bmp','webp'].indexOf(raExt) !== -1 ? 'fa-image text-blue-500' : raExt === 'pdf' ? 'fa-file-pdf text-red-500' : (raExt === 'docx' || raExt === 'doc') ? 'fa-file-word text-blue-600' : 'fa-file text-yellow-500';
+                                html += '<a href="/mensajes/descargarArchivo/' + ra.idArchivo + '" class="flex items-center gap-1.5 text-xs bg-white rounded-lg border border-gray-200 px-3 py-1.5 hover:bg-gray-50 transition" title="' + ra.archivoNombre + '"><i class="fas ' + raIcon + '"></i><span class="truncate max-w-[80px]">' + ra.archivoNombre + '</span><i class="fas fa-download text-gray-400"></i></a>';
+                            }
+                            html += '</div>';
+                        }
+                        html += '</div>';
+                    }
+                    if (showFrom > 0) {
+                        html += '<button class="ver-mas-respuestas text-xs text-[#a03030] font-bold hover:underline flex items-center gap-1" data-id="' + id + '" data-total="' + data.respuestas.length + '" data-showfrom="' + showFrom + '"><i class="fas fa-chevron-up"></i> Ver ' + showFrom + ' respuestas anteriores</button>';
+                    }
+                    html += '</div></div>';
+                }
+
+                if (data.destinatario && data.destinatario.idUsuario === currentUserId) {
+                    html += renderReplyForm(id, data.remitente ? data.remitente.idUsuario : '', 'Re: ' + (data.asunto || ''));
+                } else if (otherUserId) {
+                    html += '<div class="mt-4 pt-4 border-t border-gray-200">' +
+                        '<a href="/mensajes/chat/' + otherUserId + '" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition shadow-sm">' +
+                        '<i class="fas fa-comments mr-2"></i>Chat</a></div>';
                 }
 
                 html += '</div>';
@@ -146,16 +259,184 @@ document.querySelectorAll('.abrir-msj').forEach(btn => {
                         var url = this.getAttribute('data-url');
                         var ext = this.getAttribute('data-ext');
                         if (ext === 'pdf') {
-                            previewCont.innerHTML = '<embed src="' + url + '" type="application/pdf" class="w-full h-64 rounded-xl border" />';
+                            previewCont.innerHTML = '<embed src="' + url + '#toolbar=0" type="application/pdf" class="w-full h-[500px] rounded-xl border" />';
+                            previewCont.classList.remove('hidden');
+                        } else if (ext === 'docx') {
+                            previewCont.innerHTML = '<div class="flex items-center justify-center p-8"><i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i></div>';
+                            previewCont.classList.remove('hidden');
+                            fetch(url)
+                                .then(function(r) {
+                                    if (!r.ok) throw new Error('Error al cargar');
+                                    return r.arrayBuffer();
+                                })
+                                .then(function(buffer) {
+                                    mammoth.convertToHtml({arrayBuffer: buffer})
+                                        .then(function(result) {
+                                            previewCont.innerHTML = '<div class="rounded-xl border border-gray-200 p-6 bg-white max-h-[500px] overflow-y-auto text-sm leading-relaxed">' + result.value + '</div>';
+                                        })
+                                        .catch(function() {
+                                            previewCont.innerHTML = '<div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center"><i class="fas fa-exclamation-triangle text-yellow-500 text-2xl mb-2"></i><p class="text-sm text-yellow-700">No se pudo renderizar el documento.</p><a href="/mensajes/descargarArchivo/' + this.getAttribute('data-archivoid') + '" class="text-xs text-blue-600 underline mt-2 inline-block">Descargar para verlo</a></div>';
+                                        });
+                                })
+                                .catch(function() {
+                                    previewCont.innerHTML = '<div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center"><i class="fas fa-exclamation-triangle text-yellow-500 text-2xl mb-2"></i><p class="text-sm text-yellow-700">Error al cargar el documento.</p></div>';
+                                });
+                        } else if (ext === 'doc') {
+                            previewCont.innerHTML = '<div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center"><i class="fas fa-file-word text-blue-500 text-3xl mb-2"></i><p class="text-sm text-gray-600 mb-3">Vista previa no disponible para documentos .doc. Descargue el archivo para verlo.</p><a href="/mensajes/descargarArchivo/' + (btn.getAttribute('data-archivoid') || url.split('/').pop()) + '" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition inline-flex items-center gap-2"><i class="fas fa-download"></i>Descargar</a></div>';
+                            previewCont.classList.remove('hidden');
                         } else {
-                            previewCont.innerHTML = '<img src="' + url + '" class="w-full max-h-64 object-contain rounded-xl border" />';
+                            previewCont.innerHTML = '<img src="' + url + '" class="w-full max-h-96 object-contain rounded-xl border" />';
+                            previewCont.classList.remove('hidden');
                         }
-                        previewCont.classList.remove('hidden');
                     });
                 });
-            }).catch(err => alert('No se pudo obtener el mensaje: ' + (err.message || err)));
+
+                var replySection = cont.querySelector('.reply-section');
+                if (replySection) {
+                    if (!window.replyFiles) window.replyFiles = {};
+                    window.replyFiles[id] = [];
+
+                    var fileInput = cont.querySelector('.reply-file-input');
+                    if (fileInput) {
+                        fileInput.addEventListener('change', function() {
+                            var rid = this.getAttribute('data-id');
+                            if (!window.replyFiles[rid]) window.replyFiles[rid] = [];
+                            for (var fi = 0; fi < this.files.length; fi++) {
+                                var f = this.files[fi];
+                                var exists = window.replyFiles[rid].some(function(x) { return x.name === f.name && x.size === f.size && x.lastModified === f.lastModified; });
+                                if (!exists) window.replyFiles[rid].push(f);
+                            }
+                            this.value = '';
+                            renderReplyFilePreviews(rid);
+                        });
+                    }
+
+                    function renderReplyFilePreviews(rid) {
+                        var container = document.getElementById('replyFilePreviews-' + rid);
+                        if (!container) return;
+                        container.innerHTML = '';
+                        var files = window.replyFiles[rid] || [];
+                        for (var fi = 0; fi < files.length; fi++) {
+                            var f = files[fi];
+                            var isImg = f.type.startsWith('image/');
+                            var isPdf = f.name.toLowerCase().endsWith('.pdf');
+                            var icon = isImg ? 'fa-image text-blue-500' : isPdf ? 'fa-file-pdf text-red-500' : 'fa-file text-yellow-500';
+                            var sz = (f.size / 1024).toFixed(1) + ' KB';
+                            var chip = document.createElement('div');
+                            chip.className = 'flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs';
+                            chip.innerHTML = '<i class="fas ' + icon + '"></i><span class="truncate max-w-[80px]">' + f.name + '</span><span class="text-gray-400">' + sz + '</span><button type="button" onclick="removeReplyFile(' + rid + ', ' + fi + ')" class="w-3.5 h-3.5 rounded-full bg-red-100 text-red-500 flex items-center justify-center hover:bg-red-200 transition"><i class="fas fa-times" style="font-size:8px"></i></button>';
+                            container.appendChild(chip);
+                        }
+                    }
+
+                    var sendBtn = cont.querySelector('.send-reply-btn');
+                    if (sendBtn) {
+                        sendBtn.addEventListener('click', function() {
+                            var rid = this.getAttribute('data-id');
+                            var toId = this.getAttribute('data-to');
+                            var asuntoVal = this.getAttribute('data-asunto');
+                            var input = document.getElementById('replyInput-' + rid);
+                            var errorDiv = document.getElementById('replyError-' + rid);
+                            var errorMsg = errorDiv ? errorDiv.querySelector('.reply-error-msg') : null;
+                            if (errorDiv) errorDiv.classList.add('hidden');
+                            var text = input ? input.value.trim() : '';
+                            var files = window.replyFiles[rid] || [];
+                            if (!text && files.length === 0) return;
+
+                            var totalSize = 0;
+                            for (var fi = 0; fi < files.length; fi++) {
+                                totalSize += files[fi].size;
+                            }
+                            if (totalSize > 20 * 1024 * 1024) {
+                                if (errorMsg) errorMsg.textContent = 'El tamaño total supera los 20 MB.';
+                                if (errorDiv) errorDiv.classList.remove('hidden');
+                                return;
+                            }
+
+                            var fd = new FormData();
+                            fd.append('destinatario.idUsuario', toId);
+                            fd.append('asunto', asuntoVal);
+                            fd.append('contenido', text);
+                            fd.append('replyToId', rid);
+                            for (var fi = 0; fi < files.length; fi++) {
+                                fd.append('files', files[fi]);
+                            }
+
+                            var btnEl = this;
+                            btnEl.disabled = true;
+                            btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                            fetch('/mensajes/enviar', {
+                                method: 'POST',
+                                body: fd,
+                                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                            })
+                            .then(function(r) {
+                                if (!r.ok) return r.json().then(function(e) { throw new Error(e.error || 'Error al enviar'); });
+                                return r.json();
+                            })
+                            .then(function(data) {
+                                appendReplyBubble(data, rid);
+                                if (input) input.value = '';
+                                window.replyFiles[rid] = [];
+                                renderReplyFilePreviews(rid);
+                            })
+                            .catch(function(err) {
+                                if (errorMsg) errorMsg.textContent = err.message || 'Error al enviar la respuesta';
+                                if (errorDiv) errorDiv.classList.remove('hidden');
+                            })
+                            .finally(function() {
+                                btnEl.disabled = false;
+                                btnEl.innerHTML = '<i class="fas fa-paper-plane text-xs"></i> Enviar';
+                            });
+                        });
+                    }
+                }
+
+                var verMasBtn = cont.querySelector('.ver-mas-respuestas');
+                if (verMasBtn) {
+                    verMasBtn.addEventListener('click', function() {
+                        var threadId = this.getAttribute('data-id');
+                        var showFrom = parseInt(this.getAttribute('data-showfrom'));
+                        var container = document.getElementById('threadContainer-' + threadId);
+                        if (!container) return;
+                        var items = container.querySelectorAll('.respuesta-item');
+                        var hiddenCount = 0;
+                        for (var vi = 0; vi < items.length; vi++) {
+                            var idx = parseInt(items[vi].getAttribute('data-idx'));
+                            if (idx < showFrom) {
+                                items[vi].style.display = '';
+                                hiddenCount++;
+                            }
+                        }
+                        this.remove();
+                    });
+                }
+            }).catch(function(err) { alert('No se pudo obtener el mensaje: ' + (err.message || err)); });
     });
 });
+
+function removeReplyFile(rid, idx) {
+    if (window.replyFiles && window.replyFiles[rid]) {
+        window.replyFiles[rid].splice(idx, 1);
+        var container = document.getElementById('replyFilePreviews-' + rid);
+        if (container) {
+            container.innerHTML = '';
+            var files = window.replyFiles[rid] || [];
+            for (var fi = 0; fi < files.length; fi++) {
+                var f = files[fi];
+                var isImg = f.type.startsWith('image/');
+                var isPdf = f.name.toLowerCase().endsWith('.pdf');
+                var icon = isImg ? 'fa-image text-blue-500' : isPdf ? 'fa-file-pdf text-red-500' : 'fa-file text-yellow-500';
+                var sz = (f.size / 1024).toFixed(1) + ' KB';
+                var chip = document.createElement('div');
+                chip.className = 'flex items-center gap-1.5 bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs';
+                chip.innerHTML = '<i class="fas ' + icon + '"></i><span class="truncate max-w-[80px]">' + f.name + '</span><span class="text-gray-400">' + sz + '</span><button type="button" onclick="removeReplyFile(' + rid + ', ' + fi + ')" class="w-3.5 h-3.5 rounded-full bg-red-100 text-red-500 flex items-center justify-center hover:bg-red-200 transition"><i class="fas fa-times" style="font-size:8px"></i></button>';
+                container.appendChild(chip);
+            }
+        }
+    }
+}
 </script>
 </body>
 </html>

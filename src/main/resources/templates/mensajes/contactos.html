@@ -26,16 +26,24 @@
             <div class="space-y-3">
                 <div th:each="c : ${contactos}"
                      class="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-[#a03030]/30 transition-all duration-200 overflow-hidden">
-                    <a th:href="@{/mensajes/chat/{id}(id=${c.idUsuario})}" class="flex items-center gap-4 px-6 py-5">
-                        <div class="w-12 h-12 rounded-full bg-[#a03030]/10 flex items-center justify-center shrink-0">
-                            <i class="fas fa-user-circle text-2xl text-[#a03030]"></i>
-                        </div>
-                        <div>
-                            <p class="font-bold text-gray-800" th:text="${c.nombreCompleto}"></p>
-                            <p class="text-xs text-gray-500 capitalize" th:text="${c.rol}"></p>
-                        </div>
-                        <i class="fas fa-chevron-right ml-auto text-gray-300"></i>
-                    </a>
+                    <div class="flex items-center px-6 py-5">
+                        <a th:href="@{/mensajes/chat/{id}(id=${c.idUsuario})}" class="flex items-center gap-4 flex-1 min-w-0">
+                            <div class="w-12 h-12 rounded-full bg-[#a03030]/10 flex items-center justify-center shrink-0 relative">
+                                <i class="fas fa-user-circle text-2xl text-[#a03030]"></i>
+                                <span th:if="${noLeidos != null and noLeidos.containsKey(c.idUsuario)}" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none shadow-sm">NUEVO</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-800" th:text="${c.nombreCompleto}"></p>
+                                <p class="text-xs text-gray-500 capitalize" th:text="${c.rol}"></p>
+                            </div>
+                            <i class="fas fa-chevron-right ml-auto text-gray-300"></i>
+                        </a>
+                        <form th:action="@{/mensajes/eliminar-chat/{id}(id=${c.idUsuario})}" method="post" onsubmit="return confirm('¿Eliminar toda la conversación?')" class="shrink-0 ml-3">
+                            <button type="submit" class="w-9 h-9 rounded-xl bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-600 transition flex items-center justify-center" title="Eliminar conversación">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
 

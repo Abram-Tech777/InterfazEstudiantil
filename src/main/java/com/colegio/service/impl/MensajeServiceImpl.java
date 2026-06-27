@@ -1,7 +1,9 @@
 package com.colegio.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +39,7 @@ public class MensajeServiceImpl implements MensajeService {
     @Override
     @Transactional(readOnly = true)
     public List<Mensaje> listarInbox(int idUsuario) {
-        return mensajeRepository.findByDestinatario_IdUsuarioOrderByFechaEnvioDesc(idUsuario);
+        return mensajeRepository.findInboxByUserId(idUsuario);
     }
 
     @Override
@@ -83,6 +85,56 @@ public class MensajeServiceImpl implements MensajeService {
     @Override
     @Transactional(readOnly = true)
     public long contarNoLeidos(int idUsuario) {
-        return mensajeRepository.countByDestinatario_IdUsuarioAndLeidoFalse(idUsuario);
+        return mensajeRepository.countNoLeidosFormales(idUsuario);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Mensaje> obtenerNuevosDesde(int idUsuario1, int idUsuario2, java.time.LocalDateTime after) {
+        return mensajeRepository.findNuevosDesde(idUsuario1, idUsuario2, after);
+    }
+
+    @Override
+    public void eliminarMensaje(int idMensaje, int idUsuario) {
+        Mensaje m = mensajeRepository.findById(idMensaje)
+                .orElseThrow(() -> new IllegalArgumentException("Mensaje no encontrado."));
+        if (m.getDestinatario() == null || m.getDestinatario().getIdUsuario() != idUsuario) {
+            throw new IllegalArgumentException("No tienes permiso para eliminar este mensaje.");
+        }
+        mensajeRepository.delete(m);
+    }
+
+    @Override
+    public void vaciarInbox(int idUsuario) {
+        List<Mensaje> inbox = mensajeRepository.findInboxByUserId(idUsuario);
+        mensajeRepository.deleteAll(inbox);
+    }
+
+    @Override
+    public void eliminarConversacion(int userId, int conUserId) {
+        List<Mensaje> conversacion = mensajeRepository.findConversacion(userId, conUserId);
+        mensajeRepository.deleteAll(conversacion);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Mensaje> obtenerRespuestas(int parentId) {
+        return mensajeRepository.findRespuestasByParentId(parentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Integer, Long> contarNoLeidosPorContacto(int userId) {
+        List<Usuario> contactos = mensajeRepository.findContactos(userId);
+        Map<Integer, Long> resultado = new HashMap<>();
+        for (Usuario c : contactos) {
+            long count = mensajeRepository.countByDestinatario_IdUsuarioAndLeidoFalse(userId);
+            // Count only messages FROM this contacto that are unread
+            long fromContacto = mensajeRepository.countByRemitente_IdUsuarioAndDestinatario_IdUsuarioAndLeidoFalse(c.getIdUsuario(), userId);
+            if (fromContacto > 0) {
+                resultado.put(c.getIdUsuario(), fromContacto);
+            }
+        }
+        return resultado;
     }
 }
